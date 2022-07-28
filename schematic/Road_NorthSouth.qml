@@ -27,4 +27,7 @@ BaseMapObject {
             y: -1
         }
     }
+
+    idLabel.anchors.horizontalCenter: horizontalCenter
+    idLabel.y: 0
 }

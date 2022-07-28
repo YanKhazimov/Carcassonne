@@ -14,6 +14,7 @@ Shape {
     readonly property real halfRoadWidth: Constants.tileSize / 8 / 2
     readonly property real town2eOffset: Constants.tileSize * 35 / 100
     readonly property real town2eRadius: (Constants.tileSize * Constants.tileSize) / (8 * town2eOffset) + town2eOffset / 2
+    property alias idLabel: idLabel
 
     Component.onCompleted: mouseOn = false
 
@@ -22,4 +23,12 @@ Shape {
     containsMode: Shape.FillContains
 
     antialiasing: true
+
+    Text {
+        id: idLabel
+        text: currentId
+        color: "black"
+        rotation: -root.rotation
+        font.pixelSize: 15
+    }
 }

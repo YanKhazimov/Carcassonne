@@ -27,13 +27,6 @@ BaseMapObject {
         }
     }
 
-//    Text {
-//        text: currentId
-//        color: "white"
-//        rotation: -root.rotation
-//        anchors.horizontalCenter: parent.horizontalCenter
-//        y: side/2 - halfRoadWidth - height
-//        font.pixelSize: 20
-//        z: 1
-//    }
+    idLabel.x: side/2
+    idLabel.y: side/2 - halfRoadWidth - idLabel.height
 }

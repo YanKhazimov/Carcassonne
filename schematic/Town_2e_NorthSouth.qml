@@ -58,4 +58,7 @@ BaseMapObject {
         border.width: 2
         border.color: "brown"
     }
+
+    idLabel.anchors.horizontalCenter: horizontalCenter
+    idLabel.y: 0
 }

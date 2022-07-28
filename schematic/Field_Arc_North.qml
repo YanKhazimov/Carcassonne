@@ -18,4 +18,7 @@ BaseMapObject {
             radiusY: town1eRadius
         }
     }
+
+    idLabel.x: side/2
+    idLabel.y: 0
 }

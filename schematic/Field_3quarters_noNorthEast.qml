@@ -36,4 +36,7 @@ BaseMapObject {
             y: side/2
         }
     }
+
+    idLabel.x: side/2 - halfRoadWidth - idLabel.width
+    idLabel.y: side/2 + halfRoadWidth
 }

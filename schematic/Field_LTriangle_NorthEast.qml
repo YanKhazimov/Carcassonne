@@ -21,4 +21,7 @@ BaseMapObject {
             y: 0
         }
     }
+
+    idLabel.x: side*3/4
+    idLabel.y: 0
 }

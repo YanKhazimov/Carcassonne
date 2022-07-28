@@ -38,4 +38,7 @@ BaseMapObject {
         border.width: 2
         border.color: "brown"
     }
+
+    idLabel.x: side - idLabel.width - idLabel.width
+    idLabel.y: idLabel.height
 }
