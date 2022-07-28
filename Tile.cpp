@@ -5,6 +5,7 @@ Tile::Tile(const std::vector<TileObject> &objects, QObject *parent)
     : QObject(parent), TileData(objects), x(-100), y(-100), isFixed(false), isPlaced(false)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+    QObject::connect(this, &Tile::layoutChanged, this, &Tile::objectIdsChanged);
 }
 
 Tile::Tile(Tile &&other) noexcept

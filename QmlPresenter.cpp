@@ -41,11 +41,6 @@ void QmlPresenter::AddTiles(std::list<Tile> &tiles)
     }
 }
 
-void QmlPresenter::AddTile(Tile* tile)
-{
-    deck.AddTile(tile);
-}
-
 Tile *QmlPresenter::getTile(int i)
 {
     return deck.index(i, 0).data(DataRoles::TilePtr).value<Tile*>();
@@ -55,4 +50,9 @@ void QmlPresenter::highlight(int id)
 {
     auto targetObject = objectManager.GetObject(id);
     setHighlightedObjectId(targetObject->initialId);
+}
+
+void QmlPresenter::updateHighlight()
+{
+    highlight(objectManager.GetObject(highlightedObjId)->initialId);
 }

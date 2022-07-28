@@ -30,9 +30,9 @@ public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
 
     void AddTiles(std::list<Tile> &tiles);
-    void AddTile(Tile* tile);
     Q_INVOKABLE Tile* getTile(int i);
     Q_INVOKABLE void highlight(int id);
+    Q_INVOKABLE void updateHighlight();
 
 signals:
     void tilesChanged();

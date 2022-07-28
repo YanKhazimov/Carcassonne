@@ -127,6 +127,7 @@ Window {
             enabled: board.activeTile && board.activeTile.properlyRotated
             onClicked: {
                 engine.mapModel.fixTile(engine.getTile(tiles.length - 1))
+                engine.updateHighlight()
                 board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
                 board.activeTile = null
                 drawButton.enabled = tiles.length < engine.deck.rowCount()
