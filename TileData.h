@@ -4,18 +4,24 @@
 #include "MapObjectData.h"
 #include <memory>
 #include <vector>
+#include <set>
+
+class TileData;
 
 struct TileObject {
     std::shared_ptr<MapObjectData> objPtr;
     std::vector<std::pair<int, int>> location;
+    TileData* tile;
+
+    TileObject(std::shared_ptr<MapObjectData> objPtr, std::vector<std::pair<int, int>> location, TileData* tile = nullptr);
+    TileObject(const TileObject& other);
+    TileObject(TileObject&& other);
 };
 
 class TileData {
     std::shared_ptr<MapObjectData> grid5x5[5][5];
-    const std::vector<TileObject>& tileObjects;
 
     std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > getSideConnectors(Direction direction) const;
-    std::shared_ptr<const MapObjectData> checkConnector(Direction direction) const;
     std::shared_ptr<MapObjectData> getConnector(Direction direction);
     void mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject, std::shared_ptr<MapObjectData> absorbedObject) const;
 
@@ -38,17 +44,20 @@ class TileData {
     const std::shared_ptr<MapObjectData> SE() const;
 
 public:
-    TileData(const std::vector<TileObject> &objects);
-
     void RotateClockwise();
     void RotateCounterclockwise();
     bool CanConnect(const TileData& other, Direction from) const;
-    void Connect(TileData& other, Direction from);
+    void Connect(TileData& other, Direction from, std::set<Tile*>& updatedTiles);
     TileData copy() const;
     TileData& rotateClockwise(int times = 1);
     void print() const;
 
 protected:
+    std::vector<TileObject> tileObjects;
+    TileData(std::vector<TileObject> &&objects);
+    std::shared_ptr<const MapObjectData> checkConnector(Direction direction) const;
+    virtual void checkCompletion(std::shared_ptr<MapObjectData> object);
+
     int id_NE() const;
     int id_SE() const;
     int id_SW() const;
@@ -58,6 +67,12 @@ protected:
     int id_S() const;
     int id_E() const;
     int id_W() const;
+
+    bool hasAbbey() const;
+    int abbeyId() const;
+
+    bool hasMonastery() const;
+    int monasteryId() const;
 
     bool hasFieldWhole() const;
     int fieldWholeId() const;
@@ -119,10 +134,28 @@ protected:
     bool hasRoadSouth() const;
     bool hasRoadWest() const;
 
+    bool hasC_ToTown_NorthEastRoad() const;
+    bool hasC_ToTown_NorthWestRoad() const;
+    bool hasC_ToTown_SouthEastRoad() const;
+    bool hasC_ToTown_SouthWestRoad() const;
+    bool hasC_ToTown_EastNorthRoad() const;
+    bool hasC_ToTown_EastSouthRoad() const;
+    bool hasC_ToTown_WestNorthRoad() const;
+    bool hasC_ToTown_WestSouthRoad() const;
+
     bool hasRoadNorthSouth() const;
     int roadNorthSouthId() const;
     bool hasRoadEastWest() const;
     int roadEastWestId() const;
+
+    bool hasRoadDownThroughTownNorthSouth() const;
+    int roadDownThroughTownNorthSouthId() const;
+    bool hasRoadDownThroughTownEastWest() const;
+    int roadDownThroughTownEastWestId() const;
+    bool hasRoadDownThroughTownSouthNorth() const;
+    int roadDownThroughTownSouthNorthId() const;
+    bool hasRoadDownThroughTownWestEast() const;
+    int roadDownThroughTownWestEastId() const;
 
     bool hasT_NorthWestSouthRoad() const;
     int T_NorthWestSouthRoadId() const;
@@ -185,6 +218,12 @@ protected:
     int town2e3cSouthEastId() const;
     bool hasTown2e3cSouthWest() const;
     int town2e3cSouthWestId() const;
+
+    bool hasTownWhole() const;
+    int townWholeId() const;
+
+public:
+    const bool isAbbeyTile;
 };
 
 #endif // TILEDATA_H

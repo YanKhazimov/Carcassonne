@@ -14,17 +14,20 @@ class MapModel : public QObject
     Q_PROPERTY(int MinY MEMBER minY NOTIFY minMaxChanged)
     Q_PROPERTY(int MaxY MEMBER maxY NOTIFY minMaxChanged)
     Q_PROPERTY(int MaxCapacity READ maxCapacity CONSTANT)
+    Q_PROPERTY(Tile* LatestTile MEMBER latestTile NOTIFY latestTileChanged)
 
     std::vector<std::vector<Tile*>> tiles;
     const unsigned size;
     int minX, maxX, minY, maxY;
+    Tile* latestTile = nullptr;
 
     Tile* nextTileNorth(int x, int y) const;
     Tile* nextTileSouth(int x, int y) const;
     Tile* nextTileWest(int x, int y) const;
     Tile* nextTileEast(int x, int y) const;
 
-    bool canMergeData(int x, int y, const TileData& tile) const;
+    bool canMergeRegularTile(int x, int y, const TileData& tile) const;
+    bool canMergeAbbeyTile(int x, int y, const TileData& tile) const;
     int maxCapacity() const;
 
 public:
@@ -32,12 +35,13 @@ public:
 
     Q_INVOKABLE void placeTile(Tile* tile, int x, int y);
     Q_INVOKABLE void fixTile(Tile* tile);
-    Q_INVOKABLE bool isAdjacent(int x, int y) const;
+    Q_INVOKABLE bool isFreeAdjacent(int x, int y) const;
     Q_INVOKABLE bool canMergeAsIs(int x, int y, Tile* tile) const;
     Q_INVOKABLE bool canMergeRotated(int x, int y, Tile* tile) const;
 
 signals:
     void minMaxChanged();
+    void latestTileChanged();
 };
 
 #endif // MAPMODEL_H

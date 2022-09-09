@@ -1,9 +1,12 @@
 import QtQuick 2.15
-import QtQuick.Shapes 1.12
+import QtQuick.Shapes 1.15
 import "qrc:/"
 
 BaseMapObject {
     id: root
+
+    currentId: tileData.FieldNorthEastId
+    visible: tileData.FieldNorthEast
 
     ShapePath {
         startX: side
@@ -27,6 +30,7 @@ BaseMapObject {
         }
     }
 
-    idLabel.x: side*3/4
-    idLabel.y: side/4
+    idLabel.anchors.centerIn: root
+    idLabel.anchors.horizontalCenterOffset: 3 * halfRoadWidth
+    idLabel.anchors.verticalCenterOffset: -3 * halfRoadWidth
 }

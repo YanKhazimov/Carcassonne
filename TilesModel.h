@@ -10,9 +10,6 @@ class TilesModel : public QAbstractListModel
 
     QList<Tile*> tilesList;
 
-    Q_INVOKABLE virtual QModelIndex parent(const QModelIndex &child) const override;
-    Q_INVOKABLE virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
 public:
     TilesModel(QObject* parent = 0);
     Q_INVOKABLE virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;

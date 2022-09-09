@@ -20,21 +20,39 @@ MouseArea {
         return p
     }
 
-    hoverEnabled: true
-    cursorShape: Qt.PointingHandCursor
-    onClicked: {
-        var currentId
+    function idAt(x, y)
+    {
+        var idx = objectIndexAt(x, y)
+        return objectList[idx].currentId
+    }
+
+    function selectObjectAt(x, y)
+    {
+        var idx = objectIndexAt(x, y)
+        engine.highlight(idx !== -1 ? objectList[idx].currentId : -1)
+    }
+
+    function objectIndexAt(x, y) {
+        var result = -1
+        var resultZ = -1
         for (var i = 0; i < objectList.length; ++i)
         {
             var obj = objectList[i]
             if (!obj.visible)
                 continue
 
-            var rotatedPoint = rotate(Qt.point(mouseX, mouseY), obj.rotation)
-            if (obj.contains(rotatedPoint))
-                currentId = obj.currentId
+            var rotatedPoint = rotate(Qt.point(x, y), obj.rotation)
+            if (obj.contains(rotatedPoint) && obj.z >= resultZ)
+            {
+                result = i
+                resultZ = obj.z
+            }
         }
 
-        engine.highlight(currentId !== undefined ? currentId : -1)
+        return result
     }
+
+    hoverEnabled: true
+    cursorShape: Qt.PointingHandCursor
+    onClicked: selectObjectAt(mouseX, mouseY)
 }

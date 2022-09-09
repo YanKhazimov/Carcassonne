@@ -1,7 +1,9 @@
 #include "TileData.h"
-#include <iostream>
+#include <QDebug>
 
-std::string ObjectTypeStrings[] = {
+const int InvalidId = 0;
+
+QString ObjectTypeStrings[] = {
    "x",
    "T",
    "R",
@@ -9,8 +11,8 @@ std::string ObjectTypeStrings[] = {
    "M"
 };
 
-template<typename ... T>
-bool sameType(ObjectType type0, const T&... args)
+template<typename T, typename ... Ts>
+bool sameType(T type0, const Ts&... args)
 {
     return ((type0 == args) && ...);
 }
@@ -31,7 +33,7 @@ bool sameId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
 template <typename ... T>
 unsigned commonId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
 {
-    return (((obj0->currentObject()->initialId == args->currentObject()->initialId) ? obj0->currentObject()->initialId : 0) & ...);
+    return (((obj0->currentObject()->initialId == args->currentObject()->initialId) ? obj0->currentObject()->initialId : InvalidId) & ...);
 }
 
 void TileData::print() const
@@ -42,15 +44,15 @@ void TileData::print() const
        {
            if (grid5x5[i][j])
            {
-               std::cout << ObjectTypeStrings[static_cast<int>(grid5x5[i][j]->currentObject()->type)]
+               qDebug() << ObjectTypeStrings[static_cast<int>(grid5x5[i][j]->currentObject()->type)]
                        << grid5x5[i][j]->currentObject()->initialId << '\t';
            }
            else
            {
-               std::cout << "x0\t";
+               qDebug() << "x0\t";
            }
        }
-       std::cout << std::endl;
+       qDebug();
     }
 }
 
@@ -92,6 +94,28 @@ int TileData::id_E() const
 int TileData::id_W() const
 {
     return W()->currentObject()->initialId;
+}
+
+bool TileData::hasAbbey() const
+{
+    return sameType(ObjectType::Abbey, N()->type, E()->type, S()->type, E()->type,
+                    NW()->type, NE()->type, SE()->type, SW()->type) &&
+           sameInitialId(N(), E(), S(), W(), NW(), NE(), SE(), SW());
+}
+
+int TileData::abbeyId() const
+{
+    return commonId(N(), E(), S(), W(), NW(), NE(), SE(), SW());
+}
+
+bool TileData::hasMonastery() const
+{
+    return C() && C()->type == ObjectType::Monastery;
+}
+
+int TileData::monasteryId() const
+{
+    return C() ? C()->initialId : InvalidId;
 }
 
 bool TileData::hasFieldWhole() const
@@ -240,8 +264,9 @@ bool TileData::hasField3qNoNorthEast() const
 {
     return sameType(ObjectType::Field, NW()->type, SW()->type, SE()->type) &&
             sameInitialId(NW(), SW(), SE()) &&
-            sameType(ObjectType::Road, N()->type, E()->type) &&
-            sameInitialId(N(), E());
+            SW()->initialId != E()->initialId &&
+            SW()->initialId != NE()->initialId &&
+            SW()->initialId != N()->initialId;
 }
 
 int TileData::field3qNoNorthEastId() const
@@ -499,11 +524,23 @@ int TileData::town2e3cSouthWestId() const
     return commonId(S(), W());
 }
 
+bool TileData::hasTownWhole() const
+{
+    return sameType(ObjectType::Town, N()->type, E()->type, S()->type, W()->type) &&
+            sameInitialId(N(), E(), S(), W());
+}
+
+int TileData::townWholeId() const
+{
+    return commonId(N(), E(), S(), W());
+}
+
 bool TileData::hasRoadNorth() const
 {
     return N() &&
             N()->type == ObjectType::Road &&
-            N()->initialValency == 1;
+            N()->initialValency == 1/* &&
+            hasFieldWhole()*/;
 }
 
 bool TileData::hasRoadEast() const
@@ -521,12 +558,64 @@ bool TileData::hasRoadWest() const
     return copy().rotateClockwise(1).hasRoadNorth();
 }
 
+bool TileData::hasC_ToTown_NorthEastRoad() const
+{
+    return N() &&
+            N()->type == ObjectType::Road &&
+            N()->initialValency == 1 &&
+            E() && E()->type == ObjectType::Town &&
+            hasFieldNorthEast();
+}
+
+bool TileData::hasC_ToTown_NorthWestRoad() const
+{
+    return N() &&
+            N()->type == ObjectType::Road &&
+            N()->initialValency == 1 &&
+            W() && W()->type == ObjectType::Town &&
+            hasFieldNorthWest();
+}
+
+bool TileData::hasC_ToTown_SouthEastRoad() const
+{
+    return copy().rotateClockwise(2).hasC_ToTown_NorthWestRoad();
+}
+
+bool TileData::hasC_ToTown_SouthWestRoad() const
+{
+    return copy().rotateClockwise(2).hasC_ToTown_NorthEastRoad();
+}
+
+bool TileData::hasC_ToTown_EastNorthRoad() const
+{
+    return copy().rotateClockwise(3).hasC_ToTown_NorthWestRoad();
+}
+
+bool TileData::hasC_ToTown_EastSouthRoad() const
+{
+    return copy().rotateClockwise(3).hasC_ToTown_NorthEastRoad();
+}
+
+bool TileData::hasC_ToTown_WestNorthRoad() const
+{
+    return copy().rotateClockwise(1).hasC_ToTown_NorthEastRoad();
+}
+
+bool TileData::hasC_ToTown_WestSouthRoad() const
+{
+    return copy().rotateClockwise(1).hasC_ToTown_NorthWestRoad();
+}
+
 bool TileData::hasRoadNorthSouth() const
 {
+    auto [nw, ne] = getSideConnectors(Direction::North);
+    auto [sw, se] = getSideConnectors(Direction::South);
     return N() && S() &&
-            sameType(ObjectType::Road, N()->type, S()->type) &&
-            N()->initialId == S()->initialId &&
-            N()->initialValency == 2;
+           sameType(ObjectType::Road, N()->type, S()->type) &&
+           N()->initialId == S()->initialId &&
+           N()->initialValency == 2 &&
+           nw->initialId != ne->initialId &&
+           sw->initialId != se->initialId;
 }
 
 int TileData::roadNorthSouthId() const
@@ -540,6 +629,53 @@ bool TileData::hasRoadEastWest() const
 }
 
 int TileData::roadEastWestId() const
+{
+    return commonId(E(), W());
+}
+
+bool TileData::hasRoadDownThroughTownNorthSouth() const
+{
+    auto [nw, ne] = getSideConnectors(Direction::North);
+    auto [sw, se] = getSideConnectors(Direction::South);
+    return N() && S() &&
+           sameType(ObjectType::Road, N()->type, S()->type) &&
+           N()->initialId == S()->initialId &&
+           N()->initialValency == 2 &&
+           nw->initialId == ne->initialId &&
+           sw->initialId != se->initialId;
+}
+
+int TileData::roadDownThroughTownNorthSouthId() const
+{
+    return commonId(N(), S());
+}
+
+bool TileData::hasRoadDownThroughTownEastWest() const
+{
+    return copy().rotateClockwise(3).hasRoadDownThroughTownNorthSouth();
+}
+
+int TileData::roadDownThroughTownEastWestId() const
+{
+    return commonId(E(), W());
+}
+
+bool TileData::hasRoadDownThroughTownSouthNorth() const
+{
+    return copy().rotateClockwise(2).hasRoadDownThroughTownNorthSouth();
+}
+
+int TileData::roadDownThroughTownSouthNorthId() const
+{
+    return commonId(N(), S());
+}
+
+bool TileData::hasRoadDownThroughTownWestEast() const
+{
+    return copy().rotateClockwise(1).hasRoadDownThroughTownNorthSouth();
+}
+
+int TileData::roadDownThroughTownWestEastId() const
 {
     return commonId(E(), W());
 }
@@ -692,7 +828,7 @@ std::shared_ptr<MapObjectData> TileData::getConnector(Direction direction)
     case Direction::East: return grid5x5[2][4]; break;
     case Direction::South: return grid5x5[4][2]; break;
     case Direction::West: return grid5x5[2][0]; break;
-    default: std::cout << "Unknown direction " << (int)direction << std::endl; return nullptr;
+    default: qDebug() << "Unknown direction" << (int)direction; return nullptr;
     }
 }
 
@@ -703,37 +839,42 @@ std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > TileD
     case Direction::East: return { NEE() ? NEE() : NE(), SEE() ? SEE() : SE() }; break;
     case Direction::South: return { SSW() ? SSW() : SW(), SSE() ? SSE() : SE() }; break;
     case Direction::West: return { NWW() ? NWW() : NW(), SWW() ? SWW() : SW() }; break;
-    default: std::cout << "Unknown direction " << (int)direction << std::endl; return { nullptr, nullptr };
+    default: qDebug() << "Unknown direction" << (int)direction; return { nullptr, nullptr };
     }
 }
 
 std::shared_ptr<const MapObjectData> TileData::checkConnector(Direction direction) const
 {
     switch (direction) {
-    case Direction::North: return grid5x5[0][2]; break;
-    case Direction::East: return grid5x5[2][4]; break;
-    case Direction::South: return grid5x5[4][2]; break;
-    case Direction::West: return grid5x5[2][0]; break;
-    default: std::cout << "Unknown direction " << (int)direction << std::endl; return nullptr;
+        case Direction::North: return N(); break;
+        case Direction::East: return E(); break;
+        case Direction::South: return S(); break;
+        case Direction::West: return W(); break;
+        default: qDebug() << "Unknown direction" << (int)direction; return nullptr;
     }
+}
+
+void TileData::checkCompletion(std::shared_ptr<MapObjectData> object)
+{
+    qDebug() << "Reimplement me";
 }
 
 void TileData::mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject, std::shared_ptr<MapObjectData> absorbedObject) const
 {
     if (absorbedObject->initialId == absorbingObject->initialId)
     {
-        std::cerr << "merging object with equal initial id: " << std::endl;
+        qDebug() << "merging object with equal initial id:" << absorbedObject->initialId;
         return;
     }
 
     if (absorbedObject->currentObject() != absorbingObject->currentObject())
     {
-        int otherValency = absorbedObject->valency;
-        absorbingObject->valency += otherValency - 2;
+        int otherValency = absorbedObject->currentObject()->valency;
+        absorbingObject->currentObject()->valency += otherValency - 2;
     }
     else
     {
-        absorbingObject->valency -= 2;
+        absorbingObject->currentObject()->valency -= 2;
     }
 }
 
@@ -769,7 +910,7 @@ TileData& TileData::rotateClockwise(int times)
     return *this;
 }
 
-TileData::TileData(const std::vector<TileObject> &objects)
+TileData::TileData(std::vector<TileObject> &&objects)
     : grid5x5 {
           {nullptr,nullptr,nullptr,nullptr,nullptr},
           {nullptr,nullptr,nullptr,nullptr,nullptr},
@@ -777,7 +918,8 @@ TileData::TileData(const std::vector<TileObject> &objects)
           {nullptr,nullptr,nullptr,nullptr,nullptr},
           {nullptr,nullptr,nullptr,nullptr,nullptr}
           },
-      tileObjects(objects)
+      tileObjects(std::move(objects)),
+      isAbbeyTile(tileObjects.size() == 1 && tileObjects[0].objPtr->type == ObjectType::Abbey)
 {
     for (auto& tileObject: tileObjects)
     {
@@ -855,11 +997,26 @@ bool TileData::CanConnect(const TileData &other, Direction from) const
         return checkConnector(Direction::West)->type == other.checkConnector(Direction::East)->type;
     }
 
-    std::cout << "Unknown direction " << (int)from << std::endl;
+    qDebug() << "Unknown direction" << (int)from;
     return false;
 }
 
-void TileData::Connect(TileData &other, Direction from)
+TileObject::TileObject(std::shared_ptr<MapObjectData> _objPtr, std::vector<std::pair<int, int> > _location, TileData *_tile)
+    : objPtr(_objPtr), location(_location), tile(_tile)
+{
+}
+
+TileObject::TileObject(const TileObject &other)
+    : objPtr(other.objPtr), location(other.location), tile(other.tile)
+{
+}
+
+TileObject::TileObject(TileObject &&other)
+    : objPtr(std::move(other.objPtr)), location(std::move(other.location)), tile(std::move(other.tile))
+{
+}
+
+void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updatedTiles)
 {
     // not checking the connection validity
 
@@ -867,18 +1024,20 @@ void TileData::Connect(TileData &other, Direction from)
     std::shared_ptr<MapObjectData> connectorObject = getConnector(from);
     std::shared_ptr<MapObjectData> otherConnectorObject = other.getConnector(opposite(from));
 
-    switch (connectorObject->type) {
+    switch (otherConnectorObject->type) {
     case ObjectType::Town: {
         // update exits count, score
         mergeObjectShapes(connectorObject, otherConnectorObject);
 
         // merge ids
-        connectorObject->mergeObject(otherConnectorObject);
+        connectorObject->mergeObject(otherConnectorObject, updatedTiles);
+
+        checkCompletion(connectorObject);
         break;
     }
     case ObjectType::Field: {
         // merge ids
-        connectorObject->mergeObject(otherConnectorObject);
+        connectorObject->mergeObject(otherConnectorObject, updatedTiles);
         break;
     }
     case ObjectType::Road: {
@@ -886,22 +1045,23 @@ void TileData::Connect(TileData &other, Direction from)
         mergeObjectShapes(connectorObject, otherConnectorObject);
 
         // merge ids
-        connectorObject->mergeObject(otherConnectorObject);
+        connectorObject->mergeObject(otherConnectorObject, updatedTiles);
+
+        checkCompletion(connectorObject);
 
         // merge side fields
         auto [sideConnector1, sideConnector2] = getSideConnectors(from);
         auto [otherSideConnector1, otherSideConnector2] = other.getSideConnectors(opposite(from));
 
-        sideConnector1->mergeObject(otherSideConnector1);
-        sideConnector2->mergeObject(otherSideConnector2);
+        sideConnector1->mergeObject(otherSideConnector1, updatedTiles);
+        sideConnector2->mergeObject(otherSideConnector2, updatedTiles);
 
         break;
     }
-    default:
-        std::cout << "Error: cannot connect " << ObjectTypeStrings[static_cast<int>(connectorObject->type)] << std::endl;
+    case ObjectType::Abbey: {
+        break;
     }
-
-    /*
-        score objects
-    */
+    default:
+        qDebug() << "Error: cannot connect" << ObjectTypeStrings[static_cast<int>(connectorObject->type)];
+    }
 }

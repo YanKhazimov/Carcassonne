@@ -1,9 +1,12 @@
 import QtQuick 2.15
-import QtQuick.Shapes 1.12
+import QtQuick.Shapes 1.15
 import "qrc:/"
 
 BaseMapObject {
     id: root
+
+    currentId: tileData.Town2eNorthSouthId
+    visible: tileData.Town2eNorthSouth
 
     ShapePath {
         startX: 0
@@ -57,6 +60,11 @@ BaseMapObject {
         color: "transparent"
         border.width: 2
         border.color: "brown"
+    }
+
+    TileBonuses {
+        mapObject: root
+        primaryPoint: Qt.point(50, 20)
     }
 
     idLabel.anchors.horizontalCenter: horizontalCenter

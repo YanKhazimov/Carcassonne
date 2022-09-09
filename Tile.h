@@ -3,11 +3,16 @@
 
 #include <QObject>
 #include "TileData.h"
-#include <QQmlEngine>
 
 class Tile : public QObject, public TileData
 {
     Q_OBJECT
+
+    Q_PROPERTY(bool Abbey READ hasAbbey NOTIFY layoutChanged)
+    Q_PROPERTY(int AbbeyId READ abbeyId NOTIFY objectIdsChanged)
+
+    Q_PROPERTY(bool Monastery READ hasMonastery NOTIFY layoutChanged)
+    Q_PROPERTY(int MonasteryId READ monasteryId NOTIFY objectIdsChanged)
 
     Q_PROPERTY(bool FieldWhole READ hasFieldWhole NOTIFY layoutChanged)
     Q_PROPERTY(int FieldWholeId READ fieldWholeId NOTIFY objectIdsChanged)
@@ -94,6 +99,15 @@ class Tile : public QObject, public TileData
     Q_PROPERTY(bool RoadEastWest READ hasRoadEastWest NOTIFY layoutChanged)
     Q_PROPERTY(int RoadEastWestId READ roadEastWestId NOTIFY objectIdsChanged)
 
+    Q_PROPERTY(bool RoadDownThroughTownNorthSouth READ hasRoadDownThroughTownNorthSouth NOTIFY layoutChanged)
+    Q_PROPERTY(int RoadDownThroughTownNorthSouthId READ roadDownThroughTownNorthSouthId() NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool RoadDownThroughTownEastWest READ hasRoadDownThroughTownEastWest() NOTIFY layoutChanged)
+    Q_PROPERTY(int RoadDownThroughTownEastWestId READ roadDownThroughTownEastWestId() NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool RoadDownThroughTownSouthNorth READ hasRoadDownThroughTownSouthNorth() NOTIFY layoutChanged)
+    Q_PROPERTY(int RoadDownThroughTownSouthNorthId READ roadDownThroughTownSouthNorthId() NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool RoadDownThroughTownWestEast READ hasRoadDownThroughTownWestEast() NOTIFY layoutChanged)
+    Q_PROPERTY(int RoadDownThroughTownWestEastId READ roadDownThroughTownWestEastId NOTIFY objectIdsChanged)
+
     Q_PROPERTY(bool T_NorthWestSouthRoad READ hasT_NorthWestSouthRoad NOTIFY layoutChanged)
     Q_PROPERTY(int T_NorthWestSouthRoadId READ T_NorthWestSouthRoadId NOTIFY objectIdsChanged)
     Q_PROPERTY(bool T_WestSouthEastRoad READ hasT_WestSouthEastRoad NOTIFY layoutChanged)
@@ -102,6 +116,23 @@ class Tile : public QObject, public TileData
     Q_PROPERTY(int T_SouthEastNorthRoadId READ T_SouthEastNorthRoadId NOTIFY objectIdsChanged)
     Q_PROPERTY(bool T_EastNorthWestRoad READ hasT_EastNorthWestRoad NOTIFY layoutChanged)
     Q_PROPERTY(int T_EastNorthWestRoadId READ T_EastNorthWestRoadId NOTIFY objectIdsChanged)
+
+    Q_PROPERTY(bool C_ToTown_NorthEastRoad READ hasC_ToTown_NorthEastRoad NOTIFY layoutChanged)
+    Q_PROPERTY(int C_ToTown_NorthEastRoadId READ id_N NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool C_ToTown_NorthWestRoad READ hasC_ToTown_NorthWestRoad NOTIFY layoutChanged)
+    Q_PROPERTY(int C_ToTown_NorthWestRoadId READ id_N NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool C_ToTown_SouthEastRoad READ hasC_ToTown_SouthEastRoad NOTIFY layoutChanged)
+    Q_PROPERTY(int C_ToTown_SouthEastRoadId READ id_S NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool C_ToTown_SouthWestRoad READ hasC_ToTown_SouthWestRoad NOTIFY layoutChanged)
+    Q_PROPERTY(int C_ToTown_SouthWestRoadId READ id_S NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool C_ToTown_EastNorthRoad READ hasC_ToTown_EastNorthRoad NOTIFY layoutChanged)
+    Q_PROPERTY(int C_ToTown_EastNorthRoadId READ id_E NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool C_ToTown_WestNorthRoad READ hasC_ToTown_WestNorthRoad NOTIFY layoutChanged)
+    Q_PROPERTY(int C_ToTown_WestNorthRoadId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool C_ToTown_EastSouthRoad READ hasC_ToTown_EastSouthRoad NOTIFY layoutChanged)
+    Q_PROPERTY(int C_ToTown_EastSouthRoadId READ id_E NOTIFY objectIdsChanged)
+    Q_PROPERTY(bool C_ToTown_WestSouthRoad READ hasC_ToTown_WestSouthRoad NOTIFY layoutChanged)
+    Q_PROPERTY(int C_ToTown_WestSouthRoadId READ id_W NOTIFY objectIdsChanged)
 
     Q_PROPERTY(bool C_NorthEastRoad READ hasC_NorthEastRoad NOTIFY layoutChanged)
     Q_PROPERTY(int C_NorthEastRoadId READ C_NorthEastRoadId NOTIFY objectIdsChanged)
@@ -162,21 +193,29 @@ class Tile : public QObject, public TileData
     Q_PROPERTY(bool Town2e3cSouthWest READ hasTown2e3cSouthWest NOTIFY layoutChanged)
     Q_PROPERTY(int Town2e3cSouthWestId READ town2e3cSouthWestId NOTIFY objectIdsChanged)
 
+    Q_PROPERTY(bool TownWhole READ hasTownWhole NOTIFY layoutChanged)
+    Q_PROPERTY(int TownWholeId READ townWholeId NOTIFY objectIdsChanged)
+
 
     Q_PROPERTY(int X MEMBER x NOTIFY indexChanged)
     Q_PROPERTY(int Y MEMBER y NOTIFY indexChanged)
     Q_PROPERTY(bool IsFixed READ fixed WRITE setFixed NOTIFY isFixedChanged)
     Q_PROPERTY(bool IsPlaced READ placed WRITE setPlaced NOTIFY isPlacedChanged)
 
+    Q_PROPERTY(QList<int> BonusTypes MEMBER bonusTypes NOTIFY tileBonusesChanged)
+
     int x, y;
     bool isFixed;
     bool isPlaced;
+    QList<int> bonusTypes;
 
     void setPlaced(bool placed);
     void setPosition(int x, int y);
 
+    void checkCompletion(std::shared_ptr<MapObjectData> object) override;
+
 public:
-    explicit Tile(const std::vector<TileObject> &objects, QObject *parent = nullptr);
+    explicit Tile(std::vector<TileObject> &&objects, QObject *parent = nullptr);
     Tile(Tile&& other) noexcept;
     Q_INVOKABLE void rotateClockwise();
     Q_INVOKABLE void rotateCounterclockwise();
@@ -186,6 +225,7 @@ public:
     bool placed() const;
     Q_INVOKABLE void displace();
     Q_INVOKABLE void place(int x, int y);
+    std::tuple<int, int, int> resources() const;
 
 signals:
     void layoutChanged();
@@ -193,6 +233,12 @@ signals:
     void isFixedChanged();
     void isPlacedChanged();
     void objectIdsChanged();
+    void tileBonusesChanged();
+    void objectCompleted(unsigned objectId);
+    void meepleReset();
+
+private slots:
+    void updateBonuses();
 };
 Q_DECLARE_METATYPE(Tile*)
 

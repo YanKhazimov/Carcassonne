@@ -1,6 +1,6 @@
 import QtQuick 2.15
-import com.app.abc 1.0
-import QtGraphicalEffects 1.12
+import QmlPresenter 1.0
+import QtGraphicalEffects 1.15
 
 Rectangle {
     id: root
@@ -116,6 +116,7 @@ Rectangle {
     }
 
     onActiveTileChanged: {
+        //console.log("activeTile", activeTile)
         if (activeTile)
         {
             activeTile.tileData.layoutChanged.connect(updateActiveTileRotation)
@@ -127,7 +128,7 @@ Rectangle {
         {
             var activeTileData = activeTile.tileData
             activeTile.properlyRotated = activeTileData.IsPlaced &&
-                    engine.mapModel.isAdjacent(activeTileData.X, activeTileData.Y) &&
+                    engine.mapModel.isFreeAdjacent(activeTileData.X, activeTileData.Y) &&
                     engine.mapModel.canMergeAsIs(activeTileData.X, activeTileData.Y, activeTileData)
         }
     }
@@ -265,7 +266,7 @@ Rectangle {
                         id: dropArea
 
                         anchors.fill: parent
-
+                        keys: ["tile"]
                         readonly property bool playable: yIndex >= playableTop &&
                                                          yIndex <= playableBottom &&
                                                          xIndex >= playableLeft &&
@@ -281,7 +282,7 @@ Rectangle {
                             anchors.fill: parent
                             color: "transparent"
                             clip: true
-                            visible: parent.containsDrag && engine.mapModel.isAdjacent(parent.xIndex, parent.yIndex)
+                            visible: parent.containsDrag && engine.mapModel.isFreeAdjacent(parent.xIndex, parent.yIndex) && activeTile
 
                             RadialGradient {
                                 anchors.fill: parent
@@ -301,7 +302,7 @@ Rectangle {
                             anchors.margins: parent.width/8
                             source: "qrc:/img/x_icon.png"
                             color: "red"
-                            visible: root.activeDrag && engine.mapModel.isAdjacent(parent.xIndex, parent.yIndex) &&
+                            visible: root.activeDrag && engine.mapModel.isFreeAdjacent(parent.xIndex, parent.yIndex) &&
                                      !engine.mapModel.canMergeAsIs(parent.xIndex, parent.yIndex, root.activeTile.tileData) &&
                                      !engine.mapModel.canMergeRotated(parent.xIndex, parent.yIndex, root.activeTile.tileData)
                         }
@@ -312,7 +313,7 @@ Rectangle {
                             anchors.margins: parent.width/8
                             source: "qrc:/img/check_icon.png"
                             color: "green"
-                            visible: root.activeDrag && engine.mapModel.isAdjacent(parent.xIndex, parent.yIndex) &&
+                            visible: root.activeDrag && engine.mapModel.isFreeAdjacent(parent.xIndex, parent.yIndex) &&
                                      engine.mapModel.canMergeAsIs(parent.xIndex, parent.yIndex, root.activeTile.tileData)
                         }
 
@@ -322,19 +323,20 @@ Rectangle {
                             anchors.margins: parent.width/8
                             source: "qrc:/img/rotate_icon.png"
                             color: "yellow"
-                            visible: root.activeDrag && engine.mapModel.isAdjacent(parent.xIndex, parent.yIndex) &&
+                            visible: root.activeDrag && engine.mapModel.isFreeAdjacent(parent.xIndex, parent.yIndex) &&
                                      !engine.mapModel.canMergeAsIs(parent.xIndex, parent.yIndex, root.activeTile.tileData) &&
                                      engine.mapModel.canMergeRotated(parent.xIndex, parent.yIndex, root.activeTile.tileData)
                         }
 
                         function acceptsActiveTile() {
-                            return engine.mapModel.isAdjacent(xIndex, yIndex) &&
+                            return engine.mapModel.isFreeAdjacent(xIndex, yIndex) &&
                                     (engine.mapModel.canMergeAsIs(xIndex, yIndex, root.activeTile.tileData) ||
                                     engine.mapModel.canMergeRotated(xIndex, yIndex, root.activeTile.tileData))
                         }
 
                         onDropped: {
                             engine.mapModel.placeTile(drop.source.tileData, xIndex, yIndex)
+                            engine.GameState = GameEngine.TilePlaced
                         }
                     }
 //                    Text {

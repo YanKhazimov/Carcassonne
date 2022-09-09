@@ -1,348 +1,348 @@
 import QtQuick 2.15
 import "schematic"
-import com.app.abc 1.0
+import com.carcassonne.cppTypes 1.0
 
 Item {
     id: root
 
-    required property TileData tileData
+    property TileData tileData
 
     Field_Whole {
-        currentId: tileData.FieldWholeId
-        visible: tileData.FieldWhole
+        tileData: root.tileData
     }
 
     Field_Half_North {
-        currentId: tileData.FieldNorthId
-        visible: tileData.FieldNorth
+        tileData: root.tileData
     }
 
     Field_Half_East {
-        currentId: tileData.FieldEastId
-        visible: tileData.FieldEast
+        tileData: root.tileData
     }
 
     Field_Half_South {
-        currentId: tileData.FieldSouthId
-        visible: tileData.FieldSouth
+        tileData: root.tileData
     }
 
     Field_Half_West {
-        currentId: tileData.FieldWestId
-        visible: tileData.FieldWest
+        tileData: root.tileData
     }
 
     Field_Quarter_NorthEast {
-        currentId: tileData.FieldNorthEastId
-        visible: tileData.FieldNorthEast
+        tileData: root.tileData
     }
 
     Field_Quarter_NorthWest {
-        currentId: tileData.FieldNorthWestId
-        visible: tileData.FieldNorthWest
+        tileData: root.tileData
     }
 
     Field_Quarter_SouthEast {
-        currentId: tileData.FieldSouthEastId
-        visible: tileData.FieldSouthEast
+        tileData: root.tileData
     }
 
     Field_Quarter_SouthWest {
-        currentId: tileData.FieldSouthWestId
-        visible: tileData.FieldSouthWest
+        tileData: root.tileData
     }
 
     Field_Arc3c_NorthEast {
-        currentId: tileData.FieldArc3cNorthEastId
-        visible: tileData.FieldArc3cNorthEast
+        tileData: root.tileData
     }
 
     Field_Arc3c_NorthWest {
-        currentId: tileData.FieldArc3cNorthWestId
-        visible: tileData.FieldArc3cNorthWest
+        tileData: root.tileData
     }
 
     Field_Arc3c_SouthEast {
-        currentId: tileData.FieldArc3cSouthEastId
-        visible: tileData.FieldArc3cSouthEast
+        tileData: root.tileData
     }
 
     Field_Arc3c_SouthWest {
-        currentId: tileData.FieldArc3cSouthWestId
-        visible: tileData.FieldArc3cSouthWest
+        tileData: root.tileData
     }
 
     Field_Arc_North {
-        currentId: tileData.FieldArcNorthId
-        visible: tileData.FieldArcNorth
+        tileData: root.tileData
     }
 
     Field_Arc_East {
-        currentId: tileData.FieldArcEastId
-        visible: tileData.FieldArcEast
+        tileData: root.tileData
     }
 
     Field_Arc_South {
-        currentId: tileData.FieldArcSouthId
-        visible: tileData.FieldArcSouth
+        tileData: root.tileData
     }
 
     Field_Arc_West {
-        currentId: tileData.FieldArcWestId
-        visible: tileData.FieldArcWest
+        tileData: root.tileData
     }
 
     Field_3quarters_noNorthEast {
-        currentId: tileData.Field3qNoNorthEastId
-        visible: tileData.Field3qNoNorthEast
+        tileData: root.tileData
     }
 
     Field_3quarters_noSouthEast {
-        currentId: tileData.Field3qNoSouthEastId
-        visible: tileData.Field3qNoSouthEast
+        tileData: root.tileData
     }
 
     Field_3quarters_noSouthWest {
-        currentId: tileData.Field3qNoSouthWestId
-        visible: tileData.Field3qNoSouthWest
+        tileData: root.tileData
     }
 
     Field_3quarters_noNorthWest {
-        currentId: tileData.Field3qNoNorthWestId
-        visible: tileData.Field3qNoNorthWest
+        tileData: root.tileData
     }
 
     Field_Diagonal_NorthWest_SouthEast {
-        currentId: tileData.FieldDiagonalNWSEId
-        visible: tileData.FieldDiagonalNWSE
+        tileData: root.tileData
     }
 
     Field_Diagonal_NorthEast_SouthWest {
-        currentId: tileData.FieldDiagonalNESWId
-        visible: tileData.FieldDiagonalNESW
+        tileData: root.tileData
     }
 
     Field_LTriangle_NorthEast {
-        currentId: tileData.FieldLTriangleNorthEastId
-        visible: tileData.FieldLTriangleNorthEast
+        tileData: root.tileData
     }
 
     Field_LTriangle_NorthWest {
-        currentId: tileData.FieldLTriangleNorthWestId
-        visible: tileData.FieldLTriangleNorthWest
+        tileData: root.tileData
     }
 
     Field_LTriangle_SouthEast {
-        currentId: tileData.FieldLTriangleSouthEastId
-        visible: tileData.FieldLTriangleSouthEast
+        tileData: root.tileData
     }
 
     Field_LTriangle_SouthWest {
-        currentId: tileData.FieldLTriangleSouthWestId
-        visible: tileData.FieldLTriangleSouthWest
+        tileData: root.tileData
     }
 
     Field_LTrapezoid_NorthEast {
-        currentId: tileData.FieldLTrapezoidNorthEastId
-        visible: tileData.FieldLTrapezoidNorthEast
+        tileData: root.tileData
     }
 
     Field_LTrapezoid_NorthWest {
-        currentId: tileData.FieldLTrapezoidNorthWestId
-        visible: tileData.FieldLTrapezoidNorthWest
+        tileData: root.tileData
     }
 
     Field_LTrapezoid_SouthEast {
-        currentId: tileData.FieldLTrapezoidSouthEastId
-        visible: tileData.FieldLTrapezoidSouthEast
+        tileData: root.tileData
     }
 
     Field_LTrapezoid_SouthWest {
-        currentId: tileData.FieldLTrapezoidSouthWestId
-        visible: tileData.FieldLTrapezoidSouthWest
+        tileData: root.tileData
     }
 
     Road_North {
-        visible: tileData.RoadNorth
-        currentId: tileData.RoadNorthId
+        tileData: root.tileData
     }
 
     Road_East {
-        visible: tileData.RoadEast
-        currentId: tileData.RoadEastId
+        tileData: root.tileData
     }
 
     Road_South {
-        visible: tileData.RoadSouth
-        currentId: tileData.RoadSouthId
+        tileData: root.tileData
     }
 
     Road_West {
-        visible: tileData.RoadWest
-        currentId: tileData.RoadWestId
+        tileData: root.tileData
     }
 
     Road_NorthSouth {
-        currentId: tileData.RoadNorthSouthId
-        visible: tileData.RoadNorthSouth
+        tileData: root.tileData
         z: currentId
     }
 
     Road_EastWest {
-        currentId: tileData.RoadEastWestId
-        visible: tileData.RoadEastWest
+        tileData: root.tileData
         z: currentId
     }
 
+    Road_DownThroughTown_NorthSouth {
+        tileData: root.tileData
+        z: town_2e_EastWest.z + 1
+    }
+
+    Road_DownThroughTown_EastWest {
+        tileData: root.tileData
+        z: town_2e_NorthSouth.z + 1
+    }
+
+    Road_DownThroughTown_SouthNorth {
+        tileData: root.tileData
+        z: town_2e_EastWest.z + 1
+    }
+
+    Road_DownThroughTown_WestEast {
+        tileData: root.tileData
+        z: town_2e_NorthSouth.z + 1
+    }
+
     Road_T_NorthWestSouth {
-        currentId: tileData.T_NorthWestSouthRoadId
-        visible: tileData.T_NorthWestSouthRoad
+        tileData: root.tileData
     }
 
     Road_T_WestSouthEast {
-        currentId: tileData.T_WestSouthEastRoadId
-        visible: tileData.T_WestSouthEastRoad
+        tileData: root.tileData
     }
 
     Road_T_SouthEastNorth {
-        currentId: tileData.T_SouthEastNorthRoadId
-        visible: tileData.T_SouthEastNorthRoad
+        tileData: root.tileData
     }
 
     Road_T_EastNorthWest {
-        currentId: tileData.T_EastNorthWestRoadId
-        visible: tileData.T_EastNorthWestRoad
+        tileData: root.tileData
+    }
+
+    Road_C_ToTown_NorthEast {
+        tileData: root.tileData
+    }
+
+    Road_C_ToTown_NorthWest {
+        tileData: root.tileData
+    }
+
+    Road_C_ToTown_SouthEast {
+        tileData: root.tileData
+    }
+
+    Road_C_ToTown_SouthWest {
+        tileData: root.tileData
+    }
+
+    Road_C_ToTown_EastNorth {
+        tileData: root.tileData
+    }
+
+    Road_C_ToTown_WestNorth {
+        tileData: root.tileData
+    }
+
+    Road_C_ToTown_EastSouth {
+        tileData: root.tileData
+    }
+
+    Road_C_ToTown_WestSouth {
+        tileData: root.tileData
     }
 
     Road_C_NorthEast {
-        currentId: tileData.C_NorthEastRoadId
-        visible: tileData.C_NorthEastRoad
+        tileData: root.tileData
     }
 
     Road_C_NorthWest {
-        currentId: tileData.C_NorthWestRoadId
-        visible: tileData.C_NorthWestRoad
+        tileData: root.tileData
     }
 
     Road_C_SouthEast {
-        currentId: tileData.C_SouthEastRoadId
-        visible: tileData.C_SouthEastRoad
+        tileData: root.tileData
     }
 
     Road_C_SouthWest {
-        currentId: tileData.C_SouthWestRoadId
-        visible: tileData.C_SouthWestRoad
+        tileData: root.tileData
     }
 
     Road_L_NorthEast {
-        currentId: tileData.L_NorthEastRoadId
-        visible: tileData.L_NorthEastRoad
+        tileData: root.tileData
     }
 
     Road_L_NorthWest {
-        currentId: tileData.L_NorthWestRoadId
-        visible: tileData.L_NorthWestRoad
+        tileData: root.tileData
     }
 
     Road_L_SouthEast {
-        currentId: tileData.L_SouthEastRoadId
-        visible: tileData.L_SouthEastRoad
+        tileData: root.tileData
     }
 
     Road_L_SouthWest {
-        currentId: tileData.L_SouthWestRoadId
-        visible: tileData.L_SouthWestRoad
+        tileData: root.tileData
     }
 
     Town_1eArc_North {
-        currentId: tileData.Town1eArcNorthId
-        visible: tileData.Town1eArcNorth
+        tileData: root.tileData
     }
 
     Town_1eArc_East {
-        currentId: tileData.Town1eArcEastId
-        visible: tileData.Town1eArcEast
+        tileData: root.tileData
     }
 
     Town_1eArc_South {
-        currentId: tileData.Town1eArcSouthId
-        visible: tileData.Town1eArcSouth
+        tileData: root.tileData
     }
 
     Town_1eArc_West {
-        currentId: tileData.Town1eArcWestId
-        visible: tileData.Town1eArcWest
+        tileData: root.tileData
     }
 
     Town_1e4c_North {
-        currentId: tileData.Town1e4cNorthId
-        visible: tileData.Town1e4cNorth
+        tileData: root.tileData
     }
 
     Town_1e4c_East {
-        currentId: tileData.Town1e4cEastId
-        visible: tileData.Town1e4cEast
+        tileData: root.tileData
     }
 
     Town_1e4c_South {
-        currentId: tileData.Town1e4cSouthId
-        visible: tileData.Town1e4cSouth
+        tileData: root.tileData
     }
 
     Town_1e4c_West {
-        currentId: tileData.Town1e4cWestId
-        visible: tileData.Town1e4cWest
+        tileData: root.tileData
     }
 
     Town_2e_NorthSouth {
-        currentId: tileData.Town2eNorthSouthId
-        visible: tileData.Town2eNorthSouth
+        id: town_2e_NorthSouth
+        tileData: root.tileData
         z: currentId
     }
 
     Town_2e_EastWest {
-        currentId: tileData.Town2eEastWestId
-        visible: tileData.Town2eEastWest
+        id: town_2e_EastWest
+        tileData: root.tileData
         z: currentId
     }
 
     Town_2e2c_NorthEast {
-        currentId: tileData.Town2e2cNorthEastId
-        visible: tileData.Town2e2cNorthEast
+        tileData: root.tileData
     }
 
     Town_2e2c_NorthWest {
-        currentId: tileData.Town2e2cNorthWestId
-        visible: tileData.Town2e2cNorthWest
+        tileData: root.tileData
     }
 
     Town_2e2c_SouthEast {
-        currentId: tileData.Town2e2cSouthEastId
-        visible: tileData.Town2e2cSouthEast
+        tileData: root.tileData
     }
 
     Town_2e2c_SouthWest {
-        currentId: tileData.Town2e2cSouthWestId
-        visible: tileData.Town2e2cSouthWest
+        tileData: root.tileData
     }
 
     Town_2e3c_NorthEast {
-        currentId: tileData.Town2e3cNorthEastId
-        visible: tileData.Town2e3cNorthEast
+        tileData: root.tileData
     }
 
     Town_2e3c_NorthWest {
-        currentId: tileData.Town2e3cNorthWestId
-        visible: tileData.Town2e3cNorthWest
+        tileData: root.tileData
     }
 
     Town_2e3c_SouthEast {
-        currentId: tileData.Town2e3cSouthEastId
-        visible: tileData.Town2e3cSouthEast
+        tileData: root.tileData
     }
 
     Town_2e3c_SouthWest {
-        currentId: tileData.Town2e3cSouthWestId
-        visible: tileData.Town2e3cSouthWest
+        tileData: root.tileData
+    }
+
+    Town_Whole {
+        tileData: root.tileData
+    }
+
+    Abbey {
+        tileData: root.tileData
+    }
+
+    Monastery {
+        tileData: root.tileData
+        z: currentId
     }
 }

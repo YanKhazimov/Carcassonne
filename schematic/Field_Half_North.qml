@@ -1,9 +1,12 @@
 import QtQuick 2.15
-import QtQuick.Shapes 1.12
+import QtQuick.Shapes 1.15
 import "qrc:/"
 
 BaseMapObject {
     id: root
+
+    currentId: tileData.FieldNorthId
+    visible: tileData.FieldNorth
 
     ShapePath {
         startX: side

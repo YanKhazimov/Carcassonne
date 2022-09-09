@@ -15,88 +15,120 @@ int main(int argc, char *argv[])
 
     std::list<Tile> tiles;
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0} } },
-                           { objectManager.GenerateRoad(2), { {0, 2}, {4, 2} } },
-                           { objectManager.GenerateField(), { {0, 4}, {4, 4} } },
-                           { objectManager.GenerateTown(1), { {2, 4} } }
-                       });
+        { objectManager.GenerateField(), { {0, 0}, {0, 2}, {0, 4} } },
+        { objectManager.GenerateRoad(2), { {2, 0}, {2, 4} } },
+        { objectManager.GenerateField(), { {4, 0}, {4, 4} } },
+        { objectManager.GenerateTown(1), { {4, 2} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {4, 2}, {4, 4} } },
-                           { objectManager.GenerateTown(2), { {0, 2}, {0, 4}, {2, 4} } }
-                       });
+        { objectManager.GenerateField(), { {0, 0}, {0, 2}, {0, 4}, {2, 0}, {4, 0} } },
+        { objectManager.GenerateRoad(1), { {4, 2} } },
+        { objectManager.GenerateField(), { {4, 4} } },
+        { objectManager.GenerateTown(1), { {2, 4} } },
+        { objectManager.GenerateRoad(1), { {2, 0} } },
+        { objectManager.GenerateField(), { {0, 0} } },
+        { objectManager.GenerateTown(1), { {0, 2} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateTown(2), { {0, 0}, {0, 2}, {0, 4}, {2, 4}, {4, 0}, {4, 4} } },
-                           { objectManager.GenerateField(), { {2, 0} } },
-                           { objectManager.GenerateField(), { {4, 2} } }
-                       });
+        { objectManager.GenerateTown(2, BonusType::Shield), { {0, 2}, {4, 2} } },
+        { objectManager.GenerateTown(2, BonusType::Barrel), { {2, 0}, {2, 4} } },
+        { objectManager.GenerateField(), { {0, 0} } },
+        { objectManager.GenerateField(), { {0, 4} } },
+        { objectManager.GenerateField(), { {4, 0} } },
+        { objectManager.GenerateField(), { {4, 4} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 0} } },
-                           { objectManager.GenerateRoad(3), { {0, 2}, {2, 0}, {4, 2} } },
-                           { objectManager.GenerateField(), { {4, 0} } },
-                           { objectManager.GenerateField(), { {0, 4}, {4, 4} } },
-                           { objectManager.GenerateTown(1), { {2, 4} } }
-                       });
+        { objectManager.GenerateField(), { {0, 0}, {0, 2}, {0, 4} } },
+        { objectManager.GenerateRoad(2), { {2, 0}, {2, 4} } },
+        { objectManager.GenerateField(), { {4, 0}, {4, 4} } },
+        { objectManager.GenerateTown(1), { {4, 2} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {4, 2}, {4, 4}, {2, 4}, {0, 4} } },
-                           { objectManager.GenerateRoad(1), { {0, 2} } }
-                       });
+        { objectManager.GenerateField(), { {0, 0}, {0, 4} } },
+        { objectManager.GenerateRoad(2), { {0, 2}, {4, 2} } },
+        { objectManager.GenerateField(), { {4, 0} } },
+        { objectManager.GenerateField(), { {4, 4} } },
+        { objectManager.GenerateTown(2, BonusType::Wheat), { {2, 0}, {2, 4} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 2} } },
-                           { objectManager.GenerateField(), { {2, 0} } },
-                           { objectManager.GenerateField(), { {4, 2} } },
-                           { objectManager.GenerateTown(1), { {0, 0}, {0, 4}, {2, 4}, {4, 0}, {4, 4} } }
-                       });
+        { objectManager.GenerateTown(4, BonusType::DoubleShield), { {0, 0}, {2, 0}, {4, 0}, {2, 4}, {0, 2}, {4, 2}, {0, 4}, {4, 4} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0} } },
-                           { objectManager.GenerateRoad(2), { {0, 2}, {2, 4} } },
-                           { objectManager.GenerateField(), { {0, 4} } },
-                           { objectManager.GenerateField(), { {4, 4} } },
-                           { objectManager.GenerateTown(1), { {4, 2} } }
-                       });
+        { objectManager.GenerateField(), { {0, 4}, {2, 4}, {4, 4} } },
+        { objectManager.GenerateRoad(1), { {4, 2} } },
+        { objectManager.GenerateField(), { {4, 0} } },
+        { objectManager.GenerateTown(2, BonusType::Cloth), { {0, 0}, {0, 2}, {2, 0} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {4, 4} } },
-                           { objectManager.GenerateRoad(2), { {0, 2}, {2, 4} } },
-                           { objectManager.GenerateField(), { {0, 4} } },
-                           { objectManager.GenerateTown(1), { {4, 2} } }
-                       });
+        { objectManager.GenerateMonastery(), { {2, 2} } },
+        { objectManager.GenerateRoad(1), { {2, 0} } },
+        { objectManager.GenerateRoad(1), { {0, 2} } },
+        { objectManager.GenerateRoad(1), { {2, 4} } },
+        { objectManager.GenerateField(), { {0, 0} } },
+        { objectManager.GenerateField(), { {0, 4} } },
+        { objectManager.GenerateField(), { {4, 0}, {4, 2}, {4, 4} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 0}, {4, 4} } },
-                           { objectManager.GenerateRoad(2), { {0, 2}, {2, 4} } },
-                           { objectManager.GenerateRoad(2), { {2, 0}, {4, 2} } },
-                           { objectManager.GenerateField(), { {0, 4} } },
-                           { objectManager.GenerateField(), { {4, 0} } }
-                       });
+        { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {4, 2}, {4, 4} } },
+        { objectManager.GenerateTown(2), { {0, 2}, {0, 4}, {2, 4} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateField(), { {0, 0}, {0, 4}, {4, 0}, {4, 4} } },
-                           { objectManager.GenerateRoad(1), { {0, 2} } },
-                           { objectManager.GenerateRoad(1), { {2, 0} } },
-                           { objectManager.GenerateRoad(1), { {2, 4} } },
-                           { objectManager.GenerateRoad(1), { {4, 2} } }
-                       });
+        { objectManager.GenerateTown(2, BonusType::Wheat), { {0, 0}, {0, 2}, {0, 4}, {2, 4}, {4, 0}, {4, 4} } },
+        { objectManager.GenerateField(), { {2, 0} } },
+        { objectManager.GenerateField(), { {4, 2} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateTown(2), { {0, 2}, {4, 2} } },
-                           { objectManager.GenerateTown(2), { {2, 0}, {2, 4} } },
-                           { objectManager.GenerateField(), { {0, 0} } },
-                           { objectManager.GenerateField(), { {0, 4} } },
-                           { objectManager.GenerateField(), { {4, 0} } },
-                           { objectManager.GenerateField(), { {4, 4} } }
-                       });
+        { objectManager.GenerateField(), { {0, 0} } },
+        { objectManager.GenerateRoad(3), { {0, 2}, {2, 0}, {4, 2} } },
+        { objectManager.GenerateField(), { {4, 0} } },
+        { objectManager.GenerateField(), { {0, 4}, {4, 4} } },
+        { objectManager.GenerateTown(1), { {2, 4} } }
+    });
     tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateRoad(2), { {0, 2}, {4, 2} } },
-                           { objectManager.GenerateRoad(2), { {2, 0}, {2, 4} } },
-                           { objectManager.GenerateField(), { {0, 0} } },
-                           { objectManager.GenerateField(), { {0, 4} } },
-                           { objectManager.GenerateField(), { {4, 0} } },
-                           { objectManager.GenerateField(), { {4, 4} } }
-                       });
-
-    std::cout << std::endl;
-
-    //std::cout << (int)Direction::North << ' ' << tile1.CanConnect(tile2, Direction::North) << std::endl;
-
-//    tile1.Connect(tile2, Direction::South);
-//    tile2.Connect(tile3, Direction::South);
-//    tile3.Connect(tile4, Direction::South);
+        { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {4, 2}, {4, 4}, {2, 4}, {0, 4} } },
+        { objectManager.GenerateRoad(1), { {0, 2} } }
+    });
+    tiles.emplace_back(std::vector<TileObject> {
+        { objectManager.GenerateField(), { {0, 2} } },
+        { objectManager.GenerateField(), { {2, 0} } },
+        { objectManager.GenerateField(), { {4, 2} } },
+        { objectManager.GenerateTown(1, BonusType::Barrel), { {0, 0}, {0, 4}, {2, 4}, {4, 0}, {4, 4} } }
+    });
+    tiles.emplace_back(std::vector<TileObject> {
+        { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0} } },
+        { objectManager.GenerateRoad(2), { {0, 2}, {2, 4} } },
+        { objectManager.GenerateField(), { {0, 4} } },
+        { objectManager.GenerateField(), { {4, 4} } },
+        { objectManager.GenerateTown(1), { {4, 2} } }
+    });
+    tiles.emplace_back(std::vector<TileObject> {
+        { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {4, 4} } },
+        { objectManager.GenerateRoad(2), { {0, 2}, {2, 4} } },
+        { objectManager.GenerateField(), { {0, 4} } },
+        { objectManager.GenerateTown(1), { {4, 2} } }
+    });
+    tiles.emplace_back(std::vector<TileObject> {
+        { objectManager.GenerateField(), { {0, 0}, {4, 4} } },
+        { objectManager.GenerateRoad(2), { {0, 2}, {2, 4} } },
+        { objectManager.GenerateRoad(2), { {2, 0}, {4, 2} } },
+        { objectManager.GenerateField(), { {0, 4} } },
+        { objectManager.GenerateField(), { {4, 0} } }
+    });
+    tiles.emplace_back(std::vector<TileObject> {
+        { objectManager.GenerateField(), { {0, 0}, {0, 4}, {4, 0}, {4, 4} } },
+        { objectManager.GenerateRoad(1), { {0, 2} } },
+        { objectManager.GenerateRoad(1), { {2, 0} } },
+        { objectManager.GenerateRoad(1), { {2, 4} } },
+        { objectManager.GenerateRoad(1), { {4, 2} } }
+    });
+    tiles.emplace_back(std::vector<TileObject> {
+        { objectManager.GenerateRoad(2), { {0, 2}, {4, 2} } },
+        { objectManager.GenerateRoad(2), { {2, 0}, {2, 4} } },
+        { objectManager.GenerateField(), { {0, 0} } },
+        { objectManager.GenerateField(), { {0, 4} } },
+        { objectManager.GenerateField(), { {4, 0} } },
+        { objectManager.GenerateField(), { {4, 4} } }
+    });
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -112,13 +144,17 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
 
-    qmlRegisterUncreatableType<Tile>("com.app.abc", 1, 0, "TileData", "");
+    qmlRegisterUncreatableType<Tile>("com.carcassonne.cppTypes", 1, 0, "TileData", "");
+    qmlRegisterUncreatableType<Player>("com.carcassonne.cppTypes", 1, 0, "Player", "");
+    qmlRegisterUncreatableType<QmlPresenter>("QmlPresenter", 1, 0, "GameEngine",
+                                                       "QmlPresenter class defines the game engine");
+    qmlRegisterUncreatableMetaObject(QmlEnums::staticMetaObject, "EngineEnums", 1, 0, "EngineEnums", "Error: only enums");
 
     QmlPresenter presenter(objectManager);
 
     presenter.AddTiles(tiles);
 
-    app.setWindowIcon(QIcon(":/img/icon.png"));
+    app.setWindowIcon(QIcon(":/img/bigMeeple.png"));
 
     engine.rootContext()->setContextProperty("engine", &presenter);
 

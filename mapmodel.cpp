@@ -1,5 +1,6 @@
 #include "mapmodel.h"
 #include <QPoint>
+#include <set>
 
 Tile* MapModel::nextTileNorth(int x, int y) const
 {
@@ -21,13 +22,20 @@ Tile* MapModel::nextTileEast(int x, int y) const
     return (x + size/2 + 1 < size) ? tiles[y + size/2][x + size/2 + 1] : nullptr;
 }
 
-bool MapModel::canMergeData(int x, int y, const TileData &tile) const
+bool MapModel::canMergeRegularTile(int x, int y, const TileData &tile) const
 {
     return tiles[y + size/2][x + size/2] == nullptr &&
             (!nextTileNorth(x, y) || nextTileNorth(x, y)->CanConnect(tile, Direction::South)) &&
             (!nextTileSouth(x, y) || nextTileSouth(x, y)->CanConnect(tile, Direction::North)) &&
             (!nextTileWest(x, y) || nextTileWest(x, y)->CanConnect(tile, Direction::East)) &&
             (!nextTileEast(x, y) || nextTileEast(x, y)->CanConnect(tile, Direction::West));
+}
+
+bool MapModel::canMergeAbbeyTile(int x, int y, const TileData &tile) const
+{
+    return tile.isAbbeyTile &&
+            tiles[y + size/2][x + size/2] == nullptr &&
+            nextTileNorth(x, y) && nextTileSouth(x, y) && nextTileWest(x, y) && nextTileEast(x, y);
 }
 
 int MapModel::maxCapacity() const
@@ -54,6 +62,12 @@ void MapModel::fixTile(Tile *tile)
     tiles[position.y() + size/2][position.x() + size/2] = tile;
     tile->setFixed(true);
 
+    if (position.x() != 0 || position.y() != 0)
+    {
+        latestTile = tile;
+        emit latestTileChanged();
+    }
+
     // update minmax
     if (position.x() < minX || position.x() > maxX)
     {
@@ -69,27 +83,23 @@ void MapModel::fixTile(Tile *tile)
     }
 
     // merge objects
+    std::set<Tile*> updatedTiles;
     if (Tile* nextNorth = nextTileNorth(position.x(), position.y()); nextNorth)
-        nextNorth->Connect(*tile, Direction::South);
+        nextNorth->Connect(*tile, Direction::South, updatedTiles);
     if (Tile* nextEast = nextTileEast(position.x(), position.y()); nextEast)
-        nextEast->Connect(*tile, Direction::West);
+        nextEast->Connect(*tile, Direction::West, updatedTiles);
     if (Tile* nextSouth = nextTileSouth(position.x(), position.y()); nextSouth)
-        nextSouth->Connect(*tile, Direction::North);
+        nextSouth->Connect(*tile, Direction::North, updatedTiles);
     if (Tile* nextWest = nextTileWest(position.x(), position.y()); nextWest)
-        nextWest->Connect(*tile, Direction::East);
+        nextWest->Connect(*tile, Direction::East, updatedTiles);
 
-    // todo try precise emission
-    for (int i = 0; i < size; ++i)
+    for (Tile* tile: updatedTiles)
     {
-        for (int j = 0; j < size; ++j)
-        {
-            if (tiles[i][j])
-                emit tiles[i][j]->objectIdsChanged();
-        }
+        emit tile->objectIdsChanged();
     }
 }
 
-bool MapModel::isAdjacent(int x, int y) const
+bool MapModel::isFreeAdjacent(int x, int y) const
 {
     return tiles[y + size/2][x + size/2] == nullptr &&
             ((x + size/2 + 1 < size && tiles[y + size/2][x + size/2 + 1] != nullptr) ||
@@ -100,7 +110,7 @@ bool MapModel::isAdjacent(int x, int y) const
 
 bool MapModel::canMergeAsIs(int x, int y, Tile *tile) const
 {
-    return tile && canMergeData(x, y, *tile);
+    return tile && (canMergeRegularTile(x, y, *tile) || canMergeAbbeyTile(x, y, *tile));
 }
 
 bool MapModel::canMergeRotated(int x, int y, Tile *tile) const
@@ -110,7 +120,7 @@ bool MapModel::canMergeRotated(int x, int y, Tile *tile) const
 
     TileData copy = tile->copy();
 
-    return canMergeData(x, y, copy.rotateClockwise()) ||
-            canMergeData(x, y, copy.rotateClockwise()) ||
-            canMergeData(x, y, copy.rotateClockwise());
+    return canMergeRegularTile(x, y, copy.rotateClockwise()) ||
+            canMergeRegularTile(x, y, copy.rotateClockwise()) ||
+            canMergeRegularTile(x, y, copy.rotateClockwise());
 }

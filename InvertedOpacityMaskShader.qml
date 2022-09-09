@@ -1,7 +1,7 @@
 import QtQuick 2.15
 
 ShaderEffect {
-    required property variant maskSource
+    property variant maskSource
     fragmentShader: "
         uniform sampler2D source;
         uniform sampler2D maskSource;

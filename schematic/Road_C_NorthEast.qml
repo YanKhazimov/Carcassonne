@@ -1,9 +1,12 @@
 import QtQuick 2.15
-import QtQuick.Shapes 1.12
+import QtQuick.Shapes 1.15
 import "qrc:/"
 
 BaseMapObject {
     id: root
+
+    currentId: tileData.C_NorthEastRoadId
+    visible: tileData.C_NorthEastRoad
 
     ShapePath {
         startX: side/2 + halfRoadWidth
@@ -17,9 +20,12 @@ BaseMapObject {
             y: side/2 - 3 * halfRoadWidth
         }
 
-        PathLine {
+        PathArc {
             x: side/2 + 3 * halfRoadWidth
             y: side/2 - halfRoadWidth
+            radiusX: 2 * halfRoadWidth
+            radiusY: 2 * halfRoadWidth
+            direction: PathArc.Counterclockwise
         }
 
         PathLine {
@@ -33,13 +39,15 @@ BaseMapObject {
         }
 
         PathLine {
-            x: side/2 + 2 * halfRoadWidth
+            x: side/2 + 3 * halfRoadWidth
             y: side/2 + halfRoadWidth
         }
 
-        PathLine {
+        PathArc {
             x: side/2 - halfRoadWidth
-            y: side/2 - 2 * halfRoadWidth
+            y: side/2 - 3 * halfRoadWidth
+            radiusX: 4 * halfRoadWidth
+            radiusY: 4 * halfRoadWidth
         }
 
         PathLine {

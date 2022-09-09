@@ -79,11 +79,50 @@
         <file>schematic/Field_Arc3c_SouthEast.qml</file>
         <file>schematic/Field_Arc3c_SouthWest.qml</file>
         <file>ColoredImage.qml</file>
+        <file>schematic/Road_C_ToTown_NorthEast.qml</file>
+        <file>schematic/Road_C_ToTown_EastSouth.qml</file>
+        <file>schematic/Road_C_ToTown_SouthWest.qml</file>
+        <file>schematic/Road_C_ToTown_WestNorth.qml</file>
+        <file>schematic/Road_C_ToTown_NorthWest.qml</file>
+        <file>schematic/Road_C_ToTown_EastNorth.qml</file>
+        <file>schematic/Road_C_ToTown_SouthEast.qml</file>
+        <file>schematic/Road_C_ToTown_WestSouth.qml</file>
+        <file>schematic/Town_Whole.qml</file>
+        <file>schematic/Road_DownThroughTown_NorthSouth.qml</file>
+        <file>schematic/Road_DownThroughTown_EastWest.qml</file>
+        <file>schematic/Road_DownThroughTown_SouthNorth.qml</file>
+        <file>schematic/Road_DownThroughTown_WestEast.qml</file>
+        <file>Dimmer.qml</file>
+        <file>BaseMeeple.qml</file>
+        <file>MeeplePig.qml</file>
+        <file>MeepleSmall.qml</file>
+        <file>MeepleBig.qml</file>
+        <file>MeepleBuilder.qml</file>
+        <file>MeepleBarn.qml</file>
+        <file>PlayerZone.qml</file>
+        <file>schematic/Abbey.qml</file>
+        <file>Scoreboard.qml</file>
+        <file>LeadIndicator.qml</file>
+        <file>schematic/Monastery.qml</file>
+        <file>TileBonusIndicator.qml</file>
+        <file>TileBonuses.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="icon.png">img/icon.png</file>
         <file alias="x_icon.png">img/x_icon.png</file>
         <file alias="check_icon.png">img/check_icon.png</file>
         <file alias="rotate_icon.png">img/rotate_icon.png</file>
+        <file alias="background.png">img/background.png</file>
+        <file alias="tileBack.png">img/tileBack.png</file>
+        <file alias="barn.png">img/barn.png</file>
+        <file alias="bigMeeple.png">img/bigMeeple.png</file>
+        <file alias="builder.png">img/builder.png</file>
+        <file alias="pig.png">img/pig.png</file>
+        <file alias="smallMeeple.png">img/smallMeeple.png</file>
+        <file alias="shield.png">img/shield.png</file>
+        <file alias="barrel.png">img/barrel.png</file>
+        <file alias="cloth.png">img/cloth.png</file>
+        <file alias="wheat.png">img/wheat.png</file>
+        <file alias="star.png">img/star.png</file>
     </qresource>
 </RCC>

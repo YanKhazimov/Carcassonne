@@ -1,6 +1,9 @@
 #ifndef DATATYPES_H
 #define DATATYPES_H
 
+#include "qobjectdefs.h"
+#include <QColor>
+
 enum Direction {
     East,
     North,
@@ -14,9 +17,37 @@ enum class ObjectType {
     Town,
     Road,
     Field,
-    Monastery
+    Monastery,
+    Abbey
 };
 
+enum BonusType {
+    None,
+    Wheat,
+    Barrel,
+    Cloth,
+    Shield,
+    DoubleShield,
+    TownCenter,
+    RoadLake
+};
+
+namespace QmlEnums {
+    Q_NAMESPACE
+
+    enum MeepleType {
+        MeepleNone = 0,
+        MeepleSmall,
+        MeepleBig,
+        MeepleBarn,
+        MeepleBuilder,
+        MeeplePig
+    };
+    Q_ENUM_NS(MeepleType)
+
+}
 Direction opposite(Direction direction);
+
+extern QColor playerColors[];
 
 #endif // DATATYPES_H

@@ -1,9 +1,12 @@
 import QtQuick 2.15
-import QtQuick.Shapes 1.12
+import QtQuick.Shapes 1.15
 import "qrc:/"
 
 BaseMapObject {
     id: root
+
+    currentId: tileData.L_NorthEastRoadId
+    visible: tileData.L_NorthEastRoad
 
     ShapePath {
         startX: side/2 + halfRoadWidth

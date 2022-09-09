@@ -6,7 +6,7 @@ Rectangle {
     property alias text: text.text
     signal clicked()
 
-    width: 100
+    width: 120
     height: 30
     radius: 8
     color: "lightgrey"

@@ -32,6 +32,10 @@ set(PROJECT_SOURCES
         DataRoles.h
         MapModel.h
         MapModel.cpp
+        Player.h
+        Player.cpp
+        PlayersModel.h
+        PlayersModel.cpp
         main.cpp
         qml.qrc
 )

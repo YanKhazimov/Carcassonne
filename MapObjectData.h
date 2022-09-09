@@ -2,36 +2,79 @@
 #define MAPOBJECTDATA_H
 #include "DataTypes.h"
 #include <memory>
+#include <set>
 
 class ObjectManager;
+class Tile;
 
 struct MapObjectData {
+    ObjectManager* manager;
+    Tile* tile;
     ObjectType type = ObjectType::None;
     //! id in context of the object's tile
     const unsigned initialId;
     const unsigned initialValency;
-    int valency = -1;
-    ObjectManager* manager;
+    int pointValue = 0;
 
-    MapObjectData(ObjectType t, unsigned i, int v, ObjectManager* m);
     //! actual object
     std::shared_ptr<MapObjectData> currentObject() const;
-    void mergeObject(std::shared_ptr<MapObjectData> other);
+    int valency = -1;
+
+    void mergeObject(std::shared_ptr<MapObjectData> other, std::set<Tile *> &updatedTiles);
+    MapObjectData(ObjectType type, unsigned id, int valency, ObjectManager* manager);
+    void setTile(Tile* tilePtr);
+
+    BonusType bonusType;
+    virtual BonusType getBonusType() const;
+
+    struct MeepleInfo {
+        int playerIndex;
+        QmlEnums::MeepleType meepleType;
+        Tile *tile;
+    };
+
+    class PlayerPresence {
+        std::list<MeepleInfo> meeples;
+        bool hasBeenTaken = false;
+
+    public:
+        void addMeeple(int playerIndex, QmlEnums::MeepleType meepleType, Tile* tile);
+        void freeRemovableMeeples();
+        std::vector<int> mostPresentPlayers() const;
+        bool taken() const;
+    };
+
+    PlayerPresence playerPresence;
 };
 
-class Town : public MapObjectData {
+class Town : public MapObjectData
+{
 public:
-    Town(int v, unsigned i, ObjectManager* m);
+    Town(int valency, unsigned id, BonusType bonusType, ObjectManager* manager);
 };
 
-class Road : public MapObjectData {
+class Road : public MapObjectData
+{
 public:
-    Road(int v, unsigned i, ObjectManager* m);
+    Road(int valency, unsigned id, BonusType bonusType, ObjectManager* manager);
 };
 
-class Field : public MapObjectData {
+class Field : public MapObjectData
+{
 public:
-    Field(unsigned i, ObjectManager* m);
+    Field(unsigned id, ObjectManager* mmanager);
+};
+
+class Abbey : public MapObjectData
+{
+public:
+    Abbey(unsigned id, ObjectManager* manager);
+};
+
+class Monastery : public MapObjectData
+{
+public:
+    Monastery(unsigned id, ObjectManager* manager);
 };
 
 
