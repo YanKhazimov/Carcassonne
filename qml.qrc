@@ -106,9 +106,9 @@
         <file>schematic/Monastery.qml</file>
         <file>TileBonusIndicator.qml</file>
         <file>TileBonuses.qml</file>
+        <file>ElementActionIndicator.qml</file>
     </qresource>
     <qresource prefix="/img">
-        <file alias="icon.png">img/icon.png</file>
         <file alias="x_icon.png">img/x_icon.png</file>
         <file alias="check_icon.png">img/check_icon.png</file>
         <file alias="rotate_icon.png">img/rotate_icon.png</file>

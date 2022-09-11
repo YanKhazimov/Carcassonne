@@ -17,7 +17,6 @@ Rectangle {
     width: Constants.tileSize
     height: Constants.tileSize
     color: "#EEEEEE"
-    clip: true
 
     QtObject {
         id: internal
@@ -195,4 +194,9 @@ Rectangle {
 //            duration: 300
 //        }
 //    }
+
+    ElementActionIndicator {
+        target: parent
+        visible: dragArea.visible
+    }
 }

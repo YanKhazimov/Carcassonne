@@ -36,8 +36,6 @@ BaseMapObject {
         }
     }
 
-    clip: true
-
     idLabel.anchors.horizontalCenter: horizontalCenter
     idLabel.anchors.verticalCenter: verticalCenter
 }

@@ -22,4 +22,9 @@ Rectangle {
         anchors.fill: parent
         onClicked: root.clicked()
     }
+
+    ElementActionIndicator {
+        target: parent
+        visible: root.enabled
+    }
 }

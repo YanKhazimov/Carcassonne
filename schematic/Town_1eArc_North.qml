@@ -22,8 +22,6 @@ BaseMapObject {
         }
     }
 
-    clip: true
-
     Rectangle {
         id: border
 

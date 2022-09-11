@@ -32,9 +32,12 @@ BaseMapObject {
             radiusX: town2eRadius
             radiusY: town2eRadius
         }
-    }
 
-    clip: true
+        PathLine {
+            x: 0
+            y: 0
+        }
+    }
 
     Rectangle {
         id: eastBorder

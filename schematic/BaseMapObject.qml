@@ -22,8 +22,8 @@ Shape {
     width: side
     height: side
     containsMode: Shape.FillContains
-
     antialiasing: true
+    clip: true
 
     Text {
         id: idLabel

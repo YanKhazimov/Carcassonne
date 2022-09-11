@@ -34,8 +34,6 @@ BaseMapObject {
         }
     }
 
-    clip: true
-
     Rectangle {
         id: westBorder
 

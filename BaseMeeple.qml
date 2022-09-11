@@ -4,7 +4,6 @@ import QmlPresenter 1.0
 Item {
     id: root
 
-    opacity: 0.8
     z: 2
 
     property real xRatio
@@ -83,5 +82,10 @@ Item {
                 dragFinished()
             }
         }
+    }
+
+    ElementActionIndicator {
+        target: parent
+        visible: dragArea.visible
     }
 }

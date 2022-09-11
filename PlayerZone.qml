@@ -50,24 +50,8 @@ Rectangle {
     implicitWidth: 100
     implicitHeight: 200
     color: "white"
-    border.width: playerData && playerData.IsActive ? 4 : 2
+    border.width: 2
     border.color: activeColor
-
-    SequentialAnimation on border.color {
-        running: playerData && playerData.IsActive
-        loops: Animation.Infinite
-
-        ColorAnimation  {
-            to: activeColor
-            from: "white"
-            duration: 1500
-        }
-        ColorAnimation  {
-            from: activeColor
-            to: "white"
-            duration: 1500
-        }
-    }
 
     Rectangle {
         anchors.fill: parent
@@ -210,7 +194,7 @@ Rectangle {
     Rectangle {
         id: regularTilePlaceholder
 
-        anchors.bottom: abbeyPlaceholder.top; anchors.bottomMargin: 10
+        anchors.bottom: abbeyPlaceholder.top; anchors.bottomMargin: 15
         anchors.right: parent.right; anchors.rightMargin: 10
         width: Constants.tileSize
         height: Constants.tileSize
@@ -241,12 +225,18 @@ Rectangle {
                                                                 !engine.getAbbeyTile(engine.ActivePlayer).IsFixed)
             onClicked: tileClicked()
         }
+
+        ElementActionIndicator {
+            target: parent
+            visible: deckBackMouseArea.visible
+        }
     }
 
     Text {
-        anchors.bottom: regularTilePlaceholder.top
+        anchors.bottom: regularTilePlaceholder.top; anchors.bottomMargin: 5
         anchors.horizontalCenter: regularTilePlaceholder.horizontalCenter
         text: "Осталось: " + tilesInDeck
+        font.pixelSize: 20
     }
 
     Rectangle {
@@ -272,7 +262,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.verticalCenter: abbeyPlaceholder.top; anchors.verticalCenterOffset: -10/2
         anchors.margins: 10
-        spacing: 10
+        spacing: 20
         opacity: 0.2
 
         MeepleSmall {

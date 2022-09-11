@@ -252,7 +252,7 @@ Window {
                 id: buttonPanel
 
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 10
+                spacing: 15
 
                 MenuButton {
                     id: rotateTileButton
