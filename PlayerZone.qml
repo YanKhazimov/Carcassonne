@@ -62,7 +62,7 @@ Rectangle {
     TextEdit {
         id: playerName
 
-        anchors.top: parent.top; anchors.topMargin: 10
+        anchors.top: parent.top; anchors.topMargin: 5
         anchors.horizontalCenter: parent.horizontalCenter
         font.pixelSize: 20
         text: playerData ? playerData.Name : ""
@@ -80,7 +80,7 @@ Rectangle {
         id: separator
 
         height: 2
-        anchors.top: playerName.bottom; anchors.topMargin: 10
+        anchors.top: playerName.bottom; anchors.topMargin: 5
         anchors.left: parent.left; anchors.leftMargin: 10
         anchors.right: parent.right; anchors.rightMargin: 10
 
@@ -96,8 +96,37 @@ Rectangle {
         }
     }
 
+    Row {
+        id: timerRow
+
+        anchors.top: separator.bottom; anchors.topMargin: 5
+        anchors.horizontalCenter: parent.horizontalCenter
+        spacing: 0
+
+        Text {
+            id: prevTurnsTime
+            text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData.PreviousTime), "mm:ss")
+            font.pixelSize: 15
+            visible: playerData.PreviousTime !== 0 || !currentTurnTime.visible
+        }
+
+        Text {
+            text: " + "
+            font.pixelSize: 15
+            visible: prevTurnsTime.visible && currentTurnTime.visible
+        }
+
+        Text {
+            id: currentTurnTime
+            text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData.CurrentTime), "mm:ss")
+            font.pixelSize: 15
+            visible: playerData.CurrentTime !== 0
+            color: playerData.CurrentTime > 30 ? "red" : "black"
+        }
+    }
+
     Column {
-        anchors.top: separator.bottom; anchors.topMargin: 10
+        anchors.top: timerRow.bottom; anchors.topMargin: 5
         anchors.left: parent.left; anchors.leftMargin: 10
         spacing: 5
 
@@ -142,8 +171,6 @@ Rectangle {
                 source: "qrc:/img/cloth.png"
                 width: 32
                 height: 32
-                tint: Qt.rgba(1, 0, 0, 0.5)
-                margin: 5
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
@@ -159,7 +186,7 @@ Rectangle {
     }
 
     Column {
-        anchors.top: separator.bottom; anchors.topMargin: 10
+        anchors.top: timerRow.bottom; anchors.topMargin: 5
         anchors.right: parent.right; anchors.rightMargin: 10
         spacing: 5
 

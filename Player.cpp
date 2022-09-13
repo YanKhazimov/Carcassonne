@@ -7,6 +7,11 @@ Player::Player(QColor _color, QObject *parent)
 {
     name = color.name();
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+    turnTimer.setTimerType(Qt::VeryCoarseTimer);
+    connect(&turnTimer, &QTimer::timeout, this, [this](){
+        currentTurnSeconds++;
+        emit currentTurnSecondsChanged();
+    });
 }
 
 Player::Player(Player &&other) noexcept
@@ -31,14 +36,29 @@ void Player::setActive(bool value)
     {
         active = value;
         emit isActiveChanged();
+
+        if (active)
+        {
+            turnTimer.start(1000);
+        }
+        else
+        {
+            turnTimer.stop();
+
+            addToPreviousTime(currentTurnSeconds);
+            currentTurnSeconds = 0;
+            emit currentTurnSecondsChanged();
+        }
     }
 }
 
 void Player::createAbbeyTile(ObjectManager &objectManager)
 {
     abbeyTile = std::make_shared<Tile>(std::vector<TileObject> {
-        { objectManager.GenerateAbbey(), { {0, 0}, {0, 2}, {0, 4}, {2, 0}, {2, 4}, {4, 0}, {4, 2}, {4, 4} } }
-    });
+                                           { objectManager.GenerateAbbey(),
+                                             { {0, 0}, {0, 2}, {0, 4}, {2, 0}, {2, 4}, {4, 0}, {4, 2}, {4, 4} } }
+                                       }/*,
+                                       "abbey.png", 0*/);
 }
 
 Tile* Player::getAbbeyTile()
@@ -173,6 +193,15 @@ void Player::setPlace(int value)
 int Player::getPlace() const
 {
     return place;
+}
+
+void Player::addToPreviousTime(int seconds)
+{
+    if (seconds != 0)
+    {
+        prevTurnsSeconds += seconds;
+        emit prevTurnsSecondsChanged();
+    }
 }
 
 void Player::setScore(int value)

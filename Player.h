@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QColor>
+#include <QTimer>
 
 #include "ObjectManager.h"
 
@@ -23,6 +24,8 @@ class Player : public QObject
     Q_PROPERTY(bool ClothLead READ getClothLead WRITE setClothLead NOTIFY clothLeadChanged)
     Q_PROPERTY(bool TownLead READ getTownLead WRITE setTownLead NOTIFY townLeadChanged)
     Q_PROPERTY(bool RoadLead READ getRoadLead WRITE setRoadLead NOTIFY roadLeadChanged)
+    Q_PROPERTY(int PreviousTime MEMBER prevTurnsSeconds NOTIFY prevTurnsSecondsChanged)
+    Q_PROPERTY(int CurrentTime MEMBER currentTurnSeconds NOTIFY currentTurnSecondsChanged)
 
     QColor color;
     bool active;
@@ -33,11 +36,16 @@ class Player : public QObject
     int wheat = 0, barrels = 0, cloth = 0;
     bool wheatLead = false, barrelsLead = false, clothLead = false;
     bool townLead = false, roadLead = false;
+    int prevTurnsSeconds = 0;
+    int currentTurnSeconds = 0;
+    QTimer turnTimer;
 
     void setScore(int value);
     void setWheat(int value);
     void setBarrels(int value);
     void setCloth(int value);
+
+    void addToPreviousTime(int seconds);
 
 public:
     Player(QColor color, QObject *parent = nullptr);
@@ -88,6 +96,8 @@ signals:
     void clothLeadChanged();
     void townLeadChanged();
     void roadLeadChanged();
+    void prevTurnsSecondsChanged();
+    void currentTurnSecondsChanged();
 };
 Q_DECLARE_METATYPE(Player*)
 
