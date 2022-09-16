@@ -74,9 +74,13 @@ Item {
         model: engine.Players
         delegate: Row {
             y: PLACE * 30
+            z: placeAnimation.running ? 1 : 0
 
             Behavior on y {
-                NumberAnimation { duration: 1000 }
+                NumberAnimation {
+                    id: placeAnimation
+                    duration: 1000
+                }
             }
 
             Rectangle {
@@ -112,7 +116,7 @@ Item {
 
                 Text {
                     property int animatedScore: SCORE
-                    Behavior on animatedScore { NumberAnimation { duration: 500 } }
+                    Behavior on animatedScore { NumberAnimation { id: scoreAnimation; duration: 1000 } }
                     text: animatedScore
                     anchors.centerIn: parent
                     font.pixelSize: 25
@@ -126,12 +130,22 @@ Item {
                 border.color: "#DDDDDD"
 
                 Text {
-                    property int animatedScore: engine.MaxTown
-                    Behavior on animatedScore { NumberAnimation { duration: 500 } }
+                    property int animatedScore: TOWN_LEAD ? engine.MaxTown : 0
+                    Behavior on animatedScore { NumberAnimation { duration: 1000 } }
                     text: "+" + animatedScore
-                    visible: TOWN_LEAD
+                    visible: animatedScore > 0
                     anchors.centerIn: parent
                     font.pixelSize: 15
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    visible: TOWN_LEAD // && isGameOver
+                    onClicked: {
+                        engine.getPlayer(index).scorePoints(engine.MaxTown)
+                        engine.getPlayer(index).setTownLead(false)
+                    }
                 }
             }
 
@@ -142,12 +156,22 @@ Item {
                 border.color: "#DDDDDD"
 
                 Text {
-                    property int animatedScore: engine.MaxRoad
-                    Behavior on animatedScore { NumberAnimation { duration: 500 } }
+                    property int animatedScore: ROAD_LEAD ? engine.MaxRoad : 0
+                    Behavior on animatedScore { NumberAnimation { duration: 1000 } }
                     text: "+" + animatedScore
-                    visible: ROAD_LEAD
+                    visible: animatedScore > 0
                     anchors.centerIn: parent
                     font.pixelSize: 15
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    visible: ROAD_LEAD // && isGameOver
+                    onClicked: {
+                        engine.getPlayer(index).scorePoints(engine.MaxRoad)
+                        engine.getPlayer(index).setRoadLead(false)
+                    }
                 }
             }
 
@@ -159,11 +183,23 @@ Item {
 
                 Text {
                     property int animatedScore: WHEAT_LEAD * 10 + BARRELS_LEAD * 10 + CLOTH_LEAD * 10
-                    Behavior on animatedScore { NumberAnimation { duration: 500 } }
+                    Behavior on animatedScore { NumberAnimation { duration: 1000 } }
                     text: "+" + animatedScore
                     visible: animatedScore > 0
                     anchors.centerIn: parent
                     font.pixelSize: 15
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    visible: (WHEAT_LEAD || BARRELS_LEAD || CLOTH_LEAD) // && isGameOver
+                    onClicked: {
+                        engine.getPlayer(index).scorePoints(WHEAT_LEAD * 10 + BARRELS_LEAD * 10 + CLOTH_LEAD * 10)
+                        engine.getPlayer(index).setWheatLead(false)
+                        engine.getPlayer(index).setBarrelsLead(false)
+                        engine.getPlayer(index).setClothLead(false)
+                    }
                 }
             }
         }
