@@ -16,6 +16,7 @@ Rectangle {
         id: text
         anchors.centerIn: parent
         color: enabled ? "black" : "grey"
+        font.pixelSize: 15
     }
 
     MouseArea {

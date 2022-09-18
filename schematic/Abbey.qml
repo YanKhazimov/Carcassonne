@@ -12,7 +12,7 @@ BaseMapObject {
         startX: 0
         startY: 0
         fillColor: root.highlighted ? Constants.color.schematic.highlighter : "crimson"
-        strokeColor: "brown"
+        strokeColor: Constants.color.schematic.townBorder
         strokeWidth: 2 * 2 // half will be visible
 
         PathLine {

@@ -12,7 +12,7 @@ BaseMapObject {
         startX: side/2 - 2 * halfRoadWidth
         startY: side/2 - 4 * halfRoadWidth
         fillColor: root.highlighted ? Constants.color.schematic.highlighter : "white"
-        strokeColor: "brown"
+        strokeColor: Constants.color.schematic.townBorder
         strokeWidth: 2
 
         PathLine {

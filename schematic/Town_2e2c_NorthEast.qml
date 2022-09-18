@@ -12,7 +12,7 @@ BaseMapObject {
         startX: 0
         startY: 0
         fillColor: strokeColor
-        strokeColor: root.highlighted ? Constants.color.schematic.highlighter : "chocolate"
+        strokeColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.town
 
         PathLine {
             x: side
@@ -35,7 +35,7 @@ BaseMapObject {
         width: 2
         height: 2*side
         rotation: -45
-        color: "brown"
+        color: Constants.color.schematic.townBorder
     }
 
 //    Rectangle {
@@ -48,7 +48,7 @@ BaseMapObject {
 //        radius: height/2
 //        color: "transparent"
 //        border.width: 2
-//        border.color: "brown"
+//        border.color: Constants.color.schematic.townBorder
 //    }
 
     TileBonuses {

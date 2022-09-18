@@ -121,7 +121,16 @@ Rectangle {
             text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData.CurrentTime), "mm:ss")
             font.pixelSize: 15
             visible: playerData.CurrentTime !== 0
-            color: playerData.CurrentTime > 30 ? "red" : "black"
+            color: playerData.CurrentTime > 30 ? "white" : "black"
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -3
+                radius: 3
+                color: "red"
+                visible: playerData.CurrentTime > 30
+                z: parent.z - 1
+            }
         }
     }
 
@@ -227,7 +236,7 @@ Rectangle {
         height: Constants.tileSize
         color: "transparent"
         border.width: 2
-        border.color: "grey"
+        border.color: Constants.color.schematic.road
 
         Image {
             anchors.centerIn: parent
@@ -275,7 +284,7 @@ Rectangle {
         height: Constants.tileSize
         color: "transparent"
         border.width: 2
-        border.color: "grey"
+        border.color: Constants.color.schematic.road
 
         Image {
             anchors.centerIn: parent
@@ -289,7 +298,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.verticalCenter: abbeyPlaceholder.top; anchors.verticalCenterOffset: -10/2
         anchors.margins: 10
-        spacing: 20
+        spacing: 10
         opacity: 0.2
 
         MeepleSmall {

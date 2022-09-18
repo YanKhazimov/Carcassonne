@@ -4,7 +4,7 @@ import EngineEnums 1.0
 import "qrc:/"
 import "schematic"
 
-Rectangle {
+Item {
     id: root
 
     property alias tileData: mapObjects.tileData
@@ -16,7 +16,6 @@ Rectangle {
 
     width: Constants.tileSize
     height: Constants.tileSize
-    color: "#EEEEEE"
 
     QtObject {
         id: internal
@@ -91,6 +90,8 @@ Rectangle {
 
     TileObjects {
         id: mapObjects
+        anchors.fill: picture
+        visible: !rotationAnimation.running
     }
 
     MultiObjectMouseArea {
@@ -176,27 +177,38 @@ Rectangle {
         }
     }
 
-    Rectangle {
-        id: border
+    Image {
+        id: picture
 
+        source: tileData.Picture
         anchors.fill: parent
-        color: "transparent"
-        border.width: 2
-        border.color: "black"
-        visible: !tileData.IsFixed
+        rotation: tileData.ImageRotation
+        opacity: 0//tileData.Abbey ? 1 : 0.8//engine.TilePictureOpacity
+
+        Behavior on rotation {
+            NumberAnimation {
+                id: rotationAnimation
+                duration: 300
+            }
+        }
+
+        Rectangle {
+            id: border
+
+            anchors.fill: parent
+            color: "transparent"
+            border.width: 2
+            border.color: "black"
+            visible: !tileData.IsFixed
+        }
     }
 
     Behavior on x { NumberAnimation { duration: 200 } }
     Behavior on y { NumberAnimation { duration: 200 } }
 
-//    Behavior on rotation {
-//        NumberAnimation {
-//            duration: 300
-//        }
-//    }
-
     ElementActionIndicator {
         target: parent
         visible: dragArea.visible
+        rotation: picture.rotation
     }
 }

@@ -12,7 +12,7 @@ BaseMapObject {
         startX: side
         startY: 0
         fillColor: strokeColor
-        strokeColor: root.highlighted ? Constants.color.schematic.highlighter : "chocolate"
+        strokeColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.town
 
         PathArc {
             x: 0
@@ -32,7 +32,7 @@ BaseMapObject {
         radius: height/2
         color: "transparent"
         border.width: 2
-        border.color: "brown"
+        border.color: Constants.color.schematic.townBorder
     }
 
     idLabel.anchors.horizontalCenter: horizontalCenter

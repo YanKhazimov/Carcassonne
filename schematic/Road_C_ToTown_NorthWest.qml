@@ -11,9 +11,9 @@ BaseMapObject {
     ShapePath {
         startX: side/2 - halfRoadWidth
         startY: -1
-        strokeColor: "darkslategrey"
+        strokeColor: Constants.color.schematic.roadBorder
         strokeWidth: 2
-        fillColor: root.highlighted ? Constants.color.schematic.highlighter : "grey"
+        fillColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.road
 
         PathLine {
             x: side/2 - halfRoadWidth

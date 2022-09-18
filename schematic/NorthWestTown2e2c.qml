@@ -11,7 +11,7 @@ Item {
     Rectangle {
         id: townShape
 
-        color: "chocolate"
+        color: Constants.color.schematic.town
 
         anchors.fill: parent
         layer.enabled: true
@@ -54,6 +54,6 @@ Item {
         x: -2
         y: /*-90*/-2
         border.width: 2
-        border.color: "brown"
+        border.color: Constants.color.schematic.townBorder
     }
 }

@@ -12,7 +12,7 @@ BaseMapObject {
         startX: side
         startY: side/2
         strokeColor: fillColor
-        fillColor: root.highlighted ? Constants.color.schematic.highlighter : "lightgreen"
+        fillColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.field
 
         PathLine {
             x: side

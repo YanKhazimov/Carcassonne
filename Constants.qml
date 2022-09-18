@@ -9,6 +9,11 @@ QtObject {
     readonly property var color: QtObject {
         readonly property var schematic: QtObject {
             readonly property color highlighter: "yellow"
+            readonly property color field: "lightgreen"
+            readonly property color road: "grey"
+            readonly property color roadBorder: "darkslategrey"
+            readonly property color town: "chocolate"
+            readonly property color townBorder: "brown"
         }
     }
 }
