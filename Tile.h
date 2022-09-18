@@ -2,6 +2,7 @@
 #define TILE_H
 
 #include <QObject>
+#include <QUrl>
 #include "TileData.h"
 
 class Tile : public QObject, public TileData
@@ -197,6 +198,8 @@ class Tile : public QObject, public TileData
     Q_PROPERTY(int TownWholeId READ townWholeId NOTIFY objectIdsChanged)
 
 
+    Q_PROPERTY(QUrl Picture MEMBER imageUrl CONSTANT)
+    Q_PROPERTY(int ImageRotation READ getImageRotation WRITE setImageRotation NOTIFY imageRotationChanged)
     Q_PROPERTY(int X MEMBER x NOTIFY indexChanged)
     Q_PROPERTY(int Y MEMBER y NOTIFY indexChanged)
     Q_PROPERTY(bool IsFixed READ fixed WRITE setFixed NOTIFY isFixedChanged)
@@ -204,18 +207,22 @@ class Tile : public QObject, public TileData
 
     Q_PROPERTY(QList<int> BonusTypes MEMBER bonusTypes NOTIFY tileBonusesChanged)
 
+    const QUrl imageUrl;
+    int imageRotation;
     int x, y;
     bool isFixed;
     bool isPlaced;
     QList<int> bonusTypes;
 
+    int getImageRotation() const;
+    void setImageRotation(int rotation);
     void setPlaced(bool placed);
     void setPosition(int x, int y);
 
-    void checkCompletion(std::shared_ptr<MapObjectData> object) override;
+    void checkObjectCompletion(std::shared_ptr<MapObjectData> object) override;
 
 public:
-    explicit Tile(std::vector<TileObject> &&objects, QObject *parent = nullptr);
+    explicit Tile(std::vector<TileObject> &&objects, QString imageName, int imageRotation, QObject *parent = nullptr);
     Tile(Tile&& other) noexcept;
     Q_INVOKABLE void rotateClockwise();
     Q_INVOKABLE void rotateCounterclockwise();
@@ -236,6 +243,7 @@ signals:
     void tileBonusesChanged();
     void objectCompleted(unsigned objectId);
     void meepleReset();
+    void imageRotationChanged();
 
 private slots:
     void updateBonuses();

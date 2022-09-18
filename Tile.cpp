@@ -2,8 +2,9 @@
 #include <QPoint>
 #include <QQmlEngine>
 
-Tile::Tile(std::vector<TileObject> &&objects, QObject *parent)
-    : QObject(parent), TileData(std::move(objects)), x(-100), y(-100), isFixed(false), isPlaced(false)
+Tile::Tile(std::vector<TileObject> &&objects, QString imgName, int imgRotation, QObject *parent)
+    : QObject(parent), TileData(std::move(objects)),
+      imageUrl("img/tiles/" + imgName), imageRotation(imgRotation), x(-100), y(-100), isFixed(false), isPlaced(false)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QObject::connect(this, &Tile::layoutChanged, this, &Tile::objectIdsChanged);
@@ -18,7 +19,7 @@ Tile::Tile(std::vector<TileObject> &&objects, QObject *parent)
 }
 
 Tile::Tile(Tile &&other) noexcept
-    : TileData(std::move(other)), x(other.x), y(other.y), isFixed(other.isFixed), isPlaced(other.isPlaced)
+    : TileData(std::move(other)), imageUrl(other.imageUrl), imageRotation(other.imageRotation), x(other.x), y(other.y), isFixed(other.isFixed), isPlaced(other.isPlaced)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
@@ -27,12 +28,16 @@ void Tile::rotateClockwise()
 {
     RotateClockwise();
     emit layoutChanged();
+
+    setImageRotation(imageRotation + 90);
 }
 
 void Tile::rotateCounterclockwise()
 {
     RotateCounterclockwise();
     emit layoutChanged();
+
+    setImageRotation(imageRotation + 270);
 }
 
 void Tile::setPosition(int _x, int _y)
@@ -42,9 +47,9 @@ void Tile::setPosition(int _x, int _y)
     emit indexChanged();
 }
 
-void Tile::checkCompletion(std::shared_ptr<MapObjectData> object)
+void Tile::checkObjectCompletion(std::shared_ptr<MapObjectData> object)
 {
-    if (object->currentObject()->valency == 0)
+    if (object->currentObject()->isCompleted())
     {
         emit objectCompleted(object->currentObject()->initialId);
     }
@@ -72,6 +77,20 @@ void Tile::setFixed(bool fixed)
 bool Tile::placed() const
 {
     return isPlaced;
+}
+
+int Tile::getImageRotation() const
+{
+    return imageRotation;
+}
+
+void Tile::setImageRotation(int rotation)
+{
+    if (imageRotation != rotation)
+    {
+        imageRotation = rotation;
+        emit imageRotationChanged();
+    }
 }
 
 void Tile::setPlaced(bool placed)

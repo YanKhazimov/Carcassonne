@@ -124,5 +124,21 @@
         <file alias="cloth.png">img/cloth.png</file>
         <file alias="wheat.png">img/wheat.png</file>
         <file alias="star.png">img/star.png</file>
+        <file alias="tiles/9.jpg">img/tiles/9.jpg</file>
+        <file alias="tiles/12.jpg">img/tiles/12.jpg</file>
+        <file alias="tiles/14.jpg">img/tiles/14.jpg</file>
+        <file alias="tiles/18.jpg">img/tiles/18.jpg</file>
+        <file alias="tiles/37.jpg">img/tiles/37.jpg</file>
+        <file alias="tiles/48.jpg">img/tiles/48.jpg</file>
+        <file alias="tiles/51.jpg">img/tiles/51.jpg</file>
+        <file alias="tiles/58.jpg">img/tiles/58.jpg</file>
+        <file alias="tiles/60.jpg">img/tiles/60.jpg</file>
+        <file alias="tiles/61.jpg">img/tiles/61.jpg</file>
+        <file alias="tiles/70.jpg">img/tiles/70.jpg</file>
+        <file alias="tiles/71.jpg">img/tiles/71.jpg</file>
+        <file alias="tiles/72.jpg">img/tiles/72.jpg</file>
+        <file alias="tiles/73.jpg">img/tiles/73.jpg</file>
+        <file alias="tiles/81.jpg">img/tiles/81.jpg</file>
+        <file alias="tiles/abbey.jpg">img/tiles/abbey.jpg</file>
     </qresource>
 </RCC>

@@ -43,6 +43,50 @@ int MapModel::maxCapacity() const
     return size/2;
 }
 
+void MapModel::checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY)
+{
+    auto getTilesAround = [this](int x, int y){
+        std::vector<Tile*> vec;
+        if (Tile* northTile = nextTileNorth(x, y))
+        {
+            vec.push_back(northTile);
+            if (Tile* northWestTile = nextTileWest(northTile->position().x(), northTile->position().y()))
+                vec.push_back(northWestTile);
+            if (Tile* northEastTile = nextTileEast(northTile->position().x(), northTile->position().y()))
+                vec.push_back(northEastTile);
+        }
+        if (Tile* westTile = nextTileWest(x, y))
+            vec.push_back(westTile);
+        if (Tile* eastTile = nextTileEast(x, y))
+            vec.push_back(eastTile);
+        if (Tile* southTile = nextTileSouth(x, y))
+        {
+            vec.push_back(southTile);
+            if (Tile* southWestTile = nextTileWest(southTile->position().x(), southTile->position().y()))
+                vec.push_back(southWestTile);
+            if (Tile* southEastTile = nextTileEast(southTile->position().x(), southTile->position().y()))
+                vec.push_back(southEastTile);
+        }
+
+        return vec;
+    };
+
+    std::vector<Tile*> monasteryTiles = getTilesAround(newTileX, newTileY);
+    monasteryTiles.push_back(tiles[newTileY + size/2][newTileX + size/2]);
+
+    for (Tile* monasteryTile: monasteryTiles)
+    {
+        if (!monasteryTile->hasCentralScorableObject())
+            continue;
+
+        std::vector<Tile*> completionTiles = getTilesAround(monasteryTile->position().x(), monasteryTile->position().y());
+        if (completionTiles.size() == 8)
+        {
+            monasteryTile->markCentralObjectCompleted();
+        }
+    }
+}
+
 MapModel::MapModel(unsigned mapSize, QObject *parent)
     : QObject(parent), tiles {mapSize, std::vector<Tile*>{mapSize, nullptr}},
       size(mapSize), minX(0), maxX(0), minY(0), maxY(0)
@@ -96,6 +140,12 @@ void MapModel::fixTile(Tile *tile)
     for (Tile* tile: updatedTiles)
     {
         emit tile->objectIdsChanged();
+    }
+
+    checkNearbyMonasteryAbbeyCompletion(position.x(), position.y());
+    for (unsigned fieldObjectId: tile->getFieldObjectIds())
+    {
+        emit fieldIntegrityCheckRequested(fieldObjectId);
     }
 }
 

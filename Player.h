@@ -64,18 +64,18 @@ public:
     int getWheat() const;
     int getBarrels() const;
     int getCloth() const;
-    void setWheatLead(bool value);
-    void setBarrelsLead(bool value);
-    void setClothLead(bool value);
+    Q_INVOKABLE void setWheatLead(bool value);
+    Q_INVOKABLE void setBarrelsLead(bool value);
+    Q_INVOKABLE void setClothLead(bool value);
     bool getWheatLead() const;
     bool getBarrelsLead() const;
     bool getClothLead() const;
     void addWheat(int amount);
     void addBarrels(int amount);
     void addCloth(int amount);
-    void setTownLead(bool value);
+    Q_INVOKABLE void setTownLead(bool value);
     bool getTownLead() const;
-    void setRoadLead(bool value);
+    Q_INVOKABLE void setRoadLead(bool value);
     bool getRoadLead() const;
 
     QString getName() const;

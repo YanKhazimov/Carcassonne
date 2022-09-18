@@ -125,7 +125,7 @@ void QmlPresenter::scoreCompletionBonuses(unsigned objectId)
 QmlPresenter::QmlPresenter(ObjectManager& objManager, QObject *parent)
     : QObject(parent), mapModel(13), objectManager(objManager), gameState(GameState::NewTurn)
 {
-    QObject::connect(&players, &QAbstractListModel::rowsInserted, this, &QmlPresenter::playerCountChanged);
+    connect(&players, &QAbstractListModel::rowsInserted, this, &QmlPresenter::playerCountChanged);
 
     sortedPlayers.setSource(&players);
 
@@ -133,6 +133,8 @@ QmlPresenter::QmlPresenter(ObjectManager& objManager, QObject *parent)
 
     Player* player0 = players.index(0, 0).data(DataRoles::PlayerPtr).value<Player*>();
     player0->setActive(true);
+
+    connect(&mapModel, &MapModel::fieldIntegrityCheckRequested, this, &QmlPresenter::checkFieldIntegrity);
 }
 
 void QmlPresenter::AddTiles(std::list<Tile> &tiles)
@@ -173,6 +175,7 @@ void QmlPresenter::populatePlayers(int number)
     {
         players.AddPlayer(playerColors[i]);
         getPlayer(i)->createAbbeyTile(objectManager);
+        connect(getPlayer(i)->getAbbeyTile(), &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
     }
 
     emit players.dataChanged(players.index(0, 0), players.index(players.rowCount() - 1, 0), {DataRoles::PlayerScore});
@@ -257,18 +260,45 @@ void QmlPresenter::scoreCompletedObject(unsigned objectId)
     if (auto object = objectManager.GetObject(objectId); object)
     {
         int points = objectManager.getPoints(objectId);
-        std::vector<int> mostPresentPlayers = object->playerPresence.mostPresentPlayers();
-        //qDebug() << mostPresentPlayers << "score" << object->initialId << "for" << points;
+        std::vector<int> mostPresentPlayers = object->mostPresentPlayers();
 
         for (auto playerIndex: mostPresentPlayers)
         {
             getPlayer(playerIndex)->scorePoints(points);
         }
 
-        object->playerPresence.freeRemovableMeeples();
-        for (auto& slaveObject: objectManager.GetObjectDependencies(object->initialId))
+        object->freeRemovableMeeples();
+    }
+}
+
+void QmlPresenter::processBarnPresence(unsigned objectId, int meepleScore)
+{
+    if (auto object = objectManager.GetObject(objectId); object)
+    {
+        std::vector<int> mostPresentPlayers = object->mostPresentPlayers();
+        if (!mostPresentPlayers.empty())
         {
-            slaveObject->playerPresence.freeRemovableMeeples();
+            std::set<int> pigs = object->pigs();
+            int fieldTowns = objectManager.countTownsAround(object->initialId);
+
+            for (auto playerIndex: mostPresentPlayers)
+            {
+                bool pig = pigs.find(playerIndex) != pigs.end();
+                getPlayer(playerIndex)->scorePoints(fieldTowns * (pig ? (meepleScore + 1) : meepleScore));
+            }
+        }
+
+        object->freeRemovableMeeples();
+    }
+}
+
+void QmlPresenter::checkFieldIntegrity(unsigned fieldObjectId)
+{
+    for (unsigned barnFieldInitialId: barnFieldInitialIds)
+    {
+        if (fieldObjectId == objectManager.GetObject(barnFieldInitialId)->initialId)
+        {
+            processBarnPresence(fieldObjectId, 1);
         }
     }
 }
@@ -282,11 +312,17 @@ void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectI
 {
     if (auto object = objectManager.GetObject(objectId); object)
     {
-        object->playerPresence.addMeeple(playerIndex, (QmlEnums::MeepleType)meepleType, tile);
+        object->addMeeple(playerIndex, (QmlEnums::MeepleType)meepleType, tile);
 
-        if (object->valency == 0)
+        if (object->isCompleted())
         {
             scoreCompletedObject(object->initialId);
+        }
+
+        if ((QmlEnums::MeepleType)meepleType == QmlEnums::MeepleType::MeepleBarn)
+        {
+            processBarnPresence(object->initialId, 3);
+            barnFieldInitialIds.insert(object->initialId);
         }
     }
 }

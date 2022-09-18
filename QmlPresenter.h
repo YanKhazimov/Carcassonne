@@ -24,6 +24,7 @@ class QmlPresenter : public QObject
     Q_PROPERTY(int UnassignedCloth MEMBER unassignedCloth NOTIFY unassignedClothChanged)
     Q_PROPERTY(int MaxTown MEMBER maxTown NOTIFY maxTownChanged)
     Q_PROPERTY(int MaxRoad MEMBER maxRoad NOTIFY maxRoadChanged)
+    Q_PROPERTY(qreal TilePictureOpacity MEMBER tilePictureOpacity NOTIFY tilePictureOpacityChanged)
 
 public:
     enum class GameState {
@@ -51,6 +52,8 @@ private:
     int unassignedBarrels = 0;
     int unassignedCloth = 0;
 
+    qreal tilePictureOpacity = 0.5;
+
     void addWheatToActivePlayer(int amount);
     void addBarrelsToActivePlayer(int amount);
     void addClothToActivePlayer(int amount);
@@ -75,6 +78,11 @@ private:
     void scoreLongestRoad(unsigned roadId);
 
     void scoreCompletedObject(unsigned objectId);
+    void processBarnPresence(unsigned objectId, int meepleScore);
+
+    std::set<unsigned> barnFieldInitialIds;
+
+    void checkFieldIntegrity(unsigned fieldObjectId);
 
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
@@ -101,6 +109,7 @@ signals:
     void unassignedClothChanged();
     void maxTownChanged();
     void maxRoadChanged();
+    void tilePictureOpacityChanged();
 };
 
 #endif // QMLPRESENTER_H

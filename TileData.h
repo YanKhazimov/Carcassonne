@@ -21,9 +21,28 @@ struct TileObject {
 class TileData {
     std::shared_ptr<MapObjectData> grid5x5[5][5];
 
-    std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > getSideConnectors(Direction direction) const;
+    std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData>> getSideConnectors(Direction direction) const;
     std::shared_ptr<MapObjectData> getConnector(Direction direction);
     void mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject, std::shared_ptr<MapObjectData> absorbedObject) const;
+
+public:
+    void RotateClockwise();
+    void RotateCounterclockwise();
+    bool CanConnect(const TileData& other, Direction from) const;
+    void Connect(TileData& other, Direction from, std::set<Tile*>& updatedTiles);
+    TileData copy() const;
+    TileData& rotateClockwise(int times = 1);
+    void print() const;
+    void markCentralObjectCompleted();
+    bool hasCentralScorableObject() const;
+    void getAdjacentTowns(std::shared_ptr<MapObjectData>& object, std::set<std::shared_ptr<MapObjectData>> &towns) const;
+    std::set<unsigned> getFieldObjectIds() const;
+
+protected:
+    std::vector<TileObject> tileObjects;
+    TileData(std::vector<TileObject> &&objects);
+    std::shared_ptr<const MapObjectData> checkConnector(Direction direction) const;
+    virtual void checkObjectCompletion(std::shared_ptr<MapObjectData> object);
 
     const std::shared_ptr<MapObjectData> NW() const;
     const std::shared_ptr<MapObjectData> NNW() const;
@@ -42,21 +61,6 @@ class TileData {
     const std::shared_ptr<MapObjectData> S() const;
     const std::shared_ptr<MapObjectData> SSE() const;
     const std::shared_ptr<MapObjectData> SE() const;
-
-public:
-    void RotateClockwise();
-    void RotateCounterclockwise();
-    bool CanConnect(const TileData& other, Direction from) const;
-    void Connect(TileData& other, Direction from, std::set<Tile*>& updatedTiles);
-    TileData copy() const;
-    TileData& rotateClockwise(int times = 1);
-    void print() const;
-
-protected:
-    std::vector<TileObject> tileObjects;
-    TileData(std::vector<TileObject> &&objects);
-    std::shared_ptr<const MapObjectData> checkConnector(Direction direction) const;
-    virtual void checkCompletion(std::shared_ptr<MapObjectData> object);
 
     int id_NE() const;
     int id_SE() const;

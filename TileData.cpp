@@ -854,7 +854,7 @@ std::shared_ptr<const MapObjectData> TileData::checkConnector(Direction directio
     }
 }
 
-void TileData::checkCompletion(std::shared_ptr<MapObjectData> object)
+void TileData::checkObjectCompletion(std::shared_ptr<MapObjectData> object)
 {
     qDebug() << "Reimplement me";
 }
@@ -895,6 +895,92 @@ const std::shared_ptr<MapObjectData> TileData::SSW() const { return grid5x5[4][1
 const std::shared_ptr<MapObjectData> TileData::S() const { return grid5x5[4][2]; }
 const std::shared_ptr<MapObjectData> TileData::SSE() const { return grid5x5[4][3]; }
 const std::shared_ptr<MapObjectData> TileData::SE() const { return grid5x5[4][4]; }
+
+void TileData::markCentralObjectCompleted()
+{
+    grid5x5[2][2]->markCompleted();
+    checkObjectCompletion(grid5x5[2][2]);
+}
+
+bool TileData::hasCentralScorableObject() const
+{
+    return hasAbbey() || hasMonastery();
+}
+
+void TileData::getAdjacentTowns(std::shared_ptr<MapObjectData> &object, std::set<std::shared_ptr<MapObjectData>>& towns) const
+{
+    for (auto& tileObject: tileObjects)
+    {
+        if (object == tileObject.objPtr)
+        {
+            auto checkInsert = [&towns](const std::shared_ptr<MapObjectData>& object) {
+                if (object && object->type == ObjectType::Town && object->isCompleted())
+                    towns.insert(object);
+            };
+
+            for (auto& locationPoint: tileObject.location)
+            {
+                switch(locationPoint.first) {
+                case 0:
+                    switch (locationPoint.second)
+                    {
+                    case 0: checkInsert(grid5x5[0][2]); checkInsert(grid5x5[2][0]); break;
+                    case 1: checkInsert(grid5x5[0][0]); break;
+                    case 2: checkInsert(grid5x5[0][0]); checkInsert(grid5x5[0][4]); break;
+                    case 3: checkInsert(grid5x5[0][4]); break;
+                    case 4: checkInsert(grid5x5[0][2]); checkInsert(grid5x5[2][4]); break;
+                    }
+                    break;
+                case 1:
+                    switch (locationPoint.second)
+                    {
+                    case 0: checkInsert(grid5x5[0][0]); break;
+                    case 4: checkInsert(grid5x5[0][4]); break;
+                    }
+                case 2:
+                    switch (locationPoint.second)
+                    {
+                    case 0: checkInsert(grid5x5[0][0]); checkInsert(grid5x5[4][0]); break;
+                    case 4: checkInsert(grid5x5[0][4]); checkInsert(grid5x5[4][4]); break;
+                    }
+                    break;
+                case 3:
+                    switch (locationPoint.second)
+                    {
+                    case 0: checkInsert(grid5x5[4][0]); break;
+                    case 4: checkInsert(grid5x5[4][4]); break;
+                    }
+                    break;
+                case 4:
+                    switch (locationPoint.second)
+                    {
+                    case 0: checkInsert(grid5x5[4][2]); checkInsert(grid5x5[2][0]); break;
+                    case 1: checkInsert(grid5x5[4][0]); break;
+                    case 2: checkInsert(grid5x5[4][0]); checkInsert(grid5x5[4][4]); break;
+                    case 3: checkInsert(grid5x5[4][4]); break;
+                    case 4: checkInsert(grid5x5[4][2]); checkInsert(grid5x5[2][4]); break;
+                    }
+                    break;
+                }
+            }
+            return;
+        }
+    }
+}
+
+std::set<unsigned> TileData::getFieldObjectIds() const
+{
+    std::set<unsigned> result;
+    for (auto& tileObject: tileObjects)
+    {
+        if (tileObject.objPtr->type == ObjectType::Field)
+        {
+            result.insert(tileObject.objPtr->currentObject()->initialId);
+        }
+    }
+
+    return result;
+}
 
 TileData TileData::copy() const
 {
@@ -1032,7 +1118,7 @@ void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updated
         // merge ids
         connectorObject->mergeObject(otherConnectorObject, updatedTiles);
 
-        checkCompletion(connectorObject);
+        checkObjectCompletion(connectorObject);
         break;
     }
     case ObjectType::Field: {
@@ -1047,7 +1133,7 @@ void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updated
         // merge ids
         connectorObject->mergeObject(otherConnectorObject, updatedTiles);
 
-        checkCompletion(connectorObject);
+        checkObjectCompletion(connectorObject);
 
         // merge side fields
         auto [sideConnector1, sideConnector2] = getSideConnectors(from);

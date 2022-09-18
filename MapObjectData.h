@@ -25,7 +25,10 @@ struct MapObjectData {
     void setTile(Tile* tilePtr);
 
     BonusType bonusType;
-    virtual BonusType getBonusType() const;
+    BonusType getBonusType() const;
+
+    virtual bool isCompleted() const;
+    void markCompleted();
 
     struct MeepleInfo {
         int playerIndex;
@@ -33,36 +36,44 @@ struct MapObjectData {
         Tile *tile;
     };
 
-    class PlayerPresence {
+    struct PlayerPresence {
         std::list<MeepleInfo> meeples;
         bool hasBeenTaken = false;
 
-    public:
-        void addMeeple(int playerIndex, QmlEnums::MeepleType meepleType, Tile* tile);
-        void freeRemovableMeeples();
-        std::vector<int> mostPresentPlayers() const;
-        bool taken() const;
     };
 
+    void addMeeple(int playerIndex, QmlEnums::MeepleType meepleType, Tile* tile);
+    void freeRemovableMeeples();
+    std::vector<int> mostPresentPlayers() const;
+    bool taken() const;
+    std::set<int> pigs() const;
+
+private:
     PlayerPresence playerPresence;
+    std::vector<std::shared_ptr<MapObjectData>> group() const;
+
+protected:
+    bool completedCentralObject = false;
 };
 
 class Town : public MapObjectData
 {
 public:
     Town(int valency, unsigned id, BonusType bonusType, ObjectManager* manager);
+    bool isCompleted() const override;
 };
 
 class Road : public MapObjectData
 {
 public:
     Road(int valency, unsigned id, BonusType bonusType, ObjectManager* manager);
+    bool isCompleted() const override;
 };
 
 class Field : public MapObjectData
 {
 public:
-    Field(unsigned id, ObjectManager* mmanager);
+    Field(unsigned id, ObjectManager* manager);
 };
 
 class Abbey : public MapObjectData

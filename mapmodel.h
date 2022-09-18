@@ -30,6 +30,8 @@ class MapModel : public QObject
     bool canMergeAbbeyTile(int x, int y, const TileData& tile) const;
     int maxCapacity() const;
 
+    void checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY);
+
 public:
     MapModel(unsigned mapSize, QObject* parent = 0);
 
@@ -42,6 +44,7 @@ public:
 signals:
     void minMaxChanged();
     void latestTileChanged();
+    void fieldIntegrityCheckRequested(unsigned fieldInitialId);
 };
 
 #endif // MAPMODEL_H

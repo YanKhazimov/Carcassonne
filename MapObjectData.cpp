@@ -29,6 +29,11 @@ BonusType MapObjectData::getBonusType() const
     return bonusType;
 }
 
+bool MapObjectData::isCompleted() const
+{
+    return completedCentralObject;
+}
+
 Town::Town(int _valency, unsigned id, BonusType _bonusType, ObjectManager *manager)
     : MapObjectData(ObjectType::Town, id, _valency, manager)
 {
@@ -37,11 +42,26 @@ Town::Town(int _valency, unsigned id, BonusType _bonusType, ObjectManager *manag
     pointValue = _bonusType == BonusType::TownCenter ? 3 : 2;
 }
 
+bool Town::isCompleted() const
+{
+    return valency == 0;
+}
+
+void MapObjectData::markCompleted()
+{
+    completedCentralObject = true;
+}
+
 Road::Road(int _valency, unsigned id, BonusType _bonusType, ObjectManager *manager)
     : MapObjectData(ObjectType::Road, id, _valency, manager)
 {
     valency = _valency;
     pointValue = _bonusType == BonusType::RoadLake ? 2 : 1;
+}
+
+bool Road::isCompleted() const
+{
+    return valency == 0;
 }
 
 Field::Field(unsigned id, ObjectManager *manager)
@@ -63,36 +83,43 @@ Monastery::Monastery(unsigned id, ObjectManager *manager)
     pointValue = 9;
 }
 
-void MapObjectData::PlayerPresence::freeRemovableMeeples()
+void MapObjectData::freeRemovableMeeples()
 {
-    for (auto iter = meeples.begin(); iter != meeples.end(); )
+    for (const auto& object: group())
     {
-        switch (iter->meepleType)
+        for (auto iter = object->playerPresence.meeples.begin(); iter != object->playerPresence.meeples.end(); )
         {
-        case MeepleType::MeepleSmall:
-        case MeepleType::MeepleBig:
-        case MeepleType::MeeplePig:
-        case MeepleType::MeepleBuilder:
-            emit iter->tile->meepleReset();
-            iter = meeples.erase(iter);
-            break;
-        default:
-            ++iter;
+            switch (iter->meepleType)
+            {
+            case MeepleType::MeepleSmall:
+            case MeepleType::MeepleBig:
+            case MeepleType::MeeplePig:
+            case MeepleType::MeepleBuilder:
+                emit iter->tile->meepleReset();
+                iter = object->playerPresence.meeples.erase(iter);
+                break;
+            default:
+                ++iter;
+            }
         }
     }
 }
 
-std::vector<int> MapObjectData::PlayerPresence::mostPresentPlayers() const
+std::vector<int> MapObjectData::mostPresentPlayers() const
 {
     std::vector<int> result;
 
     std::map<int, int> presence;
-    for (const auto& meeple: meeples)
+
+    for (const auto& object: group())
     {
-        if (meeple.meepleType == MeepleType::MeepleSmall)
-            presence[meeple.playerIndex]++;
-        else if (meeple.meepleType == MeepleType::MeepleBig)
-            presence[meeple.playerIndex] += 2;
+        for (const auto& meeple: object->playerPresence.meeples)
+        {
+            if (meeple.meepleType == MeepleType::MeepleSmall)
+                presence[meeple.playerIndex]++;
+            else if (meeple.meepleType == MeepleType::MeepleBig)
+                presence[meeple.playerIndex] += 2;
+        }
     }
 
     int maxPresence = 0;
@@ -113,13 +140,38 @@ std::vector<int> MapObjectData::PlayerPresence::mostPresentPlayers() const
     return result;
 }
 
-bool MapObjectData::PlayerPresence::taken() const
+std::set<int> MapObjectData::pigs() const
 {
-    return hasBeenTaken;
+    std::set<int> result;
+
+    for (const auto& object: group())
+    {
+        for (const auto& meeple: object->playerPresence.meeples)
+        {
+            if (meeple.meepleType == MeepleType::MeeplePig)
+                result.insert(meeple.playerIndex);
+        }
+    }
+
+    return result;
 }
 
-void MapObjectData::PlayerPresence::addMeeple(int playerIndex, MeepleType meepleType, Tile *tile)
+bool MapObjectData::taken() const
 {
-    meeples.push_back({ playerIndex, meepleType, tile });
-    hasBeenTaken = true;
+    return playerPresence.hasBeenTaken;
+}
+
+std::vector<std::shared_ptr<MapObjectData> > MapObjectData::group() const
+{
+    auto dependencies = manager->GetObjectDependencies(currentObject()->initialId);
+    dependencies.push_back(manager->GetObject(initialId));
+    return dependencies;
+}
+
+void MapObjectData::addMeeple(int playerIndex, MeepleType meepleType, Tile *tile)
+{
+    playerPresence.meeples.push_back({ playerIndex, meepleType, tile });
+    //qDebug() << "object" << initialId;
+    //qDebug() << "add meeple" << playerIndex << (int)meepleType;
+    playerPresence.hasBeenTaken = true;
 }

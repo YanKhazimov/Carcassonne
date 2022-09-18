@@ -1,5 +1,6 @@
 #include "ObjectManager.h"
 #include "Tile.h"
+#include <iostream>
 
 std::shared_ptr<MapObjectData> ObjectManager::generateVoid()
 {
@@ -147,4 +148,27 @@ int ObjectManager::getPoints(unsigned objectId)
     }
 
     return pointSourceCount * pointSourceValue;
+}
+
+int ObjectManager::countTownsAround(unsigned objectId)
+{
+    if (auto object = GetObject(objectId); object->type == ObjectType::Field)
+    {
+        std::set<std::shared_ptr<MapObjectData>> adjacentTowns;
+        std::vector<std::shared_ptr<MapObjectData>> group = GetObjectDependencies(objectId);
+        group.push_back(object);
+
+        for (auto& tileObject: group)
+        {
+            tileObject->tile->getAdjacentTowns(tileObject, adjacentTowns);
+        }
+
+        //qDebug() << adjacentTowns.size() << "towns around field" << object->initialId;
+        return adjacentTowns.size();
+    }
+    else
+    {
+        std::cerr << "Counting towns around an object " << objectId << " of type " << (int)object->type << std::endl;
+        return 0;
+    }
 }

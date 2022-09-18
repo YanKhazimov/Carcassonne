@@ -20,6 +20,13 @@ Window {
     property var activeMeeple: null
     readonly property var zones: [playerZoneNW, playerZoneSW, playerZoneNE, playerZoneSE]
     property int tilesInDeck
+    property Item lastPlacedTile: null
+
+    Binding {
+        target: engine
+        property: "TilePictureOpacity"
+        value: activeMeeple ? 0.6 : 1
+    }
 
     function createTileItem(x, y) {
         var comp = Qt.createComponent("Tile.qml")
@@ -126,7 +133,7 @@ Window {
                 }
             })
             obj.reset.connect(function() {
-               zones[engine.ActivePlayer].addMeeple(obj.type, 1)
+               zones[obj.playerIndex].addMeeple(obj.type, 1)
             })
             return obj
         }
@@ -187,7 +194,8 @@ Window {
             {
                 abbeyTiles[zone].setDefaultPosition(zones[zone].x + zones[zone].abbeyPositionX,
                                                     zones[zone].y + zones[zone].abbeyPositionY)
-                abbeyTiles[zone].resetPosition()
+                if (!abbeyTiles[zone].tileData.IsFixed)
+                    abbeyTiles[zone].resetPosition()
             }
         })
 
@@ -265,6 +273,7 @@ Window {
                     text: "Поставить"
                     onClicked: {
                         engine.mapModel.fixTile(board.activeTile.tileData/*engine.getTile(tiles.length - 1)*/)
+                        lastPlacedTile = board.activeTile
                         engine.updateHighlight()
                         board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
                         board.activeTile = null
@@ -276,7 +285,7 @@ Window {
                     id: fixMeepleButton
                     text: "Занять"
                     onClicked: {
-                        tiles[tiles.length - 1].fixMeeple()
+                        lastPlacedTile.fixMeeple()
                         engine.highlight(-1)
                         root.activeMeeple = null
                         engine.GameState = GameEngine.NewTurn
@@ -337,8 +346,6 @@ Window {
                         source: "qrc:/img/cloth.png"
                         width: 32
                         height: 32
-                        tint: Qt.rgba(1, 0, 0, 0.5)
-                        margin: 5
                     }
                     Text {
                         text: "x" + engine.UnassignedCloth
@@ -350,40 +357,6 @@ Window {
             Scoreboard {
                 id: scoreboard
                 anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-
-        Column {
-            anchors.right: parent.right
-            anchors.top: parent.bottom
-
-            SpinBox {
-                id: sc
-                from: 1
-                to: 500
-                value: 50
-                stepSize: 5
-            }
-
-            MenuButton {
-                property var player: engine.getPlayer(0)
-                text: player ? player.Name + " - score " + sc.value : "-"
-                onClicked: if (player) player.scorePoints(sc.value)
-            }
-            MenuButton {
-                property var player: engine.getPlayer(1)
-                text: player ? player.Name + " - score " + sc.value : "-"
-                onClicked: if (player) player.scorePoints(sc.value)
-            }
-            MenuButton {
-                property var player: engine.getPlayer(2)
-                text: player ? player.Name + " - score " + sc.value : "-"
-                onClicked: if (player) player.scorePoints(sc.value)
-            }
-            MenuButton {
-                property var player: engine.getPlayer(3)
-                text: player ? player.Name + " - score " + sc.value : "-"
-                onClicked: if (player) player.scorePoints(sc.value)
             }
         }
     }

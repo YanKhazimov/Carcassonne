@@ -56,9 +56,9 @@ void Player::createAbbeyTile(ObjectManager &objectManager)
 {
     abbeyTile = std::make_shared<Tile>(std::vector<TileObject> {
                                            { objectManager.GenerateAbbey(),
-                                             { {0, 0}, {0, 2}, {0, 4}, {2, 0}, {2, 4}, {4, 0}, {4, 2}, {4, 4} } }
-                                       }/*,
-                                       "abbey.png", 0*/);
+                                             { {0, 0}, {0, 2}, {0, 4}, {2, 0}, {2, 2}, {2, 4}, {4, 0}, {4, 2}, {4, 4} } }
+                                       },
+                                       "abbey.jpg", 0);
 }
 
 Tile* Player::getAbbeyTile()

@@ -28,6 +28,7 @@ public:
     std::tuple<int, int, int> getTownResources(unsigned townId);
     int countObjectTiles(unsigned objectId);
     int getPoints(unsigned objectId);
+    int countTownsAround(unsigned objectId);
 };
 
 #endif // OBJECTMANAGER_H
