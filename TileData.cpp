@@ -914,7 +914,7 @@ void TileData::getAdjacentTowns(std::shared_ptr<MapObjectData> &object, std::set
         if (object == tileObject.objPtr)
         {
             auto checkInsert = [&towns](const std::shared_ptr<MapObjectData>& object) {
-                if (object && object->type == ObjectType::Town && object->isCompleted())
+                if (object && object->type == ObjectType::Town && object->currentObject()->isCompleted())
                     towns.insert(object);
             };
 

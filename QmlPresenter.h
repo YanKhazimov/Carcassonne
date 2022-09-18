@@ -80,9 +80,12 @@ private:
     void scoreCompletedObject(unsigned objectId);
     void processBarnPresence(unsigned objectId, int meepleScore);
 
-    std::set<unsigned> barnFieldInitialIds;
+    // initial id -> player indecies
+    std::map<unsigned, std::vector<int>> barnFieldInitialIds;
 
     void checkFieldIntegrity(unsigned fieldObjectId);
+    void scoreFieldMeeples(unsigned fieldObjectId);
+    void scoreBarnes(unsigned fieldObjectId);
 
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
@@ -96,6 +99,7 @@ public:
     Q_INVOKABLE Tile* getAbbeyTile(int i);
     Q_INVOKABLE void switchActivePlayer();
     Q_INVOKABLE void placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile *tile);
+    Q_INVOKABLE void scoreHighlightedField();
 
 signals:
     void tilesChanged();

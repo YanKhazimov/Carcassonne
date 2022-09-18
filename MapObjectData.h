@@ -43,7 +43,7 @@ struct MapObjectData {
     };
 
     void addMeeple(int playerIndex, QmlEnums::MeepleType meepleType, Tile* tile);
-    void freeRemovableMeeples();
+    void freeMeeples(const std::set<QmlEnums::MeepleType>& typesToRemove);
     std::vector<int> mostPresentPlayers() const;
     bool taken() const;
     std::set<int> pigs() const;

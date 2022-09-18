@@ -54,5 +54,16 @@ MouseArea {
 
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
-    onClicked: selectObjectAt(mouseX, mouseY)
+    acceptedButtons: Qt.LeftButton | Qt.RightButton
+    onClicked: {
+        if (mouse.button == Qt.LeftButton)
+        {
+            selectObjectAt(mouseX, mouseY)
+        }
+        else if (mouse.button == Qt.RightButton)
+        {
+            if (engine.HighlightedObjectId === idAt(mouseX, mouseY)) // && isGameOver
+                engine.scoreHighlightedField()
+        }
+    }
 }

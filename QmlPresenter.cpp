@@ -267,13 +267,13 @@ void QmlPresenter::scoreCompletedObject(unsigned objectId)
             getPlayer(playerIndex)->scorePoints(points);
         }
 
-        object->freeRemovableMeeples();
+        object->freeMeeples({ QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeepleBuilder });
     }
 }
 
 void QmlPresenter::processBarnPresence(unsigned objectId, int meepleScore)
 {
-    if (auto object = objectManager.GetObject(objectId); object)
+    if (auto object = objectManager.GetObject(objectId); object && object->type == ObjectType::Field)
     {
         std::vector<int> mostPresentPlayers = object->mostPresentPlayers();
         if (!mostPresentPlayers.empty())
@@ -288,17 +288,36 @@ void QmlPresenter::processBarnPresence(unsigned objectId, int meepleScore)
             }
         }
 
-        object->freeRemovableMeeples();
+        object->freeMeeples({ QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeeplePig });
     }
 }
 
 void QmlPresenter::checkFieldIntegrity(unsigned fieldObjectId)
 {
-    for (unsigned barnFieldInitialId: barnFieldInitialIds)
+    for (auto& barnFieldInitialId: barnFieldInitialIds)
     {
-        if (fieldObjectId == objectManager.GetObject(barnFieldInitialId)->initialId)
+        if (fieldObjectId == objectManager.GetObject(barnFieldInitialId.first)->initialId)
         {
             processBarnPresence(fieldObjectId, 1);
+        }
+    }
+}
+
+void QmlPresenter::scoreFieldMeeples(unsigned fieldObjectId)
+{
+    processBarnPresence(fieldObjectId, 3);
+}
+
+void QmlPresenter::scoreBarnes(unsigned fieldObjectId)
+{
+    for (auto& barnFieldInitialId: barnFieldInitialIds)
+    {
+        if (fieldObjectId == objectManager.GetObject(barnFieldInitialId.first)->initialId)
+        {
+            for (auto& playerIndex: barnFieldInitialId.second)
+            {
+                getPlayer(playerIndex)->scorePoints(4 * objectManager.countTownsAround(fieldObjectId));
+            }
         }
     }
 }
@@ -322,7 +341,17 @@ void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectI
         if ((QmlEnums::MeepleType)meepleType == QmlEnums::MeepleType::MeepleBarn)
         {
             processBarnPresence(object->initialId, 3);
-            barnFieldInitialIds.insert(object->initialId);
+            barnFieldInitialIds[object->initialId].push_back(playerIndex);
         }
+    }
+}
+
+void QmlPresenter::scoreHighlightedField()
+{
+    if (auto object = objectManager.GetObject(highlightedObjId); object && object->type == ObjectType::Field)
+    {
+        scoreFieldMeeples(object->initialId);
+        scoreBarnes(object->initialId);
+        object->freeMeeples({ QmlEnums::MeepleBarn });
     }
 }

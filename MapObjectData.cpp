@@ -83,22 +83,19 @@ Monastery::Monastery(unsigned id, ObjectManager *manager)
     pointValue = 9;
 }
 
-void MapObjectData::freeRemovableMeeples()
+void MapObjectData::freeMeeples(const std::set<QmlEnums::MeepleType>& typesToRemove)
 {
     for (const auto& object: group())
     {
         for (auto iter = object->playerPresence.meeples.begin(); iter != object->playerPresence.meeples.end(); )
         {
-            switch (iter->meepleType)
+            if (typesToRemove.find(iter->meepleType) != typesToRemove.end())
             {
-            case MeepleType::MeepleSmall:
-            case MeepleType::MeepleBig:
-            case MeepleType::MeeplePig:
-            case MeepleType::MeepleBuilder:
                 emit iter->tile->meepleReset();
                 iter = object->playerPresence.meeples.erase(iter);
-                break;
-            default:
+            }
+            else
+            {
                 ++iter;
             }
         }
