@@ -15,6 +15,8 @@ class Tile : public QObject, public TileData
     Q_PROPERTY(bool Monastery READ hasMonastery NOTIFY layoutChanged)
     Q_PROPERTY(int MonasteryId READ monasteryId NOTIFY objectIdsChanged)
 
+    Q_PROPERTY(bool RoadBlock READ hasRoadBlock NOTIFY layoutChanged)
+
     Q_PROPERTY(bool FieldWhole READ hasFieldWhole NOTIFY layoutChanged)
     Q_PROPERTY(int FieldWholeId READ fieldWholeId NOTIFY objectIdsChanged)
 

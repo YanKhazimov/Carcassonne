@@ -78,6 +78,8 @@ protected:
     bool hasMonastery() const;
     int monasteryId() const;
 
+    bool hasRoadBlock() const;
+
     bool hasFieldWhole() const;
     int fieldWholeId() const;
 

@@ -22,6 +22,48 @@ int main(int argc, char *argv[])
                        },
                        "18.jpg", 270);
     tiles.emplace_back(std::vector<TileObject> {
+                           { objectManager.GenerateField(), { {0, 0} } },
+                           { objectManager.GenerateField(), { {4, 0} } },
+                           { objectManager.GenerateField(), { {0, 4} } },
+                           { objectManager.GenerateField(), { {4, 4} } },
+                           { objectManager.GenerateRoad(1), { {0, 2} } },
+                           { objectManager.GenerateRoad(1), { {2, 0} } },
+                           { objectManager.GenerateRoad(1), { {2, 4} } },
+                           { objectManager.GenerateRoad(1), { {4, 2} } }
+                       },
+                       "78.jpg", 0);
+    tiles.emplace_back(std::vector<TileObject> {
+                           { objectManager.GenerateField(), { {0, 0} } },
+                           { objectManager.GenerateField(), { {4, 0} } },
+                           { objectManager.GenerateField(), { {0, 4} } },
+                           { objectManager.GenerateField(), { {4, 4} } },
+                           { objectManager.GenerateRoad(1), { {0, 2} } },
+                           { objectManager.GenerateTown(1), { {2, 0} } },
+                           { objectManager.GenerateTown(1), { {2, 4} } },
+                           { objectManager.GenerateRoad(1), { {4, 2} } }
+                       },
+                       "80.jpg", 0);
+    tiles.emplace_back(std::vector<TileObject> {
+                           { objectManager.GenerateField(), { {0, 0} } },
+                           { objectManager.GenerateField(), { {0, 4} } },
+                           { objectManager.GenerateField(), { {4, 0}, {4, 4} } },
+                           { objectManager.GenerateRoad(1), { {0, 2} } },
+                           { objectManager.GenerateRoad(1), { {2, 0} } },
+                           { objectManager.GenerateRoad(1), { {2, 4} } },
+                           { objectManager.GenerateTown(1), { {4, 2} } }
+                       },
+                       "1.jpg", 0);
+    tiles.emplace_back(std::vector<TileObject> {
+                           { objectManager.GenerateMonastery(), { {2, 2} } },
+                           { objectManager.GenerateRoad(1), { {2, 0} } },
+                           { objectManager.GenerateRoad(1), { {0, 2} } },
+                           { objectManager.GenerateRoad(1), { {2, 4} } },
+                           { objectManager.GenerateField(), { {0, 0} } },
+                           { objectManager.GenerateField(), { {0, 4} } },
+                           { objectManager.GenerateField(), { {4, 0}, {4, 2}, {4, 4} } }
+                       },
+                       "70.jpg", 0);
+    tiles.emplace_back(std::vector<TileObject> {
                            { objectManager.GenerateField(), { {0, 0}, {0, 2}, {0, 4}, {2, 0}, {4, 0} } },
                            { objectManager.GenerateRoad(1), { {4, 2} } },
                            { objectManager.GenerateField(), { {4, 4} } },
@@ -134,16 +176,6 @@ int main(int argc, char *argv[])
                            { objectManager.GenerateField(), { {4, 4} } }
                        },
                        "73.jpg", 0);
-    tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateMonastery(), { {2, 2} } },
-                           { objectManager.GenerateRoad(1), { {2, 0} } },
-                           { objectManager.GenerateRoad(1), { {0, 2} } },
-                           { objectManager.GenerateRoad(1), { {2, 4} } },
-                           { objectManager.GenerateField(), { {0, 0} } },
-                           { objectManager.GenerateField(), { {0, 4} } },
-                           { objectManager.GenerateField(), { {4, 0}, {4, 2}, {4, 4} } }
-                       },
-                       "70.jpg", 0);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

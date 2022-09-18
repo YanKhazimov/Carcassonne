@@ -107,6 +107,7 @@
         <file>TileBonusIndicator.qml</file>
         <file>TileBonuses.qml</file>
         <file>ElementActionIndicator.qml</file>
+        <file>schematic/RoadBlock.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>
@@ -124,6 +125,7 @@
         <file alias="cloth.png">img/cloth.png</file>
         <file alias="wheat.png">img/wheat.png</file>
         <file alias="star.png">img/star.png</file>
+        <file alias="tiles/1.jpg">img/tiles/1.jpg</file>
         <file alias="tiles/9.jpg">img/tiles/9.jpg</file>
         <file alias="tiles/12.jpg">img/tiles/12.jpg</file>
         <file alias="tiles/14.jpg">img/tiles/14.jpg</file>
@@ -138,6 +140,8 @@
         <file alias="tiles/71.jpg">img/tiles/71.jpg</file>
         <file alias="tiles/72.jpg">img/tiles/72.jpg</file>
         <file alias="tiles/73.jpg">img/tiles/73.jpg</file>
+        <file alias="tiles/78.jpg">img/tiles/78.jpg</file>
+        <file alias="tiles/80.jpg">img/tiles/80.jpg</file>
         <file alias="tiles/81.jpg">img/tiles/81.jpg</file>
         <file alias="tiles/abbey.jpg">img/tiles/abbey.jpg</file>
     </qresource>

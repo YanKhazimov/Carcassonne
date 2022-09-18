@@ -118,6 +118,12 @@ int TileData::monasteryId() const
     return C() ? C()->initialId : InvalidId;
 }
 
+bool TileData::hasRoadBlock() const
+{
+    return (hasRoadNorth() && hasRoadSouth() || hasRoadWest() && hasRoadEast()) &&
+            !C();
+}
+
 bool TileData::hasFieldWhole() const
 {
     return sameType(ObjectType::Field, NW()->type, NE()->type, SE()->type, SW()->type) &&
@@ -915,7 +921,7 @@ void TileData::getAdjacentTowns(std::shared_ptr<MapObjectData> &object, std::set
         {
             auto checkInsert = [&towns](const std::shared_ptr<MapObjectData>& object) {
                 if (object && object->type == ObjectType::Town && object->currentObject()->isCompleted())
-                    towns.insert(object);
+                    towns.insert(object->currentObject());
             };
 
             for (auto& locationPoint: tileObject.location)

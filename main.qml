@@ -112,6 +112,7 @@ Window {
                         root.activeMeeple.resetPosition()
                         if (engine.GameState === GameEngine.MeeplePlaced)
                             zones[engine.ActivePlayer].addMeeple(root.activeMeeple.type, 1)
+                        root.activeMeeple = null
                     }
                 }
 
@@ -134,6 +135,7 @@ Window {
             })
             obj.reset.connect(function() {
                zones[obj.playerIndex].addMeeple(obj.type, 1)
+                root.activeMeeple = null
             })
             return obj
         }

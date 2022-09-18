@@ -345,4 +345,8 @@ Item {
         tileData: root.tileData
         z: currentId
     }
+
+    RoadBlock {
+        tileData: root.tileData
+    }
 }
