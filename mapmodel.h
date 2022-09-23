@@ -21,11 +21,6 @@ class MapModel : public QObject
     int minX, maxX, minY, maxY;
     Tile* latestTile = nullptr;
 
-    Tile* nextTileNorth(int x, int y) const;
-    Tile* nextTileSouth(int x, int y) const;
-    Tile* nextTileWest(int x, int y) const;
-    Tile* nextTileEast(int x, int y) const;
-
     bool canMergeRegularTile(int x, int y, const TileData& tile) const;
     bool canMergeAbbeyTile(int x, int y, const TileData& tile) const;
     int maxCapacity() const;
@@ -40,6 +35,15 @@ public:
     Q_INVOKABLE bool isFreeAdjacent(int x, int y) const;
     Q_INVOKABLE bool canMergeAsIs(int x, int y, Tile* tile) const;
     Q_INVOKABLE bool canMergeRotated(int x, int y, Tile* tile) const;
+
+    Tile* nextTileNorth(int x, int y) const;
+    Tile* nextTileSouth(int x, int y) const;
+    Tile* nextTileWest(int x, int y) const;
+    Tile* nextTileEast(int x, int y) const;
+    Tile* nextTileNorthEast(int x, int y) const;
+    Tile* nextTileSouthEast(int x, int y) const;
+    Tile* nextTileSouthWest(int x, int y) const;
+    Tile* nextTileNorthWest(int x, int y) const;
 
 signals:
     void minMaxChanged();

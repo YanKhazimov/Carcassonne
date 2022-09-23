@@ -64,11 +64,12 @@ Item {
     {
         if (dragActive)
         {
+            engine.highlight(-1)
             dragStarted()
         }
         else
         {
-            if (Drag.target != null)// && Drag.target.acceptsActiveMeeple())
+            if (Drag.target != null && Drag.target.acceptsActiveMeeple())
             {
                 Drag.drop()
                 engine.GameState = GameEngine.MeeplePlaced
@@ -80,6 +81,7 @@ Item {
                 engine.GameState = GameEngine.TileFixed
                 resetPosition()
                 dragFinished()
+                //TODO indicate an unsuccessful drag
             }
         }
     }

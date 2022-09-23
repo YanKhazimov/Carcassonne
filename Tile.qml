@@ -14,6 +14,9 @@ Item {
     required property Board board
     property int playerIndex: -1
 
+    readonly property alias dragActive: dragArea.drag.active
+    readonly property bool acceptsActiveMeeple: dropArea.accepts
+
     width: Constants.tileSize
     height: Constants.tileSize
 
@@ -65,7 +68,7 @@ Item {
             meeple.yRatio = (meeple.y + meeple.height/2 - root.y) / Constants.tileSize
             meeple.draggable = false
 
-            engine.placeMeeple(meeple.type, meeple.playerIndex, dropArea.meepleObjectId, tileData)
+            engine.placeMeeple(meeple.type, meeple.playerIndex, dropArea.selectedObject.currentId, tileData)
         }
     }
 
@@ -119,15 +122,10 @@ Item {
     signal dragFinished()
     signal dragCancelled()
 
-    property alias dragActive: dragArea.drag.active
     onDragActiveChanged:
     {
-        //console.log("dragActive", dragActive)
         if (!dragActive)
         {
-//            console.log("Drag.target", Drag.target)
-//            if (Drag.target)
-//                console.log("accepts", Drag.target.acceptsActiveTile())
             if (Drag.target != null && Drag.target.acceptsActiveTile())
             {
                 Drag.drop()
@@ -160,23 +158,43 @@ Item {
     DropArea {
         id: dropArea
 
-        property var meepleObjectId
+        property Item selectedObject
+        property bool accepts
+
         anchors.fill: parent
         keys: ["meeple"]
         enabled: engine.mapModel.LatestTile === tileData
-        onPositionChanged: objectsArea.selectObjectAt(drag.x, drag.y)
+
+        function acceptsActiveMeeple() {
+            // operating meeple, selectedObject, tileData
+            return selectedObject && meeple &&
+                    engine.canPlaceMeeple(selectedObject.currentId, meeple.playerIndex, meeple.type, selectedObject.tileData)
+        }
+
+        Component.onCompleted: accepts = false
+
+        onPositionChanged: {
+            selectedObject = objectsArea.objectAt(drag.x, drag.y)
+            engine.highlight(selectedObject ? selectedObject.currentId : -1)
+            accepts = acceptsActiveMeeple()
+        }
         onEntered: {
             meeple = drag.source
+            selectedObject = objectsArea.objectAt(drag.x, drag.y)
+            engine.highlight(selectedObject ? selectedObject.currentId : -1)
+            accepts = acceptsActiveMeeple()
         }
         onExited: {
+            accepts = false
             meeple = null
+            selectedObject = null
             engine.highlight(-1)
         }
         onDropped: {
-            meepleObjectId = objectsArea.idAt(drag.x, drag.y)
-            if (meepleObjectId === -1) {
+            if (!selectedObject || selectedObject.currentId === -1) {
                 resetMeeple()
             }
+            engine.highlight(-1)
         }
     }
 
@@ -186,7 +204,7 @@ Item {
         source: tileData.Picture
         anchors.fill: parent
         rotation: tileData.ImageRotation
-        opacity: 0.2//tileData.Abbey ? 1 : 0.8//engine.TilePictureOpacity
+        opacity: 0//tileData.Abbey ? 1 : 0.8//engine.TilePictureOpacity
 
         Behavior on rotation {
             NumberAnimation {

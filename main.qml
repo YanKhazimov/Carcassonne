@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+import QtQml 2.15
 import QmlPresenter 1.0
 import "schematic"
 
@@ -26,6 +27,14 @@ Window {
         target: engine
         property: "TilePictureOpacity"
         value: activeMeeple ? 0.6 : 1
+    }
+
+    Binding {
+        target: Constants.color.schematic
+        property: "highlighter"
+        value: (lastPlacedTile && lastPlacedTile.acceptsActiveMeeple) ? Constants.color.schematic.highlighterRight : Constants.color.schematic.highlighterWrong
+        when: lastPlacedTile && activeMeeple && activeMeeple.dragActive
+        restoreMode: Binding.RestoreBindingOrValue
     }
 
     function createTileItem(x, y) {

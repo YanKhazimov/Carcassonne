@@ -22,6 +22,26 @@ Tile* MapModel::nextTileEast(int x, int y) const
     return (x + size/2 + 1 < size) ? tiles[y + size/2][x + size/2 + 1] : nullptr;
 }
 
+Tile *MapModel::nextTileNorthEast(int x, int y) const
+{
+    return nextTileNorth(x, y) ? nextTileEast(x, y - 1) : nullptr;
+}
+
+Tile *MapModel::nextTileSouthEast(int x, int y) const
+{
+    return nextTileSouth(x, y) ? nextTileEast(x, y + 1) : nullptr;
+}
+
+Tile *MapModel::nextTileSouthWest(int x, int y) const
+{
+    return nextTileSouth(x, y) ? nextTileWest(x, y + 1) : nullptr;
+}
+
+Tile *MapModel::nextTileNorthWest(int x, int y) const
+{
+    return nextTileNorth(x, y) ? nextTileWest(x, y - 1) : nullptr;
+}
+
 bool MapModel::canMergeRegularTile(int x, int y, const TileData &tile) const
 {
     return tiles[y + size/2][x + size/2] == nullptr &&

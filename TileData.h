@@ -37,6 +37,10 @@ public:
     bool hasCentralScorableObject() const;
     void getAdjacentTowns(std::shared_ptr<MapObjectData>& object, std::set<std::shared_ptr<MapObjectData>> &towns) const;
     std::set<unsigned> getFieldObjectIds() const;
+    unsigned NEBarnCornerId() const;
+    unsigned NWBarnCornerId() const;
+    unsigned SEBarnCornerId() const;
+    unsigned SWBarnCornerId() const;
 
 protected:
     std::vector<TileObject> tileObjects;

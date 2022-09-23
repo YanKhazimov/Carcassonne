@@ -988,6 +988,38 @@ std::set<unsigned> TileData::getFieldObjectIds() const
     return result;
 }
 
+unsigned TileData::NEBarnCornerId() const
+{
+    return NE()->type == ObjectType::Field &&
+            N()->type != ObjectType::Town &&
+            E()->type != ObjectType::Town ?
+                NE()->currentObject()->initialId : InvalidId;
+}
+
+unsigned TileData::NWBarnCornerId() const
+{
+    return NW()->type == ObjectType::Field &&
+            N()->type != ObjectType::Town &&
+            W()->type != ObjectType::Town ?
+                NW()->currentObject()->initialId : InvalidId;
+}
+
+unsigned TileData::SEBarnCornerId() const
+{
+    return SE()->type == ObjectType::Field &&
+            S()->type != ObjectType::Town &&
+            E()->type != ObjectType::Town ?
+                SE()->currentObject()->initialId : InvalidId;
+}
+
+unsigned TileData::SWBarnCornerId() const
+{
+    return SW()->type == ObjectType::Field &&
+            S()->type != ObjectType::Town &&
+            W()->type != ObjectType::Town ?
+                SW()->currentObject()->initialId : InvalidId;
+}
+
 TileData TileData::copy() const
 {
     return *this;

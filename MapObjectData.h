@@ -47,6 +47,8 @@ struct MapObjectData {
     std::vector<int> mostPresentPlayers() const;
     bool taken() const;
     std::set<int> pigs() const;
+    bool commonMeeplesPresent(int playerIndex) const;
+    bool barnPresent() const;
 
 private:
     PlayerPresence playerPresence;

@@ -2,6 +2,8 @@
 #include "DataRoles.h"
 #include "ObjectManager.h"
 #include "DataTypes.h"
+#include <iostream>
+#include <QPoint>
 #include <QDebug>
 
 TilesModel *QmlPresenter::getTiles()
@@ -310,16 +312,75 @@ void QmlPresenter::scoreFieldMeeples(unsigned fieldObjectId)
 
 void QmlPresenter::scoreBarnes(unsigned fieldObjectId)
 {
+    std::vector<unsigned> idsToDelete;
     for (auto& barnFieldInitialId: barnFieldInitialIds)
     {
-        if (fieldObjectId == objectManager.GetObject(barnFieldInitialId.first)->initialId)
+        auto barnField = objectManager.GetObject(barnFieldInitialId.first);
+        if (fieldObjectId == barnField->initialId)
         {
             for (auto& playerIndex: barnFieldInitialId.second)
             {
                 getPlayer(playerIndex)->scorePoints(4 * objectManager.countTownsAround(fieldObjectId));
             }
+
+            barnField->freeMeeples({ QmlEnums::MeepleBarn });
+            idsToDelete.push_back(barnFieldInitialId.first);
         }
     }
+
+    for (unsigned toDelete: idsToDelete)
+    {
+        barnFieldInitialIds.erase(toDelete);
+    }
+}
+
+bool QmlPresenter::isFieldCorner(Tile *tile, unsigned objectId) const
+{
+    int x = tile->position().x();
+    int y = tile->position().y();
+
+    Tile* north = mapModel.nextTileNorth(x, y);
+    Tile* west = mapModel.nextTileNorth(x, y);
+    Tile* south = mapModel.nextTileSouth(x, y);
+    Tile* east = mapModel.nextTileEast(x, y);
+
+    if (tile->NEBarnCornerId() == objectId)
+    {
+        Tile* northEast = mapModel.nextTileNorthEast(x, y);
+        if (north && north->SEBarnCornerId() &&
+                east && east->NWBarnCornerId() &&
+                northEast && northEast->SWBarnCornerId())
+            return true;
+    }
+
+    if (tile->SEBarnCornerId() == objectId)
+    {
+        Tile* southEast = mapModel.nextTileSouthEast(x, y);
+        if (south && south->NEBarnCornerId() &&
+                east && east->SWBarnCornerId() &&
+                southEast && southEast->NWBarnCornerId())
+            return true;
+    }
+
+    if (tile->SWBarnCornerId() == objectId)
+    {
+        Tile* southWest = mapModel.nextTileSouthWest(x, y);
+        if (south && south->NWBarnCornerId() &&
+                west && west->SEBarnCornerId() &&
+                southWest && southWest->NEBarnCornerId())
+            return true;
+    }
+
+    if (tile->NWBarnCornerId() == objectId)
+    {
+        Tile* northWest = mapModel.nextTileNorthWest(x, y);
+        if (north && north->SWBarnCornerId() &&
+                west && west->NEBarnCornerId() &&
+                northWest && northWest->SEBarnCornerId())
+            return true;
+    }
+
+    return false;
 }
 
 void QmlPresenter::switchActivePlayer()
@@ -352,6 +413,34 @@ void QmlPresenter::scoreHighlightedField()
     {
         scoreFieldMeeples(object->initialId);
         scoreBarnes(object->initialId);
-        object->freeMeeples({ QmlEnums::MeepleBarn });
     }
+}
+
+bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile* tile) const
+{
+    if (auto object = objectManager.GetObject(objectId); object)
+    {
+        switch ((QmlEnums::MeepleType)type)
+        {
+        case QmlEnums::MeepleSmall:
+        case QmlEnums::MeepleBig:
+            return object->mostPresentPlayers().empty();
+        case QmlEnums::MeepleBarn:
+            return object->type == ObjectType::Field
+                    && !object->barnPresent()
+                    && isFieldCorner(tile, objectId);
+            return false;
+        case QmlEnums::MeeplePig:
+            return object->type == ObjectType::Field
+                    && object->commonMeeplesPresent(playerIndex);
+        case QmlEnums::MeepleBuilder:
+            return (object->type == ObjectType::Town || object->type == ObjectType::Road)
+                    && object->commonMeeplesPresent(playerIndex);
+            return false;
+        default:
+            std::cerr << "placing unknown meeple type " << type << std::endl;
+        }
+    }
+
+    return false;
 }

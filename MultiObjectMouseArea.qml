@@ -5,51 +5,48 @@ MouseArea {
 
     required property var objectList
 
-    function rotate(p, objectRotation) {
-        while (objectRotation > 0)
-        {
-            // rotateCounterClockwise90
-            p = Qt.point(p.y, root.width - p.x)
-            objectRotation -= 90
-        }
+    QtObject {
+        id: internal
 
-        if (objectRotation !== 0) {
-            console.error("Unsupported rotation", obj.rotation)
-        }
-
-        return p
-    }
-
-    function idAt(x, y)
-    {
-        var idx = objectIndexAt(x, y)
-        return objectList[idx].currentId
-    }
-
-    function selectObjectAt(x, y)
-    {
-        var idx = objectIndexAt(x, y)
-        engine.highlight(idx !== -1 ? objectList[idx].currentId : -1)
-    }
-
-    function objectIndexAt(x, y) {
-        var result = -1
-        var resultZ = -1
-        for (var i = 0; i < objectList.length; ++i)
-        {
-            var obj = objectList[i]
-            if (!obj.visible)
-                continue
-
-            var rotatedPoint = rotate(Qt.point(x, y), obj.rotation)
-            if (obj.contains(rotatedPoint) && obj.z >= resultZ)
+        function rotate(p, objectRotation) {
+            while (objectRotation > 0)
             {
-                result = i
-                resultZ = obj.z
+                // rotateCounterClockwise90
+                p = Qt.point(p.y, root.width - p.x)
+                objectRotation -= 90
             }
+
+            if (objectRotation !== 0) {
+                console.error("Unsupported rotation", obj.rotation)
+            }
+
+            return p
         }
 
-        return result
+        function objectIndexAt(x, y) {
+            var result = -1
+            var resultZ = -1
+            for (var i = 0; i < objectList.length; ++i)
+            {
+                var obj = objectList[i]
+                if (!obj.visible)
+                    continue
+
+                var rotatedPoint = rotate(Qt.point(x, y), obj.rotation)
+                if (obj.contains(rotatedPoint) && obj.z >= resultZ)
+                {
+                    result = i
+                    resultZ = obj.z
+                }
+            }
+
+            return result
+        }
+    }
+
+    function objectAt(x, y) {
+        var idx = internal.objectIndexAt(x, y)
+        return idx !== -1 ? objectList[idx] : null
     }
 
     hoverEnabled: true
@@ -58,11 +55,11 @@ MouseArea {
     onClicked: {
         if (mouse.button == Qt.LeftButton)
         {
-            selectObjectAt(mouseX, mouseY)
+            engine.highlight(objectAt(mouseX, mouseY).currentId)
         }
         else if (mouse.button == Qt.RightButton)
         {
-            if (engine.HighlightedObjectId === idAt(mouseX, mouseY)) // && isGameOver
+            if (engine.HighlightedObjectId === objectAt(mouseX, mouseY).currentId) // && isGameOver
                 engine.scoreHighlightedField()
         }
     }

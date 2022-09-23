@@ -87,6 +87,8 @@ private:
     void scoreFieldMeeples(unsigned fieldObjectId);
     void scoreBarnes(unsigned fieldObjectId);
 
+    bool isFieldCorner(Tile* tile, unsigned objectId) const;
+
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
 
@@ -100,6 +102,7 @@ public:
     Q_INVOKABLE void switchActivePlayer();
     Q_INVOKABLE void placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile *tile);
     Q_INVOKABLE void scoreHighlightedField();
+    Q_INVOKABLE bool canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile *tile) const;
 
 signals:
     void tilesChanged();
