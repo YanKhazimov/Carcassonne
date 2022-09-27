@@ -2,10 +2,9 @@
 #include <QQmlEngine>
 #include "Tile.h"
 
-Player::Player(QColor _color, QObject *parent)
-    : QObject(parent), color(_color), active(false)
+Player::Player(QColor _color, QString _name, QObject *parent)
+    : QObject(parent), color(_color), active(false), name(_name)
 {
-    name = color.name();
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     turnTimer.setTimerType(Qt::VeryCoarseTimer);
     connect(&turnTimer, &QTimer::timeout, this, [this](){
@@ -15,7 +14,7 @@ Player::Player(QColor _color, QObject *parent)
 }
 
 Player::Player(Player &&other) noexcept
-    : color(other.color)
+    : color(other.color), name(other.name)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }

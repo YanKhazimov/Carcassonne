@@ -48,7 +48,7 @@ class Player : public QObject
     void addToPreviousTime(int seconds);
 
 public:
-    Player(QColor color, QObject *parent = nullptr);
+    Player(QColor color, QString name, QObject *parent = nullptr);
     Player(Player&& other) noexcept;
 
     QColor getColor() const;

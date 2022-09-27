@@ -131,10 +131,7 @@ QmlPresenter::QmlPresenter(ObjectManager& objManager, QObject *parent)
 
     sortedPlayers.setSource(&players);
 
-    populatePlayers(4);
-
-    Player* player0 = players.index(0, 0).data(DataRoles::PlayerPtr).value<Player*>();
-    player0->setActive(true);
+    populatePlayers({}, {});
 
     connect(&mapModel, &MapModel::fieldIntegrityCheckRequested, this, &QmlPresenter::checkFieldIntegrity);
 }
@@ -171,13 +168,20 @@ void QmlPresenter::updateHighlight()
     highlight(objectManager.GetObject(highlightedObjId)->initialId);
 }
 
-void QmlPresenter::populatePlayers(int number)
+void QmlPresenter::populatePlayers(QVariantList colors, QVariantList names)
 {
-    for (int i = 0; i < number; ++i)
+    Q_ASSERT(colors.length() == names.length());
+    for (int i = 0; i < colors.length(); ++i)
     {
-        players.AddPlayer(playerColors[i]);
+        players.AddPlayer(colors[i].value<QColor>(), names[i].value<QString>());
         getPlayer(i)->createAbbeyTile(objectManager);
         connect(getPlayer(i)->getAbbeyTile(), &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
+    }
+
+    if (colors.length() > 0)
+    {
+        Player* player0 = players.index(0, 0).data(DataRoles::PlayerPtr).value<Player*>();
+        player0->setActive(true);
     }
 
     emit players.dataChanged(players.index(0, 0), players.index(players.rowCount() - 1, 0), {DataRoles::PlayerScore});
@@ -383,6 +387,11 @@ bool QmlPresenter::isFieldCorner(Tile *tile, unsigned objectId) const
     return false;
 }
 
+QVariantList QmlPresenter::getPossibleColors() const
+{
+    return playerColors;
+}
+
 void QmlPresenter::switchActivePlayer()
 {
     setActivePlayer((activePlayer() + 1) % players.rowCount());
@@ -443,4 +452,9 @@ bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, 
     }
 
     return false;
+}
+
+bool QmlPresenter::isFieldObject(unsigned objectId) const
+{
+    return objectManager.GetObject(objectId)->type == ObjectType::Field;
 }

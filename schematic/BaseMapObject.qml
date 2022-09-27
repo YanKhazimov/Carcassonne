@@ -19,6 +19,8 @@ Shape {
     required property TileData tileData
     readonly property int bonusSideIndex: (rotation + 360) % 360 / 90
 
+    //opacity: highlighted ? 1 : 0
+
     width: side
     height: side
     containsMode: Shape.FillContains

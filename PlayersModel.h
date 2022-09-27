@@ -18,7 +18,7 @@ public:
     Q_INVOKABLE virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void AddPlayer(QColor color);
+    void AddPlayer(QColor color, QString name);
 };
 
 class ScoreboardModel: public QSortFilterProxyModel

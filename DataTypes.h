@@ -3,6 +3,7 @@
 
 #include "qobjectdefs.h"
 #include <QColor>
+#include <QVariantList>
 
 enum Direction {
     East,
@@ -48,6 +49,6 @@ namespace QmlEnums {
 }
 Direction opposite(Direction direction);
 
-extern QColor playerColors[];
+extern QVariantList playerColors;
 
 #endif // DATATYPES_H

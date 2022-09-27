@@ -25,6 +25,7 @@ class QmlPresenter : public QObject
     Q_PROPERTY(int MaxTown MEMBER maxTown NOTIFY maxTownChanged)
     Q_PROPERTY(int MaxRoad MEMBER maxRoad NOTIFY maxRoadChanged)
     Q_PROPERTY(qreal TilePictureOpacity MEMBER tilePictureOpacity NOTIFY tilePictureOpacityChanged)
+    Q_PROPERTY(QVariantList PossibleColors READ getPossibleColors CONSTANT)
 
 public:
     enum class GameState {
@@ -89,6 +90,8 @@ private:
 
     bool isFieldCorner(Tile* tile, unsigned objectId) const;
 
+    QVariantList getPossibleColors() const;
+
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
 
@@ -96,13 +99,14 @@ public:
     Q_INVOKABLE Tile* getTile(int i);
     Q_INVOKABLE void highlight(int id);
     Q_INVOKABLE void updateHighlight();
-    Q_INVOKABLE void populatePlayers(int number);
+    Q_INVOKABLE void populatePlayers(QVariantList colors, QVariantList names);
     Q_INVOKABLE Player* getPlayer(int i);
     Q_INVOKABLE Tile* getAbbeyTile(int i);
     Q_INVOKABLE void switchActivePlayer();
     Q_INVOKABLE void placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile *tile);
     Q_INVOKABLE void scoreHighlightedField();
     Q_INVOKABLE bool canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile *tile) const;
+    Q_INVOKABLE bool isFieldObject(unsigned objectId) const;
 
 signals:
     void tilesChanged();

@@ -105,9 +105,9 @@ Rectangle {
 
         Text {
             id: prevTurnsTime
-            text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData.PreviousTime), "mm:ss")
+            text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData ? playerData.PreviousTime : 0), "mm:ss")
             font.pixelSize: 15
-            visible: playerData.PreviousTime !== 0 || !currentTurnTime.visible
+            visible: playerData && playerData.PreviousTime !== 0 || !currentTurnTime.visible
         }
 
         Text {
@@ -118,17 +118,17 @@ Rectangle {
 
         Text {
             id: currentTurnTime
-            text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData.CurrentTime), "mm:ss")
+            text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData ? playerData.CurrentTime : 0), "mm:ss")
             font.pixelSize: 15
-            visible: playerData.CurrentTime !== 0
-            color: playerData.CurrentTime > 30 ? "white" : "black"
+            visible: playerData && playerData.CurrentTime !== 0
+            color: playerData && playerData.CurrentTime > 30 ? "white" : "black"
 
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: -3
                 radius: 3
                 color: "red"
-                visible: playerData.CurrentTime > 30
+                visible: playerData && playerData.CurrentTime > 30
                 z: parent.z - 1
             }
         }
@@ -147,12 +147,12 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
-                text: " x" + playerData.Barrels
+                text: playerData ? " x" + playerData.Barrels : ""
                 font.pixelSize: 20
                 anchors.verticalCenter: parent.verticalCenter
             }
             LeadIndicator {
-                visible: playerData.BarrelsLead
+                visible: playerData && playerData.BarrelsLead
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -165,12 +165,12 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
-                text: " x" + playerData.Wheat
+                text: playerData ? " x" + playerData.Wheat : ""
                 font.pixelSize: 20
                 anchors.verticalCenter: parent.verticalCenter
             }
             LeadIndicator {
-                visible: playerData.WheatLead
+                visible: playerData && playerData.WheatLead
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -183,12 +183,12 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
-                text: " x" + playerData.Cloth
+                text: playerData ? " x" + playerData.Cloth : ""
                 font.pixelSize: 20
                 anchors.verticalCenter: parent.verticalCenter
             }
             LeadIndicator {
-                visible: playerData.ClothLead
+                visible: playerData && playerData.ClothLead
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -200,7 +200,7 @@ Rectangle {
         spacing: 5
 
         Row {
-            visible: playerData.TownLead
+            visible: playerData && playerData.TownLead
 
             Text {
                 text: "город: " + engine.MaxTown
@@ -213,7 +213,7 @@ Rectangle {
         }
 
         Row {
-            visible: playerData.RoadLead
+            visible: playerData && playerData.RoadLead
 
             Text {
                 text: "дорога: " + engine.MaxRoad
@@ -255,7 +255,7 @@ Rectangle {
             id: deckBackMouseArea
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            visible: tilesInDeck > 0 && playerData.IsActive && (engine.GameState === GameEngine.NewTurn ||
+            visible: tilesInDeck > 0 && playerData && playerData.IsActive && (engine.GameState === GameEngine.NewTurn ||
                                                                 engine.GameState === GameEngine.TilePlaced &&
                                                                 engine.getAbbeyTile(engine.ActivePlayer).IsPlaced &&
                                                                 !engine.getAbbeyTile(engine.ActivePlayer).IsFixed)

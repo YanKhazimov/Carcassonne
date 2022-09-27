@@ -47,12 +47,12 @@ QVariant PlayersModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void PlayersModel::AddPlayer(QColor color)
+void PlayersModel::AddPlayer(QColor color, QString name)
 {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
 
     int i = players.size();
-    players.push_back(std::make_shared<Player>(color));
+    players.push_back(std::make_shared<Player>(color, name));
 
     connect(players[i].get(), &Player::nameChanged, this, [this, i](){
         emit dataChanged(index(i, 0), index(i, 0), {DataRoles::PlayerName});

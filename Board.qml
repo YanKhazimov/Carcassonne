@@ -257,7 +257,7 @@ Rectangle {
                     width: Constants.tileSize
                     height: Constants.tileSize
                     color: dropArea.playable ? "transparent" : "cyan"
-                    border.color: "silver"//activeTile && activeTile.dragActive ? "silver" : "transparent"
+                    border.color: activeTile && activeTile.dragActive ? "silver" : "transparent"
 
                     Behavior on width { NumberAnimation { duration: 200 } }
                     Behavior on height { NumberAnimation { duration: 200 } }
@@ -339,10 +339,6 @@ Rectangle {
                             engine.GameState = GameEngine.TilePlaced
                         }
                     }
-//                    Text {
-//                        text: "%1, %2".arg(dropArea.xIndex).arg(dropArea.yIndex)
-//                        color: "white"
-//                    }
 
                     MouseArea {
                         anchors.fill: parent

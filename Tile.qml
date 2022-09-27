@@ -171,24 +171,29 @@ Item {
                     engine.canPlaceMeeple(selectedObject.currentId, meeple.playerIndex, meeple.type, selectedObject.tileData)
         }
 
+        function processSelectedObject(obj) {
+            if (selectedObject !== obj) {
+                selectedObject = obj
+                meeple.rotation = (selectedObject && engine.isFieldObject(selectedObject.currentId) &&
+                                   (meeple.type === EngineEnums.MeepleSmall || meeple.type === EngineEnums.MeepleBig))
+                        ? 90 : 0
+                accepts = acceptsActiveMeeple()
+            }
+            engine.highlight(selectedObject ? selectedObject.currentId : -1)
+        }
+
         Component.onCompleted: accepts = false
 
         onPositionChanged: {
-            selectedObject = objectsArea.objectAt(drag.x, drag.y)
-            engine.highlight(selectedObject ? selectedObject.currentId : -1)
-            accepts = acceptsActiveMeeple()
+            processSelectedObject(objectsArea.objectAt(drag.x, drag.y))
         }
         onEntered: {
             meeple = drag.source
-            selectedObject = objectsArea.objectAt(drag.x, drag.y)
-            engine.highlight(selectedObject ? selectedObject.currentId : -1)
-            accepts = acceptsActiveMeeple()
+            processSelectedObject(objectsArea.objectAt(drag.x, drag.y))
         }
         onExited: {
-            accepts = false
+            processSelectedObject(null)
             meeple = null
-            selectedObject = null
-            engine.highlight(-1)
         }
         onDropped: {
             if (!selectedObject || selectedObject.currentId === -1) {

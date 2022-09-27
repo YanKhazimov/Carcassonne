@@ -108,6 +108,8 @@
         <file>TileBonuses.qml</file>
         <file>ElementActionIndicator.qml</file>
         <file>schematic/RoadBlock.qml</file>
+        <file>SettingsWindow.qml</file>
+        <file>GameWindow.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>
@@ -144,5 +146,6 @@
         <file alias="tiles/80.jpg">img/tiles/80.jpg</file>
         <file alias="tiles/81.jpg">img/tiles/81.jpg</file>
         <file alias="tiles/abbey.jpg">img/tiles/abbey.jpg</file>
+        <file alias="startBackground.jpg">img/startBackground.jpg</file>
     </qresource>
 </RCC>

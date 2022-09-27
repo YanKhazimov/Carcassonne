@@ -11,7 +11,7 @@ Item {
     property bool draggable
     property var type
     required property int playerIndex
-    readonly property color playerColor: engine.getPlayer(playerIndex).Color
+    readonly property color playerColor: playerIndex < engine.PlayerCount ? engine.getPlayer(playerIndex).Color : "white"
 
     QtObject {
         id: internal
