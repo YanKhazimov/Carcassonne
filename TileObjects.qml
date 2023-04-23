@@ -131,6 +131,38 @@ Item {
         tileData: root.tileData
     }
 
+    Field_HalfQuarter_NEE {
+        tileData: root.tileData
+    }
+
+    Field_HalfQuarter_SEE {
+        tileData: root.tileData
+    }
+
+    Field_HalfQuarter_SSE {
+        tileData: root.tileData
+    }
+
+    Field_HalfQuarter_SSW {
+        tileData: root.tileData
+    }
+
+    Field_HalfQuarter_SWW {
+        tileData: root.tileData
+    }
+
+    Field_HalfQuarter_NWW {
+        tileData: root.tileData
+    }
+
+    Field_HalfQuarter_NNW {
+        tileData: root.tileData
+    }
+
+    Field_HalfQuarter_NNE {
+        tileData: root.tileData
+    }
+
     Road_North {
         tileData: root.tileData
     }
@@ -330,6 +362,22 @@ Item {
     }
 
     Town_2e3c_SouthWest {
+        tileData: root.tileData
+    }
+
+    Town_3e4c_NorthEastWest {
+        tileData: root.tileData
+    }
+
+    Town_3e4c_EastNorthSouth {
+        tileData: root.tileData
+    }
+
+    Town_3e4c_SouthEastWest {
+        tileData: root.tileData
+    }
+
+    Town_3e4c_WestNorthSouth {
         tileData: root.tileData
     }
 

@@ -112,6 +112,18 @@
         <file>GameWindow.qml</file>
         <file>BinarySwitch.qml</file>
         <file>Preferences.qml</file>
+        <file>schematic/Field_HalfQuarter_NEE.qml</file>
+        <file>schematic/Field_HalfQuarter_SEE.qml</file>
+        <file>schematic/Field_HalfQuarter_SSE.qml</file>
+        <file>schematic/Field_HalfQuarter_SSW.qml</file>
+        <file>schematic/Field_HalfQuarter_SWW.qml</file>
+        <file>schematic/Field_HalfQuarter_NWW.qml</file>
+        <file>schematic/Field_HalfQuarter_NNW.qml</file>
+        <file>schematic/Field_HalfQuarter_NNE.qml</file>
+        <file>schematic/Town_3e4c_NorthEastWest.qml</file>
+        <file>schematic/Town_3e4c_EastNorthSouth.qml</file>
+        <file>schematic/Town_3e4c_SouthEastWest.qml</file>
+        <file>schematic/Town_3e4c_WestNorthSouth.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>
@@ -129,24 +141,86 @@
         <file alias="cloth.png">img/cloth.png</file>
         <file alias="wheat.png">img/wheat.png</file>
         <file alias="star.png">img/star.png</file>
+        <file alias="tiles/0.jpg">img/tiles/0.jpg</file>
         <file alias="tiles/1.jpg">img/tiles/1.jpg</file>
+        <file alias="tiles/2.jpg">img/tiles/2.jpg</file>
+        <file alias="tiles/3.jpg">img/tiles/3.jpg</file>
+        <file alias="tiles/4.jpg">img/tiles/4.jpg</file>
+        <file alias="tiles/5.jpg">img/tiles/5.jpg</file>
+        <file alias="tiles/6.jpg">img/tiles/6.jpg</file>
+        <file alias="tiles/7.jpg">img/tiles/7.jpg</file>
+        <file alias="tiles/8.jpg">img/tiles/8.jpg</file>
         <file alias="tiles/9.jpg">img/tiles/9.jpg</file>
+        <file alias="tiles/10.jpg">img/tiles/10.jpg</file>
+        <file alias="tiles/11.jpg">img/tiles/11.jpg</file>
         <file alias="tiles/12.jpg">img/tiles/12.jpg</file>
+        <file alias="tiles/13.jpg">img/tiles/13.jpg</file>
         <file alias="tiles/14.jpg">img/tiles/14.jpg</file>
+        <file alias="tiles/15.jpg">img/tiles/15.jpg</file>
+        <file alias="tiles/16.jpg">img/tiles/16.jpg</file>
+        <file alias="tiles/17.jpg">img/tiles/17.jpg</file>
         <file alias="tiles/18.jpg">img/tiles/18.jpg</file>
+        <file alias="tiles/19.jpg">img/tiles/19.jpg</file>
+        <file alias="tiles/20.jpg">img/tiles/20.jpg</file>
+        <file alias="tiles/21.jpg">img/tiles/21.jpg</file>
+        <file alias="tiles/22.jpg">img/tiles/22.jpg</file>
+        <file alias="tiles/23.jpg">img/tiles/23.jpg</file>
+        <file alias="tiles/24.jpg">img/tiles/24.jpg</file>
+        <file alias="tiles/25.jpg">img/tiles/25.jpg</file>
+        <file alias="tiles/27.jpg">img/tiles/27.jpg</file>
+        <file alias="tiles/26.jpg">img/tiles/26.jpg</file>
+        <file alias="tiles/28.jpg">img/tiles/28.jpg</file>
+        <file alias="tiles/29.jpg">img/tiles/29.jpg</file>
+        <file alias="tiles/30.jpg">img/tiles/30.jpg</file>
+        <file alias="tiles/31.jpg">img/tiles/31.jpg</file>
+        <file alias="tiles/32.jpg">img/tiles/32.jpg</file>
+        <file alias="tiles/33.jpg">img/tiles/33.jpg</file>
+        <file alias="tiles/34.jpg">img/tiles/34.jpg</file>
+        <file alias="tiles/35.jpg">img/tiles/35.jpg</file>
+        <file alias="tiles/36.jpg">img/tiles/36.jpg</file>
         <file alias="tiles/37.jpg">img/tiles/37.jpg</file>
+        <file alias="tiles/38.jpg">img/tiles/38.jpg</file>
+        <file alias="tiles/39.jpg">img/tiles/39.jpg</file>
+        <file alias="tiles/40.jpg">img/tiles/40.jpg</file>
+        <file alias="tiles/41.jpg">img/tiles/41.jpg</file>
+        <file alias="tiles/42.jpg">img/tiles/42.jpg</file>
+        <file alias="tiles/43.jpg">img/tiles/43.jpg</file>
+        <file alias="tiles/44.jpg">img/tiles/44.jpg</file>
+        <file alias="tiles/45.jpg">img/tiles/45.jpg</file>
+        <file alias="tiles/46.jpg">img/tiles/46.jpg</file>
+        <file alias="tiles/47.jpg">img/tiles/47.jpg</file>
         <file alias="tiles/48.jpg">img/tiles/48.jpg</file>
+        <file alias="tiles/50.jpg">img/tiles/50.jpg</file>
         <file alias="tiles/51.jpg">img/tiles/51.jpg</file>
+        <file alias="tiles/52.jpg">img/tiles/52.jpg</file>
+        <file alias="tiles/53.jpg">img/tiles/53.jpg</file>
+        <file alias="tiles/54.jpg">img/tiles/54.jpg</file>
+        <file alias="tiles/55.jpg">img/tiles/55.jpg</file>
+        <file alias="tiles/56.jpg">img/tiles/56.jpg</file>
+        <file alias="tiles/57.jpg">img/tiles/57.jpg</file>
         <file alias="tiles/58.jpg">img/tiles/58.jpg</file>
+        <file alias="tiles/59.jpg">img/tiles/59.jpg</file>
         <file alias="tiles/60.jpg">img/tiles/60.jpg</file>
         <file alias="tiles/61.jpg">img/tiles/61.jpg</file>
+        <file alias="tiles/62.jpg">img/tiles/62.jpg</file>
+        <file alias="tiles/63.jpg">img/tiles/63.jpg</file>
+        <file alias="tiles/64.jpg">img/tiles/64.jpg</file>
+        <file alias="tiles/65.jpg">img/tiles/65.jpg</file>
+        <file alias="tiles/66.jpg">img/tiles/66.jpg</file>
+        <file alias="tiles/67.jpg">img/tiles/67.jpg</file>
+        <file alias="tiles/68.jpg">img/tiles/68.jpg</file>
+        <file alias="tiles/69.jpg">img/tiles/69.jpg</file>
         <file alias="tiles/70.jpg">img/tiles/70.jpg</file>
         <file alias="tiles/71.jpg">img/tiles/71.jpg</file>
         <file alias="tiles/72.jpg">img/tiles/72.jpg</file>
         <file alias="tiles/73.jpg">img/tiles/73.jpg</file>
+        <file alias="tiles/74.jpg">img/tiles/74.jpg</file>
+        <file alias="tiles/75.jpg">img/tiles/75.jpg</file>
+        <file alias="tiles/76.jpg">img/tiles/76.jpg</file>
+        <file alias="tiles/77.jpg">img/tiles/77.jpg</file>
         <file alias="tiles/78.jpg">img/tiles/78.jpg</file>
+        <file alias="tiles/79.jpg">img/tiles/79.jpg</file>
         <file alias="tiles/80.jpg">img/tiles/80.jpg</file>
-        <file alias="tiles/81.jpg">img/tiles/81.jpg</file>
         <file alias="tiles/abbey.jpg">img/tiles/abbey.jpg</file>
         <file alias="startBackground.jpg">img/startBackground.jpg</file>
     </qresource>

@@ -76,6 +76,46 @@ int TileData::id_NW() const
     return NW()->currentObject()->initialId;
 }
 
+int TileData::id_NEE() const
+{
+    return NEE() ? NEE()->currentObject()->initialId : InvalidId;
+}
+
+int TileData::id_SEE() const
+{
+    return SEE() ? SEE()->currentObject()->initialId : InvalidId;
+}
+
+int TileData::id_SSE() const
+{
+    return SSE() ? SSE()->currentObject()->initialId : InvalidId;
+}
+
+int TileData::id_SSW() const
+{
+    return SSW() ? SSW()->currentObject()->initialId : InvalidId;
+}
+
+int TileData::id_SWW() const
+{
+    return SWW() ? SWW()->currentObject()->initialId : InvalidId;
+}
+
+int TileData::id_NWW() const
+{
+    return NWW() ? NWW()->currentObject()->initialId : InvalidId;
+}
+
+int TileData::id_NNW() const
+{
+    return NNW() ? NNW()->currentObject()->initialId : InvalidId;
+}
+
+int TileData::id_NNE() const
+{
+    return NNE() ? NNE()->currentObject()->initialId : InvalidId;
+}
+
 int TileData::id_N() const
 {
     return N()->currentObject()->initialId;
@@ -375,6 +415,46 @@ bool TileData::hasFieldLTrapezoidSouthWest() const
     return copy().rotateClockwise(2).hasFieldLTrapezoidNorthEast();
 }
 
+bool TileData::hasFieldHalfQuarterNEE() const
+{
+    return NEE() && NEE()->type == ObjectType::Field;
+}
+
+bool TileData::hasFieldHalfQuarterSEE() const
+{
+    return SEE() && SEE()->type == ObjectType::Field;
+}
+
+bool TileData::hasFieldHalfQuarterSSE() const
+{
+    return SSE() && SSE()->type == ObjectType::Field;
+}
+
+bool TileData::hasFieldHalfQuarterSSW() const
+{
+    return SSW() && SSW()->type == ObjectType::Field;
+}
+
+bool TileData::hasFieldHalfQuarterSWW() const
+{
+    return SWW() && SWW()->type == ObjectType::Field;
+}
+
+bool TileData::hasFieldHalfQuarterNWW() const
+{
+    return NWW() && NWW()->type == ObjectType::Field;
+}
+
+bool TileData::hasFieldHalfQuarterNNW() const
+{
+    return NNW() && NNW()->type == ObjectType::Field;
+}
+
+bool TileData::hasFieldHalfQuarterNNE() const
+{
+    return NNE() && NNE()->type == ObjectType::Field;
+}
+
 bool TileData::hasTown1eArcNorth() const
 {
     return N() && N()->type == ObjectType::Town && N()->initialValency == 1 &&
@@ -528,6 +608,49 @@ bool TileData::hasTown2e3cSouthWest() const
 int TileData::town2e3cSouthWestId() const
 {
     return commonId(S(), W());
+}
+
+bool TileData::hasTown3e4cNorthEastWest() const
+{
+    return N() && E() && W() &&
+            sameType(ObjectType::Town, N()->type, E()->type, W()->type) &&
+            sameInitialId(N(), E(), W()) &&
+            !sameInitialId(N(), S());
+}
+
+int TileData::town3e4cNorthEastWestId() const
+{
+    return commonId(N(), E(), W());
+}
+
+bool TileData::hasTown3e4cEastNorthSouth() const
+{
+    return copy().rotateClockwise(3).hasTown3e4cNorthEastWest();
+}
+
+int TileData::town3e4cEastNorthSouthId() const
+{
+    return commonId(N(), E(), S());
+}
+
+bool TileData::hasTown3e4cSouthEastWest() const
+{
+    return copy().rotateClockwise(2).hasTown3e4cNorthEastWest();
+}
+
+int TileData::town3e4cSouthEastWestId() const
+{
+    return commonId(S(), E(), W());
+}
+
+bool TileData::hasTown3e4cWestNorthSouth() const
+{
+    return copy().rotateClockwise(1).hasTown3e4cNorthEastWest();
+}
+
+int TileData::town3e4cWestNorthSouthId() const
+{
+    return commonId(N(), S(), W());
 }
 
 bool TileData::hasTownWhole() const

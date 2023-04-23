@@ -5,8 +5,8 @@ import "qrc:/"
 BaseMapObject {
     id: root
 
-    currentId: tileData.FieldWholeId
-    visible: tileData.FieldWhole
+    currentId: tileData.FieldHalfQuarterSEEId
+    visible: tileData.FieldHalfQuarterSEE
 
     ShapePath {
         startX: side
@@ -15,21 +15,16 @@ BaseMapObject {
         fillColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.field
 
         PathLine {
-            x: 0
-            y: side
-        }
-
-        PathLine {
-            x: 0
-            y: 0
+            x: side/2
+            y: side/2
         }
 
         PathLine {
             x: side
-            y: 0
+            y: side/2
         }
     }
 
-    idLabel.x: side/4
-    idLabel.y: side/4
+    idLabel.x: side - idLabel.width
+    idLabel.y: side*3/4
 }

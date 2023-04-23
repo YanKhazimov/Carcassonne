@@ -71,6 +71,15 @@ protected:
     int id_SW() const;
     int id_NW() const;
 
+    int id_NEE() const;
+    int id_SEE() const;
+    int id_SSE() const;
+    int id_SSW() const;
+    int id_SWW() const;
+    int id_NWW() const;
+    int id_NNW() const;
+    int id_NNE() const;
+
     int id_N() const;
     int id_S() const;
     int id_E() const;
@@ -138,6 +147,15 @@ protected:
     bool hasFieldLTrapezoidNorthWest() const;
     bool hasFieldLTrapezoidSouthEast() const;
     bool hasFieldLTrapezoidSouthWest() const;
+
+    bool hasFieldHalfQuarterNEE() const;
+    bool hasFieldHalfQuarterSEE() const;
+    bool hasFieldHalfQuarterSSE() const;
+    bool hasFieldHalfQuarterSSW() const;
+    bool hasFieldHalfQuarterSWW() const;
+    bool hasFieldHalfQuarterNWW() const;
+    bool hasFieldHalfQuarterNNW() const;
+    bool hasFieldHalfQuarterNNE() const;
 
     bool hasRoadNorth() const;
     bool hasRoadEast() const;
@@ -228,6 +246,15 @@ protected:
     int town2e3cSouthEastId() const;
     bool hasTown2e3cSouthWest() const;
     int town2e3cSouthWestId() const;
+
+    bool hasTown3e4cNorthEastWest() const;
+    int town3e4cNorthEastWestId() const;
+    bool hasTown3e4cEastNorthSouth() const;
+    int town3e4cEastNorthSouthId() const;
+    bool hasTown3e4cSouthEastWest() const;
+    int town3e4cSouthEastWestId() const;
+    bool hasTown3e4cWestNorthSouth() const;
+    int town3e4cWestNorthSouthId() const;
 
     bool hasTownWhole() const;
     int townWholeId() const;
