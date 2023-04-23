@@ -209,7 +209,7 @@ Item {
         source: tileData.Picture
         anchors.fill: parent
         rotation: tileData.ImageRotation
-        opacity: 0//tileData.Abbey ? 1 : 0.8//engine.TilePictureOpacity
+        opacity: Preferences.schematicView ? 0 : 1//tileData.Abbey ? 1 : 0.8//engine.TilePictureOpacity
 
         Behavior on rotation {
             NumberAnimation {

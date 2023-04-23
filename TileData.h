@@ -15,7 +15,7 @@ struct TileObject {
 
     TileObject(std::shared_ptr<MapObjectData> objPtr, std::vector<std::pair<int, int>> location, TileData* tile = nullptr);
     TileObject(const TileObject& other);
-    TileObject(TileObject&& other);
+    TileObject(TileObject&& other) noexcept;
 };
 
 class TileData {

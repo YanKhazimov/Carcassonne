@@ -36,6 +36,8 @@ set(PROJECT_SOURCES
         Player.cpp
         PlayersModel.h
         PlayersModel.cpp
+        DeckBuilder.h
+        DeckBuilder.cpp
         main.cpp
         qml.qrc
 )

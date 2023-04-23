@@ -1133,11 +1133,15 @@ TileObject::TileObject(std::shared_ptr<MapObjectData> _objPtr, std::vector<std::
 TileObject::TileObject(const TileObject &other)
     : objPtr(other.objPtr), location(other.location), tile(other.tile)
 {
+    if (objPtr->initialId == 1)
+        qDebug() << objPtr->initialId << " copy ctor";
 }
 
-TileObject::TileObject(TileObject &&other)
+TileObject::TileObject(TileObject &&other) noexcept
     : objPtr(std::move(other.objPtr)), location(std::move(other.location)), tile(std::move(other.tile))
 {
+    if (objPtr->initialId == 1)
+        qDebug() << objPtr->initialId << " move ctor";
 }
 
 void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updatedTiles)

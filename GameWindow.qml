@@ -219,6 +219,7 @@ Item {
         sourceSize.width: 144
         sourceSize.height: 144
         fillMode: Image.Tile
+        opacity: 0.5
         Keys.onTabPressed: {
             engine.switchActivePlayer()
             console.log("active player", engine.ActivePlayer)
@@ -364,9 +365,23 @@ Item {
                 }
             }
 
-            Scoreboard {
-                id: scoreboard
+            Column {
                 anchors.verticalCenter: parent.verticalCenter
+                spacing: 5
+
+                Scoreboard {
+                    id: scoreboard
+                }
+
+                BinarySwitch {
+                    id: tileViewSwitch
+
+                    anchors.right: scoreboard.right
+                    leftOption: "Картинки"
+                    rightOption: "Схемы"
+                    defaultState: Preferences.schematicView ? BinarySwitch.SwitchState.RIGHT : BinarySwitch.SwitchState.LEFT
+                    onStateChanged: Preferences.schematicView = (state == BinarySwitch.SwitchState.RIGHT)
+                }
             }
         }
     }

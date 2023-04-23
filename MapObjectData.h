@@ -39,7 +39,6 @@ struct MapObjectData {
     struct PlayerPresence {
         std::list<MeepleInfo> meeples;
         bool hasBeenTaken = false;
-
     };
 
     void addMeeple(int playerIndex, QmlEnums::MeepleType meepleType, Tile* tile);

@@ -433,19 +433,17 @@ bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, 
         {
         case QmlEnums::MeepleSmall:
         case QmlEnums::MeepleBig:
-            return object->mostPresentPlayers().empty();
+            return !object->taken() && object->mostPresentPlayers().empty();
         case QmlEnums::MeepleBarn:
             return object->type == ObjectType::Field
                     && !object->barnPresent()
                     && isFieldCorner(tile, objectId);
-            return false;
         case QmlEnums::MeeplePig:
             return object->type == ObjectType::Field
                     && object->commonMeeplesPresent(playerIndex);
         case QmlEnums::MeepleBuilder:
             return (object->type == ObjectType::Town || object->type == ObjectType::Road)
                     && object->commonMeeplesPresent(playerIndex);
-            return false;
         default:
             std::cerr << "placing unknown meeple type " << type << std::endl;
         }
