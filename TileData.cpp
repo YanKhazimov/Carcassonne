@@ -668,7 +668,9 @@ bool TileData::hasRoadNorth() const
 {
     return N() &&
             N()->type == ObjectType::Road &&
-            N()->initialValency == 1/* &&
+            N()->initialValency == 1 &&
+            !hasC_ToTown_NorthEastRoad() &&
+            !hasC_ToTown_NorthWestRoad()/* &&
             hasFieldWhole()*/;
 }
 

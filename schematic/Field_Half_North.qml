@@ -30,6 +30,6 @@ BaseMapObject {
         }
     }
 
-    idLabel.x: side/2
-    idLabel.y: side/2 - halfRoadWidth - idLabel.height
+    idLabel.anchors.horizontalCenter: horizontalCenter
+    idLabel.y: side * 0.2 // between town1eOffset and town2eOffset
 }

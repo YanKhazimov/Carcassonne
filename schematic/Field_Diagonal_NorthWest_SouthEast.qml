@@ -10,23 +10,20 @@ BaseMapObject {
 
     ShapePath {
         startX: side
-        startY: side/2
+        startY: side
         strokeColor: fillColor
         fillColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.field
 
         PathLine {
             x: side
-            y: side
+            y: side/2
         }
 
-        PathLine {
-            x: side/2
-            y: side
-        }
-
-        PathLine {
+        PathArc {
             x: side/2
             y: 0
+            radiusX: side/2
+            radiusY: side/2
         }
 
         PathLine {
@@ -39,9 +36,11 @@ BaseMapObject {
             y: side/2
         }
 
-        PathLine {
-            x: side
-            y: side/2
+        PathArc {
+            x: side/2
+            y: side
+            radiusX: side
+            radiusY: side/2
         }
     }
 

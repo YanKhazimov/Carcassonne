@@ -15,39 +15,24 @@ BaseMapObject {
         strokeWidth: 2
         fillColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.road
 
-        PathLine {
-            x: side/2 - halfRoadWidth
-            y: side/2 - 3 * halfRoadWidth
-        }
-
-        PathLine {
-            x: side/2 - 3 * halfRoadWidth
+        PathArc {
+            x: 0
             y: side/2 - halfRoadWidth
+            radiusX: side/2 - halfRoadWidth
+            radiusY: side/2 - halfRoadWidth
         }
 
         PathLine {
-            x: town1eOffset - 1
-            y: side/2 - halfRoadWidth
-        }
-
-        PathLine {
-            x: town1eOffset - 1
+            x: 0
             y: side/2 + halfRoadWidth
         }
 
-        PathLine {
-            x: side/2 - 2 * halfRoadWidth
-            y: side/2 + halfRoadWidth
-        }
-
-        PathLine {
-            x: side/2 + halfRoadWidth
-            y: side/2 - 2 * halfRoadWidth
-        }
-
-        PathLine {
+        PathArc {
+            direction: PathArc.Counterclockwise
             x: side/2 + halfRoadWidth
             y: -1
+            radiusX: side/2 + halfRoadWidth
+            radiusY: side/2 + halfRoadWidth
         }
     }
 

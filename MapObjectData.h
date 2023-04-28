@@ -24,8 +24,8 @@ struct MapObjectData {
     MapObjectData(ObjectType type, unsigned id, int valency, ObjectManager* manager);
     void setTile(Tile* tilePtr);
 
-    BonusType bonusType;
-    BonusType getBonusType() const;
+    QmlEnums::BonusType bonusType;
+    QmlEnums::BonusType getBonusType() const;
 
     virtual bool isCompleted() const;
     void markCompleted();
@@ -60,14 +60,14 @@ protected:
 class Town : public MapObjectData
 {
 public:
-    Town(int valency, unsigned id, BonusType bonusType, ObjectManager* manager);
+    Town(int valency, unsigned id, QmlEnums::BonusType bonusType, ObjectManager* manager);
     bool isCompleted() const override;
 };
 
 class Road : public MapObjectData
 {
 public:
-    Road(int valency, unsigned id, BonusType bonusType, ObjectManager* manager);
+    Road(int valency, unsigned id, QmlEnums::BonusType bonusType, ObjectManager* manager);
     bool isCompleted() const override;
 };
 

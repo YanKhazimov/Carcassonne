@@ -31,6 +31,6 @@ BaseMapObject {
     }
 
     idLabel.anchors.centerIn: root
-    idLabel.anchors.horizontalCenterOffset: 3 * halfRoadWidth
-    idLabel.anchors.verticalCenterOffset: -3 * halfRoadWidth
+    idLabel.anchors.horizontalCenterOffset: side/4
+    idLabel.anchors.verticalCenterOffset: -side/4
 }

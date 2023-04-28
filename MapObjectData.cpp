@@ -24,7 +24,7 @@ void MapObjectData::setTile(Tile *tilePtr)
     tile = tilePtr;
 }
 
-BonusType MapObjectData::getBonusType() const
+QmlEnums::BonusType MapObjectData::getBonusType() const
 {
     return bonusType;
 }
@@ -34,12 +34,12 @@ bool MapObjectData::isCompleted() const
     return completedCentralObject;
 }
 
-Town::Town(int _valency, unsigned id, BonusType _bonusType, ObjectManager *manager)
+Town::Town(int _valency, unsigned id, QmlEnums::BonusType _bonusType, ObjectManager *manager)
     : MapObjectData(ObjectType::Town, id, _valency, manager)
 {
     valency = _valency;
     bonusType = _bonusType;
-    pointValue = _bonusType == BonusType::TownCenter ? 3 : 2;
+    pointValue = _bonusType == QmlEnums::BonusType::TownCenter ? 3 : 2;
 }
 
 bool Town::isCompleted() const
@@ -52,11 +52,11 @@ void MapObjectData::markCompleted()
     completedCentralObject = true;
 }
 
-Road::Road(int _valency, unsigned id, BonusType _bonusType, ObjectManager *manager)
+Road::Road(int _valency, unsigned id, QmlEnums::BonusType _bonusType, ObjectManager *manager)
     : MapObjectData(ObjectType::Road, id, _valency, manager)
 {
     valency = _valency;
-    pointValue = _bonusType == BonusType::RoadLake ? 2 : 1;
+    pointValue = _bonusType == QmlEnums::BonusType::RoadLake ? 2 : 1;
 }
 
 bool Road::isCompleted() const

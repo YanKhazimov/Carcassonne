@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <QIcon>
+#include <QSurfaceFormat>
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +17,10 @@ int main(int argc, char *argv[])
 #endif
 
     QGuiApplication app(argc, argv);
+
+    QSurfaceFormat format;
+    format.setSamples(8); // smoothing out arc shapes
+    QSurfaceFormat::setDefaultFormat(format);
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

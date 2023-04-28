@@ -16,8 +16,8 @@ class ObjectManager
 
 public:
     ObjectManager();
-    std::shared_ptr<MapObjectData> GenerateRoad(unsigned valency, BonusType bonusType = BonusType::None);
-    std::shared_ptr<MapObjectData> GenerateTown(unsigned valency, BonusType bonusType = BonusType::None);
+    std::shared_ptr<MapObjectData> GenerateRoad(unsigned valency, QmlEnums::BonusType bonusType = QmlEnums::BonusType::None);
+    std::shared_ptr<MapObjectData> GenerateTown(unsigned valency, QmlEnums::BonusType bonusType = QmlEnums::BonusType::None);
     std::shared_ptr<MapObjectData> GenerateField();
     std::shared_ptr<MapObjectData> GenerateAbbey();
     std::shared_ptr<MapObjectData> GenerateMonastery();

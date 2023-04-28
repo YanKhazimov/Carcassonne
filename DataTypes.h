@@ -22,19 +22,20 @@ enum class ObjectType {
     Abbey
 };
 
-enum BonusType {
-    None,
-    Wheat,
-    Barrel,
-    Cloth,
-    Shield,
-    DoubleShield,
-    TownCenter,
-    RoadLake
-};
-
 namespace QmlEnums {
     Q_NAMESPACE
+
+    enum BonusType {
+        None,
+        Wheat,
+        Barrel,
+        Cloth,
+        Shield,
+        DoubleShield,
+        TownCenter,
+        RoadLake
+    };
+    Q_ENUM_NS(BonusType)
 
     enum MeepleType {
         MeepleNone = 0,

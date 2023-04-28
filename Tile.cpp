@@ -121,9 +121,9 @@ std::tuple<int, int, int> Tile::resources() const
     {
         switch (tileObject.objPtr->bonusType)
         {
-        case BonusType::Wheat: wheat++; break;
-        case BonusType::Barrel: barrels++; break;
-        case BonusType::Cloth: cloth++; break;
+        case QmlEnums::BonusType::Wheat: wheat++; break;
+        case QmlEnums::BonusType::Barrel: barrels++; break;
+        case QmlEnums::BonusType::Cloth: cloth++; break;
         }
     }
 

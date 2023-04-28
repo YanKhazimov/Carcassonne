@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import EngineEnums 1.0
 
 Item {
     id: root
@@ -11,7 +12,8 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/shield.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] > 3
+        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Shield ||
+                 mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.DoubleShield
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -19,7 +21,7 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/shield.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === 5
+        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.DoubleShield
         x: secondaryPoint.x - width/2
         y: secondaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -27,7 +29,7 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/wheat.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === 1
+        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Wheat
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -35,7 +37,7 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/barrel.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === 2
+        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Barrel
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -43,9 +45,23 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/cloth.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === 3
+        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Cloth
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
         rotation: -mapObject.rotation
+    }
+
+    Rectangle {
+        width: 20
+        height: 20
+        color: "white"
+        x: primaryPoint.x - width/2
+        y: primaryPoint.y - height/2
+        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.TownCenter
+
+        Text {
+            anchors.centerIn: parent
+            text: "C"
+        }
     }
 }

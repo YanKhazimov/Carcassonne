@@ -14,11 +14,11 @@ BaseMapObject {
         fillColor: strokeColor
         strokeColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.town
 
-        PathLine {
+        PathArc {
             x: side
             y: side
-//            radiusX: side
-//            radiusY: side
+            radiusX: 2*side
+            radiusY: 2*side
         }
 
         PathLine {
@@ -27,16 +27,41 @@ BaseMapObject {
         }
     }
 
-    Rectangle {
+    ShapePath {
         id: border
 
-        x: side/2
-        y: -side/2
-        width: 2
-        height: 2*side
-        rotation: -45
-        color: Constants.color.schematic.townBorder
+        startX: 0
+        startY: 0
+        fillColor: Constants.color.schematic.townBorder
+        strokeColor: Constants.color.schematic.townBorder
+        strokeWidth: 2
+
+        PathArc {
+            x: side
+            y: side
+            radiusX: 2*side
+            radiusY: 2*side
+        }
+
+        PathArc {
+            x: 0
+            y: 0
+            radiusX: 2*side
+            radiusY: 2*side
+            direction: PathArc.Counterclockwise
+        }
     }
+
+//    Rectangle {
+//        id: border
+
+//        x: side/2
+//        y: -side/2
+//        width: 2
+//        height: 2*side
+//        rotation: -45
+//        color: Constants.color.schematic.townBorder
+//    }
 
 //    Rectangle {
 //        id: border
@@ -47,13 +72,13 @@ BaseMapObject {
 //        height: 2*side
 //        radius: height/2
 //        color: "transparent"
-//        border.width: 2
+//        border.width: 5
 //        border.color: Constants.color.schematic.townBorder
 //    }
 
     TileBonuses {
         mapObject: root
-        primaryPoint: Qt.point(50, 20)
+        primaryPoint: Qt.point(root.side/2, 10)
     }
 
     idLabel.x: side - idLabel.width - idLabel.width

@@ -13,13 +13,13 @@ ObjectManager::ObjectManager()
     voidId = generateVoid()->initialId;
 }
 
-std::shared_ptr<MapObjectData> ObjectManager::GenerateRoad(unsigned valency, BonusType bonusType)
+std::shared_ptr<MapObjectData> ObjectManager::GenerateRoad(unsigned valency, QmlEnums::BonusType bonusType)
 {
     mapObjects[objectCounter] = { std::make_shared<Road>(valency, objectCounter, bonusType, this), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
-std::shared_ptr<MapObjectData> ObjectManager::GenerateTown(unsigned valency, BonusType bonusType)
+std::shared_ptr<MapObjectData> ObjectManager::GenerateTown(unsigned valency, QmlEnums::BonusType bonusType)
 {
     mapObjects[objectCounter] = { std::make_shared<Town>(valency, objectCounter, bonusType, this), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
@@ -86,7 +86,7 @@ void ObjectManager::MergeObjectIds(std::shared_ptr<MapObjectData> absorbingObjec
 
 std::tuple<int, int, int> ObjectManager::getTownResources(unsigned townId)
 {
-    std::vector<BonusType> bonuses(1, std::get<0>(mapObjects.at(townId))->getBonusType());
+    std::vector<QmlEnums::BonusType> bonuses(1, std::get<0>(mapObjects.at(townId))->getBonusType());
 
     for (auto& dependency: std::get<2>(mapObjects.at(townId)))
     {
@@ -98,9 +98,9 @@ std::tuple<int, int, int> ObjectManager::getTownResources(unsigned townId)
     {
         switch (bonus)
         {
-        case BonusType::Wheat: wheat++; break;
-        case BonusType::Barrel: barrels++; break;
-        case BonusType::Cloth: cloth++; break;
+        case QmlEnums::BonusType::Wheat: wheat++; break;
+        case QmlEnums::BonusType::Barrel: barrels++; break;
+        case QmlEnums::BonusType::Cloth: cloth++; break;
         }
     }
 
@@ -128,9 +128,9 @@ int ObjectManager::getPoints(unsigned objectId)
     std::set<Tile*> tiles({object->tile});
     int pointSourceValue = object->pointValue;
     int pointSourceCount = 1;
-    if (object->bonusType == BonusType::Shield)
+    if (object->bonusType == QmlEnums::BonusType::Shield)
         ++pointSourceCount;
-    else if (object->bonusType == BonusType::DoubleShield)
+    else if (object->bonusType == QmlEnums::BonusType::DoubleShield)
         pointSourceCount += 2;
 
     for (auto& slave: slaveObjects)
@@ -140,9 +140,9 @@ int ObjectManager::getPoints(unsigned objectId)
         if (tiles.insert(slave->tile).second)
         {
             ++pointSourceCount;
-            if (slave->bonusType == BonusType::Shield)
+            if (slave->bonusType == QmlEnums::BonusType::Shield)
                 ++pointSourceCount;
-            else if (slave->bonusType == BonusType::DoubleShield)
+            else if (slave->bonusType == QmlEnums::BonusType::DoubleShield)
                 pointSourceCount += 2;
         }
     }
