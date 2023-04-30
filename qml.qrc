@@ -124,6 +124,8 @@
         <file>schematic/Town_3e4c_EastNorthSouth.qml</file>
         <file>schematic/Town_3e4c_SouthEastWest.qml</file>
         <file>schematic/Town_3e4c_WestNorthSouth.qml</file>
+        <file>RemainingTilesPopup.qml</file>
+        <file>TileViewSwitch.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>
@@ -190,6 +192,7 @@
         <file alias="tiles/46.jpg">img/tiles/46.jpg</file>
         <file alias="tiles/47.jpg">img/tiles/47.jpg</file>
         <file alias="tiles/48.jpg">img/tiles/48.jpg</file>
+        <file alias="tiles/49.jpg">img/tiles/49.jpg</file>
         <file alias="tiles/50.jpg">img/tiles/50.jpg</file>
         <file alias="tiles/51.jpg">img/tiles/51.jpg</file>
         <file alias="tiles/52.jpg">img/tiles/52.jpg</file>

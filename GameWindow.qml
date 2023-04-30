@@ -34,6 +34,12 @@ Item {
         restoreMode: Binding.RestoreBindingOrValue
     }
 
+    Keys.onPressed: {
+        if (event.key === Qt.Key_R) {
+            remainingTilesPopup.visible = !remainingTilesPopup.visible
+        }
+    }
+
     function createTileItem(x, y) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
@@ -373,14 +379,8 @@ Item {
                     id: scoreboard
                 }
 
-                BinarySwitch {
-                    id: tileViewSwitch
-
+                TileViewSwitch {
                     anchors.right: scoreboard.right
-                    leftOption: "Картинки"
-                    rightOption: "Схемы"
-                    defaultState: Preferences.schematicView ? BinarySwitch.SwitchState.RIGHT : BinarySwitch.SwitchState.LEFT
-                    onStateChanged: Preferences.schematicView = (state == BinarySwitch.SwitchState.RIGHT)
                 }
             }
         }
@@ -459,12 +459,16 @@ Item {
         }
     }
 
-//    Connections {
-//        target: engine
-//        function onGameStateChanged() {
-//            console.log("engine.GameState", engine.GameState)
-//        }
-//    }
+    RemainingTilesPopup {
+        id: remainingTilesPopup
+
+        anchors.centerIn: parent
+        width: parent.width - 200
+        height: parent.height - 200
+        visible: false
+        modal: true
+        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+    }
 
     Item {
         id: state

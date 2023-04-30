@@ -15,7 +15,6 @@ void DeckBuilder::BuildStandardDeck(ObjectManager &objectManager, std::list<Tile
                            { objectManager.GenerateField(), { {4, 0}, {4, 4} } },
                            { objectManager.GenerateTown(1), { {4, 2} } }
                        }, "18.jpg", 270);
-    /*
     tiles.emplace_back(std::vector<TileObject> {
                            { objectManager.GenerateMonastery(), { {2, 2} } },
                            { objectManager.GenerateField(), { {0, 0} } },
@@ -235,12 +234,6 @@ void DeckBuilder::BuildStandardDeck(ObjectManager &objectManager, std::list<Tile
                            { objectManager.GenerateField(), { {4, 0}, {4, 2}, {4, 4} } },
                            { objectManager.GenerateTown(2, QmlEnums::BonusType::Barrel), { {2, 0}, {2, 4} } }
                        }, "33.jpg", 270);
-    */
-    tiles.emplace_back(std::vector<TileObject> {
-                           { objectManager.GenerateRoad(2), { {2, 4}, {4, 2} } },
-                           { objectManager.GenerateField(), { {4, 4} } },
-                           { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {0, 2}, {0, 4} } }
-                       }, "8.jpg", 0);
     tiles.emplace_back(std::vector<TileObject> {
                            { objectManager.GenerateField(), { {4, 0}, {0, 4} } },
                            { objectManager.GenerateTown(2), { {0, 0}, {2, 0}, {0, 2} } },

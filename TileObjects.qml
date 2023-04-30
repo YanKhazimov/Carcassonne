@@ -6,6 +6,7 @@ Item {
     id: root
 
     property TileData tileData
+    required property bool isPreview
 
     Field_Whole {
         tileData: root.tileData

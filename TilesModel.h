@@ -17,7 +17,7 @@ public:
 
     virtual QHash<int,QByteArray> roleNames() const override;
 
-    void AddTile(Tile* tile);
+    void AddTiles(std::list<Tile> &tiles);
 };
 
 #endif // TILESMODEL_H

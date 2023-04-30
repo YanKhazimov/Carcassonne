@@ -8,12 +8,12 @@ Shape {
 
     required property int currentId
     readonly property bool highlighted: engine.HighlightedObjectId === currentId
-    readonly property int side: Constants.tileSize
-    readonly property real town1eOffset: Constants.tileSize / 5
-    readonly property real town1eRadius: (Constants.tileSize * Constants.tileSize) / (8 * town1eOffset) + town1eOffset / 2
-    readonly property real halfRoadWidth: Constants.tileSize / 8 / 2
-    readonly property real town2eOffset: Constants.tileSize * 35 / 100
-    readonly property real town2eRadius: (Constants.tileSize * Constants.tileSize) / (8 * town2eOffset) + town2eOffset / 2
+    readonly property int side: parent.width
+    readonly property real town1eOffset: side / 5
+    readonly property real town1eRadius: (side * side) / (8 * town1eOffset) + town1eOffset / 2
+    readonly property real halfRoadWidth: side / 8 / 2
+    readonly property real town2eOffset: side * 35 / 100
+    readonly property real town2eRadius: (side * side) / (8 * town2eOffset) + town2eOffset / 2
     property alias idLabel: idLabel
 
     required property TileData tileData
@@ -33,5 +33,6 @@ Shape {
         color: "black"
         rotation: -root.rotation
         font.pixelSize: 15
+        visible: !root.parent.isPreview
     }
 }

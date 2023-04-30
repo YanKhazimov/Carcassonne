@@ -3,22 +3,10 @@ import QtQuick 2.15
 Item {
     id: root
 
-    enum SwitchState {
-        LEFT,
-        RIGHT
-    }
-
     property alias leftOption: leftText.text
     property alias rightOption: rightText.text
-    required property var defaultState
-    signal stateChanged(bool state)
-
-    QtObject {
-        id: internal
-        property var state
-    }
-
-    Component.onCompleted: internal.state = defaultState
+    required property var callback
+    required property bool on
 
     width: childrenRect.width
     height: childrenRect.height
@@ -33,17 +21,10 @@ Item {
         }
 
         MouseArea {
-            onPressed: {
-                if (internal.state === BinarySwitch.SwitchState.RIGHT)
-                    internal.state = BinarySwitch.SwitchState.LEFFT
-                else
-                    internal.state = BinarySwitch.SwitchState.RIGHT
-
-                root.stateChanged(internal.state)
-            }
-
-            width: childrenRect.width
-            height: childrenRect.height
+            onPressed: root.callback()
+            width: switchBackground.width
+            height: switchBackground.height
+            cursorShape: Qt.PointingHandCursor
 
             Row {
                 id: switchBackground
@@ -75,7 +56,7 @@ Item {
                 height: 20 - 2 * margin
                 width: 20 - 2 * margin
                 radius: width / 2
-                x: internal.state === BinarySwitch.SwitchState.RIGHT ? (parent.width - width - margin) : margin
+                x: root.on ? (parent.width - width - margin) : margin
                 y: margin
 
                 Behavior on x {

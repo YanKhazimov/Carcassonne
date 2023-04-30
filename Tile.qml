@@ -12,13 +12,14 @@ Item {
     property BaseMeeple meeple
 
     required property Board board
+    readonly property bool isPreview: board == null
     property int playerIndex: -1
 
     readonly property alias dragActive: dragArea.drag.active
     readonly property bool acceptsActiveMeeple: dropArea.accepts
 
-    width: Constants.tileSize
-    height: Constants.tileSize
+    width: isPreview ? Constants.tilePreviewSize : Constants.tileSize
+    height: isPreview ? Constants.tilePreviewSize : Constants.tileSize
 
     QtObject {
         id: internal
@@ -32,7 +33,8 @@ Item {
     }
 
     Component.onCompleted: {
-        board.boardRepositioned.connect(updateXY)
+        if (!isPreview)
+            board.boardRepositioned.connect(updateXY)
         meeple = null
     }
 
@@ -83,6 +85,7 @@ Item {
 
     Connections {
         target: tileData
+        enabled: !isPreview
         function onIndexChanged() {
             updateXY()
         }
@@ -93,8 +96,10 @@ Item {
 
     TileObjects {
         id: mapObjects
-        anchors.fill: picture
+        anchors.fill: parent
         visible: !rotationAnimation.running
+        opacity: Preferences.schematicView ? 1 : 0
+        isPreview: root.isPreview
     }
 
     MultiObjectMouseArea {

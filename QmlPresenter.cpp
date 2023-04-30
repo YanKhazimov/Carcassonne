@@ -11,6 +11,11 @@ TilesModel *QmlPresenter::getTiles()
     return &deck;
 }
 
+RemainingTilesModel *QmlPresenter::getRemainingTiles()
+{
+    return &remainingTilesModel;
+}
+
 MapModel *QmlPresenter::getMapModel()
 {
     return &mapModel;
@@ -134,14 +139,14 @@ QmlPresenter::QmlPresenter(ObjectManager& objManager, QObject *parent)
     populatePlayers({}, {});
 
     connect(&mapModel, &MapModel::fieldIntegrityCheckRequested, this, &QmlPresenter::checkFieldIntegrity);
+
+    remainingTilesModel.setSource(&deck);
 }
 
 void QmlPresenter::AddTiles(std::list<Tile> &tiles)
 {
     for (Tile& tile: tiles)
     {
-        deck.AddTile(&tile);
-
         auto [wheat, barrels, cloth] = tile.resources();
         unassignedWheat += wheat;
         unassignedBarrels += barrels;
@@ -150,11 +155,18 @@ void QmlPresenter::AddTiles(std::list<Tile> &tiles)
         connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
         connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::scoreCompletionBonuses);
     }
+
+    deck.AddTiles(tiles);
 }
 
 Tile *QmlPresenter::getTile(int i)
 {
     return deck.index(i, 0).data(DataRoles::TilePtr).value<Tile*>();
+}
+
+Tile *QmlPresenter::getRemainingTile(int i)
+{
+    return remainingTilesModel.index(i, 0).data(DataRoles::TilePtr).value<Tile*>();
 }
 
 void QmlPresenter::highlight(int id)

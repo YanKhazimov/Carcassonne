@@ -14,7 +14,10 @@ enum DataRoles {
     BarrelsLead,
     ClothLead,
     TownLead,
-    RoadLead
+    RoadLead,
+    IsTileFixed,
+    TileCopies,
+    TileImagePath
 };
 
 #endif // DATAROLES_H

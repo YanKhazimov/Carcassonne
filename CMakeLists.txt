@@ -38,6 +38,8 @@ set(PROJECT_SOURCES
         PlayersModel.cpp
         DeckBuilder.h
         DeckBuilder.cpp
+        RemainingTilesModel.h
+        RemainingTilesModel.cpp
         main.cpp
         qml.qrc
 )

@@ -6,6 +6,7 @@
 #include "TilesModel.h"
 #include "mapmodel.h"
 #include "PlayersModel.h"
+#include "RemainingTilesModel.h"
 
 class QmlPresenter : public QObject
 {
@@ -26,6 +27,7 @@ class QmlPresenter : public QObject
     Q_PROPERTY(int MaxRoad MEMBER maxRoad NOTIFY maxRoadChanged)
     Q_PROPERTY(qreal TilePictureOpacity MEMBER tilePictureOpacity NOTIFY tilePictureOpacityChanged)
     Q_PROPERTY(QVariantList PossibleColors READ getPossibleColors CONSTANT)
+    Q_PROPERTY(RemainingTilesModel* remainingTilesModel READ getRemainingTiles NOTIFY remainingTilesChanged)
 
 public:
     enum class GameState {
@@ -40,6 +42,9 @@ public:
 private:
     TilesModel deck;
     TilesModel* getTiles();
+
+    RemainingTilesModel remainingTilesModel;
+    RemainingTilesModel* getRemainingTiles();
 
     MapModel mapModel;
     MapModel* getMapModel();
@@ -97,6 +102,7 @@ public:
 
     void AddTiles(std::list<Tile> &tiles);
     Q_INVOKABLE Tile* getTile(int i);
+    Q_INVOKABLE Tile* getRemainingTile(int i);
     Q_INVOKABLE void highlight(int id);
     Q_INVOKABLE void updateHighlight();
     Q_INVOKABLE void populatePlayers(QVariantList colors, QVariantList names);
@@ -121,6 +127,7 @@ signals:
     void maxTownChanged();
     void maxRoadChanged();
     void tilePictureOpacityChanged();
+    void remainingTilesChanged();
 };
 
 #endif // QMLPRESENTER_H
