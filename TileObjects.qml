@@ -116,6 +116,22 @@ Item {
         tileData: root.tileData
     }
 
+    Field_JTriangle_NorthEast {
+        tileData: root.tileData
+    }
+
+    Field_JTriangle_NorthWest {
+        tileData: root.tileData
+    }
+
+    Field_JTriangle_SouthEast {
+        tileData: root.tileData
+    }
+
+    Field_JTriangle_SouthWest {
+        tileData: root.tileData
+    }
+
     Field_LTrapezoid_NorthEast {
         tileData: root.tileData
     }
@@ -129,6 +145,22 @@ Item {
     }
 
     Field_LTrapezoid_SouthWest {
+        tileData: root.tileData
+    }
+
+    Field_JTrapezoid_NorthEast {
+        tileData: root.tileData
+    }
+
+    Field_JTrapezoid_NorthWest {
+        tileData: root.tileData
+    }
+
+    Field_JTrapezoid_SouthEast {
+        tileData: root.tileData
+    }
+
+    Field_JTrapezoid_SouthWest {
         tileData: root.tileData
     }
 
@@ -177,6 +209,22 @@ Item {
     }
 
     Road_West {
+        tileData: root.tileData
+    }
+
+    Road_Long_North {
+        tileData: root.tileData
+    }
+
+    Road_Long_East {
+        tileData: root.tileData
+    }
+
+    Road_Long_South {
+        tileData: root.tileData
+    }
+
+    Road_Long_West {
         tileData: root.tileData
     }
 
@@ -290,6 +338,22 @@ Item {
         tileData: root.tileData
     }
 
+    Road_J_NorthEast {
+        tileData: root.tileData
+    }
+
+    Road_J_NorthWest {
+        tileData: root.tileData
+    }
+
+    Road_J_SouthEast {
+        tileData: root.tileData
+    }
+
+    Road_J_SouthWest {
+        tileData: root.tileData
+    }
+
     Town_1eArc_North {
         tileData: root.tileData
     }
@@ -303,6 +367,22 @@ Item {
     }
 
     Town_1eArc_West {
+        tileData: root.tileData
+    }
+
+    Town_1eBridge_North {
+        tileData: root.tileData
+    }
+
+    Town_1eBridge_East {
+        tileData: root.tileData
+    }
+
+    Town_1eBridge_South {
+        tileData: root.tileData
+    }
+
+    Town_1eBridge_West {
         tileData: root.tileData
     }
 
@@ -379,6 +459,22 @@ Item {
     }
 
     Town_3e4c_WestNorthSouth {
+        tileData: root.tileData
+    }
+
+    Town_1e3c_NorthToSouthEast {
+        tileData: root.tileData
+    }
+
+    Town_1e3c_EastToSouthWest {
+        tileData: root.tileData
+    }
+
+    Town_1e3c_SouthToNorthWest {
+        tileData: root.tileData
+    }
+
+    Town_1e3c_WestToNorthEast {
         tileData: root.tileData
     }
 

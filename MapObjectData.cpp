@@ -56,6 +56,7 @@ Road::Road(int _valency, unsigned id, QmlEnums::BonusType _bonusType, ObjectMana
     : MapObjectData(ObjectType::Road, id, _valency, manager)
 {
     valency = _valency;
+    bonusType = _bonusType;
     pointValue = _bonusType == QmlEnums::BonusType::RoadLake ? 2 : 1;
 }
 

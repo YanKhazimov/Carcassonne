@@ -143,10 +143,20 @@ protected:
     bool hasFieldLTriangleSouthEast() const;
     bool hasFieldLTriangleSouthWest() const;
 
+    bool hasFieldJTriangleNorthEast() const;
+    bool hasFieldJTriangleNorthWest() const;
+    bool hasFieldJTriangleSouthEast() const;
+    bool hasFieldJTriangleSouthWest() const;
+
     bool hasFieldLTrapezoidNorthEast() const;
     bool hasFieldLTrapezoidNorthWest() const;
     bool hasFieldLTrapezoidSouthEast() const;
     bool hasFieldLTrapezoidSouthWest() const;
+
+    bool hasFieldJTrapezoidNorthEast() const;
+    bool hasFieldJTrapezoidNorthWest() const;
+    bool hasFieldJTrapezoidSouthEast() const;
+    bool hasFieldJTrapezoidSouthWest() const;
 
     bool hasFieldHalfQuarterNEE() const;
     bool hasFieldHalfQuarterSEE() const;
@@ -161,6 +171,11 @@ protected:
     bool hasRoadEast() const;
     bool hasRoadSouth() const;
     bool hasRoadWest() const;
+
+    bool hasRoadLongNorth() const;
+    bool hasRoadLongEast() const;
+    bool hasRoadLongSouth() const;
+    bool hasRoadLongWest() const;
 
     bool hasC_ToTown_NorthEastRoad() const;
     bool hasC_ToTown_NorthWestRoad() const;
@@ -214,15 +229,36 @@ protected:
 
     bool hasAnyL_Road() const;
 
+    bool hasJ_NorthWestRoad() const;
+    int J_NorthWestRoadId() const;
+    bool hasJ_NorthEastRoad() const;
+    int J_NorthEastRoadId() const;
+    bool hasJ_SouthWestRoad() const;
+    int J_SouthWestRoadId() const;
+    bool hasJ_SouthEastRoad() const;
+    int J_SouthEastRoadId() const;
+
+    bool hasAnyJ_Road() const;
+
     bool hasTown1eArcNorth() const;
     bool hasTown1eArcEast() const;
     bool hasTown1eArcSouth() const;
     bool hasTown1eArcWest() const;
 
+    bool hasTown1eBridgeNorth() const;
+    bool hasTown1eBridgeEast() const;
+    bool hasTown1eBridgeSouth() const;
+    bool hasTown1eBridgeWest() const;
+
     bool hasTown1e4cNorth() const;
     bool hasTown1e4cEast() const;
     bool hasTown1e4cSouth() const;
     bool hasTown1e4cWest() const;
+
+    bool hasTown1e3cNorthToSouthEast() const;
+    bool hasTown1e3cEastToSouthWest() const;
+    bool hasTown1e3cSouthToNorthWest() const;
+    bool hasTown1e3cWestToNorthEast() const;
 
     bool hasTown2eNorthSouth() const;
     int town2eNorthSouthId() const;

@@ -17,12 +17,12 @@ BaseMapObject {
 
         PathLine {
             x: side/2 + halfRoadWidth
-            y: side/4
+            y: town2eOffset
         }
 
         PathArc {
             x: side/2 - halfRoadWidth
-            y: side/4
+            y: town2eOffset
             radiusX: halfRoadWidth
             radiusY: halfRoadWidth
         }
@@ -31,6 +31,11 @@ BaseMapObject {
             x: side/2 - halfRoadWidth
             y: -1
         }
+    }
+
+    TileBonuses {
+        mapObject: root
+        primaryPoint: Qt.point(side/2 - 4 * halfRoadWidth, side/6)
     }
 
     idLabel.anchors.horizontalCenter: horizontalCenter

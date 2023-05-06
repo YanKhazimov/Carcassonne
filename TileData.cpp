@@ -4,11 +4,12 @@
 const int InvalidId = 0;
 
 QString ObjectTypeStrings[] = {
-   "x",
-   "T",
-   "R",
-   "F",
-   "M"
+    "x",
+    "T",
+    "R",
+    "F",
+    "M",
+    "A"
 };
 
 template<typename T, typename ... Ts>
@@ -29,7 +30,7 @@ bool sameId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
     return ((obj0->currentObject()->initialId == args->currentObject()->initialId) && ...);
 }
 
-// ! returns 0 in case the ids are not all equal, the id otherwise
+// ! returns InvalidId in case the ids are not all equal, the id otherwise
 template <typename ... T>
 unsigned commonId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
 {
@@ -40,20 +41,22 @@ void TileData::print() const
 {
     for (int i = 0; i < 5; ++i)
     {
+        QString row;
        for (int j = 0; j < 5; ++j)
        {
            if (grid5x5[i][j])
            {
-               qDebug() << ObjectTypeStrings[static_cast<int>(grid5x5[i][j]->currentObject()->type)]
-                       << grid5x5[i][j]->currentObject()->initialId << '\t';
+               row += ObjectTypeStrings[static_cast<int>(grid5x5[i][j]->currentObject()->type)] +
+                       QString::number(grid5x5[i][j]->currentObject()->initialId) + " ";
            }
            else
            {
-               qDebug() << "x0\t";
+               row += "x0 ";
            }
        }
-       qDebug();
+       qDebug() << row;
     }
+    qDebug() << " ";
 }
 
 int TileData::id_NE() const
@@ -225,7 +228,7 @@ bool TileData::hasFieldNorthEast() const
     bool r = NE() && NE()->type == ObjectType::Field &&
             N()->type != ObjectType::Field && E()->type != ObjectType::Field &&
             !sameInitialId(NE(), SE()) && !sameInitialId(NE(), NW()) && !sameInitialId(NE(), SW()) &&
-            !hasAnyL_Road(); // && !hasAnyL_Road();
+            !hasAnyL_Road() && !hasAnyJ_Road();
     return r;
 }
 
@@ -268,7 +271,8 @@ bool TileData::hasFieldArc2cWest() const
 
 bool TileData::hasFieldArc3cNorthEast() const
 {
-    return hasTown2e2cSouthWest() && sameType(ObjectType::Field, N()->type, E()->type);
+    return (hasTown2e2cSouthWest() || hasTown1e3cSouthToNorthWest()) &&
+            sameType(ObjectType::Field, N()->type, E()->type);
 }
 
 int TileData::fieldArc3cNorthEastId() const
@@ -394,6 +398,27 @@ bool TileData::hasFieldLTriangleSouthWest() const
     return copy().rotateClockwise(2).hasFieldLTriangleNorthEast();
 }
 
+bool TileData::hasFieldJTriangleNorthEast() const
+{
+    return copy().rotateClockwise(3).hasFieldJTriangleNorthWest();
+}
+
+bool TileData::hasFieldJTriangleNorthWest() const
+{
+    return NW() && NW()->type == ObjectType::Field &&
+            hasJ_NorthEastRoad();
+}
+
+bool TileData::hasFieldJTriangleSouthEast() const
+{
+    return copy().rotateClockwise(2).hasFieldJTriangleNorthWest();
+}
+
+bool TileData::hasFieldJTriangleSouthWest() const
+{
+    return copy().rotateClockwise(1).hasFieldJTriangleNorthWest();
+}
+
 bool TileData::hasFieldLTrapezoidNorthEast() const
 {
     return NE() && NE()->type == ObjectType::Field &&
@@ -413,6 +438,27 @@ bool TileData::hasFieldLTrapezoidSouthEast() const
 bool TileData::hasFieldLTrapezoidSouthWest() const
 {
     return copy().rotateClockwise(2).hasFieldLTrapezoidNorthEast();
+}
+
+bool TileData::hasFieldJTrapezoidNorthEast() const
+{
+    return copy().rotateClockwise(3).hasFieldJTrapezoidNorthWest();
+}
+
+bool TileData::hasFieldJTrapezoidNorthWest() const
+{
+    return NW() && NW()->type == ObjectType::Field &&
+            hasJ_NorthWestRoad();
+}
+
+bool TileData::hasFieldJTrapezoidSouthEast() const
+{
+    return copy().rotateClockwise(2).hasFieldJTrapezoidNorthWest();
+}
+
+bool TileData::hasFieldJTrapezoidSouthWest() const
+{
+    return copy().rotateClockwise(1).hasFieldJTrapezoidNorthWest();
 }
 
 bool TileData::hasFieldHalfQuarterNEE() const
@@ -459,7 +505,8 @@ bool TileData::hasTown1eArcNorth() const
 {
     return N() && N()->type == ObjectType::Town && N()->initialValency == 1 &&
             SE()->initialId != N()->initialId &&
-            SW()->initialId != N()->initialId;
+            SW()->initialId != N()->initialId &&
+            !hasTown1eBridgeNorth();
 }
 
 bool TileData::hasTown1eArcEast() const
@@ -475,6 +522,29 @@ bool TileData::hasTown1eArcSouth() const
 bool TileData::hasTown1eArcWest() const
 {
     return copy().rotateClockwise(1).hasTown1eArcNorth();
+}
+
+bool TileData::hasTown1eBridgeNorth() const
+{
+    return N() && N()->type == ObjectType::Town && N()->initialValency == 1 &&
+            hasTown2eEastWest() &&
+            sameType(ObjectType::Field, NE()->type, NW()->type) &&
+            !sameInitialId(NE(), NW());
+}
+
+bool TileData::hasTown1eBridgeEast() const
+{
+    return copy().rotateClockwise(3).hasTown1eBridgeNorth();
+}
+
+bool TileData::hasTown1eBridgeSouth() const
+{
+    return copy().rotateClockwise(2).hasTown1eBridgeNorth();
+}
+
+bool TileData::hasTown1eBridgeWest() const
+{
+    return copy().rotateClockwise(1).hasTown1eBridgeNorth();
 }
 
 bool TileData::hasTown1e4cNorth() const
@@ -496,6 +566,31 @@ bool TileData::hasTown1e4cSouth() const
 bool TileData::hasTown1e4cWest() const
 {
     return copy().rotateClockwise(1).hasTown1e4cNorth();
+}
+
+bool TileData::hasTown1e3cNorthToSouthEast() const
+{
+    bool a1 = N() && N()->type == ObjectType::Town && N()->initialValency == 1;
+    bool a2 = sameInitialId(SE(), N());
+    bool a3 = hasFieldArc2cEast();
+    bool a4 = sameInitialId(W(), S(), SW()) && sameType(ObjectType::Field, S()->type, W()->type, SW()->type);
+    bool a5 = !sameInitialId(SW(), E());
+    return a1 && a2 && a3 && a4 && a5;
+}
+
+bool TileData::hasTown1e3cEastToSouthWest() const
+{
+    return copy().rotateClockwise(3).hasTown1e3cNorthToSouthEast();
+}
+
+bool TileData::hasTown1e3cSouthToNorthWest() const
+{
+    return copy().rotateClockwise(2).hasTown1e3cNorthToSouthEast();
+}
+
+bool TileData::hasTown1e3cWestToNorthEast() const
+{
+    return copy().rotateClockwise(1).hasTown1e3cNorthToSouthEast();
 }
 
 bool TileData::hasTown2eNorthSouth() const
@@ -670,8 +765,8 @@ bool TileData::hasRoadNorth() const
             N()->type == ObjectType::Road &&
             N()->initialValency == 1 &&
             !hasC_ToTown_NorthEastRoad() &&
-            !hasC_ToTown_NorthWestRoad()/* &&
-            hasFieldWhole()*/;
+            !hasC_ToTown_NorthWestRoad() &&
+            !hasRoadLongNorth();
 }
 
 bool TileData::hasRoadEast() const
@@ -689,13 +784,38 @@ bool TileData::hasRoadWest() const
     return copy().rotateClockwise(1).hasRoadNorth();
 }
 
+bool TileData::hasRoadLongNorth() const
+{
+    return N() && N()->type == ObjectType::Road && N()->initialValency == 1 &&
+            S()->type == ObjectType::Town && S()->initialValency == 1 &&
+            SW()->initialId != SE()->initialId &&
+            !hasC_ToTown_NorthEastRoad() &&
+            !hasC_ToTown_NorthWestRoad();
+}
+
+bool TileData::hasRoadLongEast() const
+{
+    return copy().rotateClockwise(3).hasRoadLongNorth();
+}
+
+bool TileData::hasRoadLongSouth() const
+{
+    return copy().rotateClockwise(2).hasRoadLongNorth();
+}
+
+bool TileData::hasRoadLongWest() const
+{
+    return copy().rotateClockwise(1).hasRoadLongNorth();
+}
+
 bool TileData::hasC_ToTown_NorthEastRoad() const
 {
     return N() &&
             N()->type == ObjectType::Road &&
             N()->initialValency == 1 &&
             E() && E()->type == ObjectType::Town &&
-            hasFieldNorthEast();
+            hasFieldNorthEast() &&
+            (!C() || C()->type != ObjectType::Town);
 }
 
 bool TileData::hasC_ToTown_NorthWestRoad() const
@@ -704,7 +824,8 @@ bool TileData::hasC_ToTown_NorthWestRoad() const
             N()->type == ObjectType::Road &&
             N()->initialValency == 1 &&
             W() && W()->type == ObjectType::Town &&
-            hasFieldNorthWest();
+            hasFieldNorthWest() &&
+            (!C() || C()->type != ObjectType::Town);
 }
 
 bool TileData::hasC_ToTown_SouthEastRoad() const
@@ -950,6 +1071,60 @@ bool TileData::hasAnyL_Road() const
             hasL_NorthWestRoad() ||
             hasL_SouthEastRoad() ||
             hasL_SouthWestRoad();
+}
+
+bool TileData::hasJ_NorthWestRoad() const
+{
+    return N() && W() &&
+            sameType(ObjectType::Road, N()->type, W()->type) &&
+            sameInitialId(N(), W()) &&
+            N()->initialValency == 2 &&
+            sameType(ObjectType::Field, NE()->type, SW()->type, SE()->type) &&
+            !sameInitialId(NE(), SW()) &&
+            sameInitialId(NE(), SE());
+}
+
+int TileData::J_NorthWestRoadId() const
+{
+    return commonId(W(), N());
+}
+
+bool TileData::hasJ_NorthEastRoad() const
+{
+    return copy().rotateClockwise(3).hasJ_NorthWestRoad();
+}
+
+int TileData::J_NorthEastRoadId() const
+{
+    return commonId(E(), N());
+}
+
+bool TileData::hasJ_SouthWestRoad() const
+{
+    return copy().rotateClockwise(1).hasJ_NorthWestRoad();
+}
+
+int TileData::J_SouthWestRoadId() const
+{
+    return commonId(S(), W());
+}
+
+bool TileData::hasJ_SouthEastRoad() const
+{
+    return copy().rotateClockwise(2).hasJ_NorthWestRoad();
+}
+
+int TileData::J_SouthEastRoadId() const
+{
+    return commonId(E(), S());
+}
+
+bool TileData::hasAnyJ_Road() const
+{
+    return hasJ_NorthEastRoad() ||
+            hasJ_NorthWestRoad() ||
+            hasJ_SouthEastRoad() ||
+            hasJ_SouthWestRoad();
 }
 
 std::shared_ptr<MapObjectData> TileData::getConnector(Direction direction)

@@ -8,8 +8,17 @@
         <file>schematic/NorthWestTown2e2c.qml</file>
         <file>schematic/Town_2e2c_NorthEast.qml</file>
         <file>schematic/Road_L_NorthEast.qml</file>
+        <file>schematic/Road_L_NorthWest.qml</file>
+        <file>schematic/Road_L_SouthEast.qml</file>
+        <file>schematic/Road_L_SouthWest.qml</file>
         <file>schematic/Field_LTrapezoid_NorthEast.qml</file>
         <file>schematic/Field_LTriangle_NorthEast.qml</file>
+        <file>schematic/Field_LTrapezoid_NorthWest.qml</file>
+        <file>schematic/Field_LTrapezoid_SouthEast.qml</file>
+        <file>schematic/Field_LTrapezoid_SouthWest.qml</file>
+        <file>schematic/Field_LTriangle_NorthWest.qml</file>
+        <file>schematic/Field_LTriangle_SouthEast.qml</file>
+        <file>schematic/Field_LTriangle_SouthWest.qml</file>
         <file>schematic/Road_C_NorthEast.qml</file>
         <file>schematic/Town_1e4c_East.qml</file>
         <file>schematic/Town_1eArc_South.qml</file>
@@ -17,6 +26,13 @@
         <file>schematic/Town_1eArc_East.qml</file>
         <file>schematic/Road_T_NorthWestSouth.qml</file>
         <file>schematic/Road_North.qml</file>
+        <file>schematic/Road_East.qml</file>
+        <file>schematic/Road_South.qml</file>
+        <file>schematic/Road_West.qml</file>
+        <file>schematic/Road_Long_North.qml</file>
+        <file>schematic/Road_Long_East.qml</file>
+        <file>schematic/Road_Long_South.qml</file>
+        <file>schematic/Road_Long_West.qml</file>
         <file>schematic/BaseMapObject.qml</file>
         <file>MultiObjectMouseArea.qml</file>
         <file>schematic/Field_Half_North.qml</file>
@@ -29,9 +45,6 @@
         <file>schematic/Field_Quarter_NorthWest.qml</file>
         <file>schematic/Field_Quarter_SouthEast.qml</file>
         <file>schematic/Field_Quarter_SouthWest.qml</file>
-        <file>schematic/Road_L_NorthWest.qml</file>
-        <file>schematic/Road_L_SouthEast.qml</file>
-        <file>schematic/Road_L_SouthWest.qml</file>
         <file>schematic/Road_C_NorthWest.qml</file>
         <file>schematic/Road_C_SouthEast.qml</file>
         <file>schematic/Road_C_SouthWest.qml</file>
@@ -46,25 +59,20 @@
         <file>schematic/Field_3quarters_noSouthWest.qml</file>
         <file>schematic/Town_1eArc_North.qml</file>
         <file>schematic/Town_1eArc_West.qml</file>
+        <file>schematic/Town_1eBridge_North.qml</file>
+        <file>schematic/Town_1eBridge_East.qml</file>
+        <file>schematic/Town_1eBridge_South.qml</file>
+        <file>schematic/Town_1eBridge_West.qml</file>
         <file>schematic/Town_1e4c_North.qml</file>
         <file>schematic/Town_1e4c_South.qml</file>
         <file>schematic/Town_1e4c_West.qml</file>
         <file>schematic/Road_EastWest.qml</file>
-        <file>schematic/Road_East.qml</file>
-        <file>schematic/Road_South.qml</file>
-        <file>schematic/Road_West.qml</file>
         <file>schematic/Road_T_WestSouthEast.qml</file>
         <file>schematic/Road_T_EastNorthWest.qml</file>
         <file>schematic/Road_T_SouthEastNorth.qml</file>
         <file>MenuButton.qml</file>
         <file>schematic/Field_Diagonal_NorthWest_SouthEast.qml</file>
         <file>schematic/Field_Diagonal_NorthEast_SouthWest.qml</file>
-        <file>schematic/Field_LTrapezoid_NorthWest.qml</file>
-        <file>schematic/Field_LTrapezoid_SouthEast.qml</file>
-        <file>schematic/Field_LTrapezoid_SouthWest.qml</file>
-        <file>schematic/Field_LTriangle_NorthWest.qml</file>
-        <file>schematic/Field_LTriangle_SouthEast.qml</file>
-        <file>schematic/Field_LTriangle_SouthWest.qml</file>
         <file>schematic/Town_2e_NorthSouth.qml</file>
         <file>schematic/Town_2e_EastWest.qml</file>
         <file>schematic/Town_2e2c_SouthEast.qml</file>
@@ -126,6 +134,22 @@
         <file>schematic/Town_3e4c_WestNorthSouth.qml</file>
         <file>RemainingTilesPopup.qml</file>
         <file>TileViewSwitch.qml</file>
+        <file>schematic/Town_1e3c_NorthToSouthEast.qml</file>
+        <file>schematic/Town_1e3c_EastToSouthWest.qml</file>
+        <file>schematic/Town_1e3c_SouthToNorthWest.qml</file>
+        <file>schematic/Town_1e3c_WestToNorthEast.qml</file>
+        <file>schematic/Road_J_NorthEast.qml</file>
+        <file>schematic/Road_J_NorthWest.qml</file>
+        <file>schematic/Road_J_SouthEast.qml</file>
+        <file>schematic/Road_J_SouthWest.qml</file>
+        <file>schematic/Field_JTrapezoid_NorthEast.qml</file>
+        <file>schematic/Field_JTrapezoid_NorthWest.qml</file>
+        <file>schematic/Field_JTrapezoid_SouthEast.qml</file>
+        <file>schematic/Field_JTrapezoid_SouthWest.qml</file>
+        <file>schematic/Field_JTriangle_NorthEast.qml</file>
+        <file>schematic/Field_JTriangle_NorthWest.qml</file>
+        <file>schematic/Field_JTriangle_SouthEast.qml</file>
+        <file>schematic/Field_JTriangle_SouthWest.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>

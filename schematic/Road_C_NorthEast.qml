@@ -56,6 +56,11 @@ BaseMapObject {
         }
     }
 
+    TileBonuses {
+        mapObject: root
+        primaryPoint: Qt.point(side/2 - 3 * halfRoadWidth, side/4)
+    }
+
     idLabel.anchors.horizontalCenter: horizontalCenter
     idLabel.y: 0
 }

@@ -53,6 +53,18 @@ Item {
 
     Rectangle {
         width: 20
+        height: 40
+        radius: 10
+        x: primaryPoint.x - width/2
+        y: primaryPoint.y - height/2
+        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.RoadLake
+        color: "lightblue"
+        border.width: 2
+        border.color: "blue"
+    }
+
+    Rectangle {
+        width: 20
         height: 20
         color: "white"
         x: primaryPoint.x - width/2

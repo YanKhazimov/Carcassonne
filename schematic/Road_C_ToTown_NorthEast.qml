@@ -15,25 +15,50 @@ BaseMapObject {
         strokeWidth: 2
         fillColor: root.highlighted ? Constants.color.schematic.highlighter : Constants.color.schematic.road
 
+        PathLine {
+            x: side/2 + halfRoadWidth
+            y: side/2 - 3 * halfRoadWidth
+        }
+
         PathArc {
-            direction: PathArc.Counterclockwise
-            x: side
+            x: side/2 + 3 * halfRoadWidth
             y: side/2 - halfRoadWidth
-            radiusX: side/2 - halfRoadWidth
-            radiusY: side/2 - halfRoadWidth
+            radiusX: 2 * halfRoadWidth
+            radiusY: 2 * halfRoadWidth
+            direction: PathArc.Counterclockwise
         }
 
         PathLine {
-            x: side
+            x: side + 1
+            y: side/2 - halfRoadWidth
+        }
+
+        PathLine {
+            x: side + 1
+            y: side/2 + halfRoadWidth
+        }
+
+        PathLine {
+            x: side/2 + 3 * halfRoadWidth
             y: side/2 + halfRoadWidth
         }
 
         PathArc {
             x: side/2 - halfRoadWidth
-            y: -1
-            radiusX: side/2 + halfRoadWidth
-            radiusY: side/2 + halfRoadWidth
+            y: side/2 - 3 * halfRoadWidth
+            radiusX: 4 * halfRoadWidth
+            radiusY: 4 * halfRoadWidth
         }
+
+        PathLine {
+            x: side/2 - halfRoadWidth
+            y: -1
+        }
+    }
+
+    TileBonuses {
+        mapObject: root
+        primaryPoint: Qt.point(side/2 - 3 * halfRoadWidth, side/4)
     }
 
     idLabel.anchors.horizontalCenter: horizontalCenter
