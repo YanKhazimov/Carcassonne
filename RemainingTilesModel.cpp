@@ -1,21 +1,21 @@
 #include "RemainingTilesModel.h"
 #include "DataRoles.h"
 #include "Tile.h"
+#include <QFileInfo>
 #include <QDebug>
 
 RemainingTilesModel::RemainingTilesModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
-
 }
 
-void RemainingTilesModel::setSource(TilesModel *source)
+void RemainingTilesModel::setSource(QAbstractItemModel *source)
 {
     if (!sourceModel())
     {
         setSourceModel(source);
-        connect(source, &TilesModel::dataChanged, this, &RemainingTilesModel::onDataChanged);
-        connect(source, &TilesModel::rowsInserted, this, &RemainingTilesModel::onRowsInserted);
+        connect(source, &QAbstractItemModel::dataChanged, this, &RemainingTilesModel::onDataChanged);
+        connect(source, &QAbstractItemModel::rowsInserted, this, &RemainingTilesModel::onRowsInserted);
         sort(0);
     }
     else
@@ -83,12 +83,14 @@ bool RemainingTilesModel::lessThan(const QModelIndex &source_left, const QModelI
 {
     Tile* left = source_left.data(DataRoles::TilePtr).value<Tile*>();
     Tile* right = source_right.data(DataRoles::TilePtr).value<Tile*>();
-    QString leftId = source_left.data(DataRoles::TileImagePath).value<QString>();
-    QString rightId = source_right.data(DataRoles::TileImagePath).value<QString>();
+    QString leftPath = source_left.data(DataRoles::TileImagePath).value<QString>();
+    QString rightPath = source_right.data(DataRoles::TileImagePath).value<QString>();
+    QString leftBasename = QFileInfo(QUrl(leftPath).fileName()).baseName();
+    QString rightBasename = QFileInfo(QUrl(rightPath).fileName()).baseName();
 
     if (left->fixed() != right->fixed())
         return left->fixed() < right->fixed();
-    return leftId < rightId;
+    return leftBasename.toInt() < rightBasename.toInt();
 }
 
 bool RemainingTilesModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const

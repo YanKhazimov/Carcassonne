@@ -7,12 +7,13 @@
 #include "mapmodel.h"
 #include "PlayersModel.h"
 #include "RemainingTilesModel.h"
+#include "ShuffledDeck.h"
 
 class QmlPresenter : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(TilesModel* deck READ getTiles NOTIFY tilesChanged)
+    Q_PROPERTY(ShuffledDeck* deck READ getShuffledDeck NOTIFY tilesChanged)
     Q_PROPERTY(unsigned HighlightedObjectId READ highlightedObjectId WRITE setHighlightedObjectId NOTIFY highlightedObjectIdChanged)
     Q_PROPERTY(MapModel* mapModel READ getMapModel NOTIFY mapModelChanged)
     Q_PROPERTY(GameState GameState MEMBER gameState NOTIFY gameStateChanged)
@@ -41,10 +42,12 @@ public:
 
 private:
     TilesModel deck;
-    TilesModel* getTiles();
 
     RemainingTilesModel remainingTilesModel;
     RemainingTilesModel* getRemainingTiles();
+
+    ShuffledDeck shuffledDeck;
+    ShuffledDeck* getShuffledDeck();
 
     MapModel mapModel;
     MapModel* getMapModel();

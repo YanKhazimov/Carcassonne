@@ -2,7 +2,7 @@
 #define REMAININGTILESMODEL_H
 
 #include <QSortFilterProxyModel>
-#include "TilesModel.h"
+#include "Tile.h"
 
 class RemainingTilesModel : public QSortFilterProxyModel
 {
@@ -10,7 +10,7 @@ class RemainingTilesModel : public QSortFilterProxyModel
 
 public:
     explicit RemainingTilesModel(QObject *parent = nullptr);
-    void setSource(TilesModel* source);
+    void setSource(QAbstractItemModel* source);
     Q_INVOKABLE virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     Q_INVOKABLE int getTileCopies(int row) const;
 

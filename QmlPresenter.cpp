@@ -6,14 +6,14 @@
 #include <QPoint>
 #include <QDebug>
 
-TilesModel *QmlPresenter::getTiles()
-{
-    return &deck;
-}
-
 RemainingTilesModel *QmlPresenter::getRemainingTiles()
 {
     return &remainingTilesModel;
+}
+
+ShuffledDeck *QmlPresenter::getShuffledDeck()
+{
+    return &shuffledDeck;
 }
 
 MapModel *QmlPresenter::getMapModel()
@@ -141,6 +141,7 @@ QmlPresenter::QmlPresenter(ObjectManager& objManager, QObject *parent)
     connect(&mapModel, &MapModel::fieldIntegrityCheckRequested, this, &QmlPresenter::checkFieldIntegrity);
 
     remainingTilesModel.setSource(&deck);
+    shuffledDeck.setSource(&deck);
 }
 
 void QmlPresenter::AddTiles(std::list<Tile> &tiles)
@@ -161,7 +162,7 @@ void QmlPresenter::AddTiles(std::list<Tile> &tiles)
 
 Tile *QmlPresenter::getTile(int i)
 {
-    return deck.index(i, 0).data(DataRoles::TilePtr).value<Tile*>();
+    return shuffledDeck.index(i, 0).data(DataRoles::TilePtr).value<Tile*>();
 }
 
 Tile *QmlPresenter::getRemainingTile(int i)

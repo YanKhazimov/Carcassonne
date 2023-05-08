@@ -40,6 +40,8 @@ set(PROJECT_SOURCES
         DeckBuilder.cpp
         RemainingTilesModel.h
         RemainingTilesModel.cpp
+        ShuffledDeck.h
+        ShuffledDeck.cpp
         main.cpp
         qml.qrc
 )
