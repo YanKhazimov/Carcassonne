@@ -59,7 +59,9 @@ void RemainingTilesModel::onDataChanged(QModelIndex first, QModelIndex last, QVe
             Tile* tile = sourceIndex.data(DataRoles::TilePtr).value<Tile*>();
             Q_ASSERT(tile->fixed());
             const QString& picture = sourceIndex.data(DataRoles::TileImagePath).value<QString>();
-            fixedTiles[picture].append(unfixedTiles[picture].takeLast());
+            auto tileIter = std::find(unfixedTiles[picture].begin(), unfixedTiles[picture].end(), tile);
+            unfixedTiles[picture].erase(tileIter);
+            fixedTiles[picture].push_back(tile);
             if (unfixedTiles[picture].empty())
                 unfixedTiles.remove(picture);
         }
@@ -75,7 +77,7 @@ void RemainingTilesModel::onRowsInserted(const QModelIndex &source_parent, int f
         const QModelIndex sourceIndex = sourceModel()->index(i, 0, source_parent);
         Tile* tile = sourceIndex.data(DataRoles::TilePtr).value<Tile*>();
         // initially all tiles are not fixed
-        unfixedTiles[sourceIndex.data(DataRoles::TileImagePath).value<QString>()].append(tile);
+        unfixedTiles[sourceIndex.data(DataRoles::TileImagePath).value<QString>()].push_back(tile);
     }
 }
 

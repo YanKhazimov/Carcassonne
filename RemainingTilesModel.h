@@ -2,6 +2,7 @@
 #define REMAININGTILESMODEL_H
 
 #include <QSortFilterProxyModel>
+#include <vector>
 #include "Tile.h"
 
 class RemainingTilesModel : public QSortFilterProxyModel
@@ -23,7 +24,7 @@ protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
 private:
-    QMap<QString, QList<Tile*>> fixedTiles, unfixedTiles;
+    QMap<QString, std::vector<Tile*>> fixedTiles, unfixedTiles;
 };
 
 #endif // REMAININGTILESMODEL_H

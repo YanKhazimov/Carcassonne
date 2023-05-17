@@ -364,7 +364,7 @@ std::list<Tile> DeckBuilder::BuildDeck(ObjectManager &objectManager, const QStri
                         { objectManager.GenerateRoad(2), { {0, 2}, {4, 2} } },
                         { objectManager.GenerateField(), { {0, 4}, {2, 4}, {4, 4} } },
                         { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}  } }
-                    }, "50", 0);
+                    }, "50", 90);
     X_(i, 3)
             addTile(std::vector<TileObject> {
                         { objectManager.GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {4, 4} } },
