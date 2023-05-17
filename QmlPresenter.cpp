@@ -5,6 +5,8 @@
 #include <iostream>
 #include <QPoint>
 #include <QDebug>
+#include <QGuiApplication>
+#include <QCursor>
 
 RemainingTilesModel *QmlPresenter::getRemainingTiles()
 {
@@ -468,4 +470,12 @@ bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, 
 bool QmlPresenter::isFieldObject(unsigned objectId) const
 {
     return objectManager.GetObject(objectId)->type == ObjectType::Field;
+}
+
+void QmlPresenter::setWaitingCursor(bool value)
+{
+    if (value)
+        QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    else
+        QGuiApplication::restoreOverrideCursor();
 }

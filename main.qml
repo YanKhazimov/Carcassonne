@@ -20,11 +20,13 @@ Window {
 
         anchors.centerIn: parent
         source: "qrc:/SettingsWindow.qml"
+        onItemChanged: engine.setWaitingCursor(false)
     }
 
     Connections {
         target: loader.item
         function onUrlRequested(urlAddress) {
+            engine.setWaitingCursor(true)
             loader.source = urlAddress
         }
     }

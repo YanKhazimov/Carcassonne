@@ -116,6 +116,7 @@ public:
     Q_INVOKABLE void scoreHighlightedField();
     Q_INVOKABLE bool canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile *tile) const;
     Q_INVOKABLE bool isFieldObject(unsigned objectId) const;
+    Q_INVOKABLE void setWaitingCursor(bool value);
 
 signals:
     void tilesChanged();
