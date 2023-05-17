@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <QQmlEngine>
 #include "Tile.h"
+#include "DeckBuilder.h"
 
 Player::Player(QColor _color, QString _name, QObject *parent)
     : QObject(parent), color(_color), active(false), name(_name)
@@ -53,11 +54,7 @@ void Player::setActive(bool value)
 
 void Player::createAbbeyTile(ObjectManager &objectManager)
 {
-    abbeyTile = std::make_shared<Tile>(std::vector<TileObject> {
-                                           { objectManager.GenerateAbbey(),
-                                             { {0, 0}, {0, 2}, {0, 4}, {2, 0}, {2, 2}, {2, 4}, {4, 0}, {4, 2}, {4, 4} } }
-                                       },
-                                       "abbey.jpg", 0);
+    abbeyTile = DeckBuilder::createAbbeyTile(objectManager, "img/pnp/tiles", "png");
 }
 
 Tile* Player::getAbbeyTile()

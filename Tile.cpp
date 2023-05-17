@@ -2,9 +2,9 @@
 #include <QPoint>
 #include <QQmlEngine>
 
-Tile::Tile(std::vector<TileObject> &&objects, QString imgName, int imgRotation, QObject *parent)
+Tile::Tile(std::vector<TileObject> &&objects, const QUrl &image, int imgRotation, QObject *parent)
     : QObject(parent), TileData(std::move(objects)),
-      imageUrl("img/tiles/" + imgName), imageRotation(imgRotation), x(-100), y(-100), isFixed(false), isPlaced(false)
+      imageUrl(image), imageRotation(imgRotation), x(-100), y(-100), isFixed(false), isPlaced(false)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QObject::connect(this, &Tile::layoutChanged, this, &Tile::objectIdsChanged);

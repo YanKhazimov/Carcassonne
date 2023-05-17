@@ -38,8 +38,7 @@ int main(int argc, char *argv[])
 
     ObjectManager objectManager;
 
-    std::list<Tile> tiles;
-    DeckBuilder::BuildStandardDeck(objectManager, tiles);
+    std::list<Tile> tiles = DeckBuilder::BuildDeck(objectManager, "img/pnp/tiles", "png");
 
     QmlPresenter presenter(objectManager);
 

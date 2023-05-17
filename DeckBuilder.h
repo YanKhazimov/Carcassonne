@@ -4,13 +4,14 @@
 #include "Tile.h"
 
 #include <vector>
+#include <memory>
 
 class DeckBuilder
 {
 public:
     DeckBuilder();
-    static void BuildStandardDeck(ObjectManager& objectManager, std::list<Tile> &tiles);
-    static void BuildExampleDeck(ObjectManager& objectManager, std::list<Tile> &tiles);
+    static std::list<Tile> BuildDeck(ObjectManager& objectManager, const QString& imagesFolder, const QString& imageFormat);
+    static std::shared_ptr<Tile> createAbbeyTile(ObjectManager& objectManager, const QString& imagesFolder, const QString& imageFormat);
 };
 
 #endif // DECKBUILDER_H

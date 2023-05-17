@@ -69,6 +69,10 @@ else()
     endif()
 endif()
 
+add_custom_command(TARGET Carcassonne POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/img/pnp/tiles $<TARGET_FILE_DIR:Carcassonne>/img/pnp/tiles
+)
+
 target_compile_definitions(Carcassonne
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(Carcassonne
