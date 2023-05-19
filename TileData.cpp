@@ -1433,8 +1433,8 @@ TileObject::TileObject(std::shared_ptr<MapObjectData> _objPtr, std::vector<std::
 TileObject::TileObject(const TileObject &other)
     : objPtr(other.objPtr), location(other.location), tile(other.tile)
 {
-    if (objPtr->initialId == 1)
-        qDebug() << objPtr->initialId << " copy ctor";
+    //if (objPtr->initialId == 1)
+    //    qDebug() << objPtr->initialId << " copy ctor";
 }
 
 TileObject::TileObject(TileObject &&other) noexcept
@@ -1454,12 +1454,13 @@ void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updated
 
     switch (otherConnectorObject->type) {
     case ObjectType::Town: {
-        // update exits count, score
+        // update exits count
         mergeObjectShapes(connectorObject, otherConnectorObject);
 
         // merge ids
         connectorObject->mergeObject(otherConnectorObject, updatedTiles);
 
+        // check completion to score
         checkObjectCompletion(connectorObject);
         break;
     }
@@ -1469,12 +1470,13 @@ void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updated
         break;
     }
     case ObjectType::Road: {
-        // update exits count, score
+        // update exits count
         mergeObjectShapes(connectorObject, otherConnectorObject);
 
         // merge ids
         connectorObject->mergeObject(otherConnectorObject, updatedTiles);
 
+        // check completion to score
         checkObjectCompletion(connectorObject);
 
         // merge side fields
@@ -1487,6 +1489,11 @@ void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updated
         break;
     }
     case ObjectType::Abbey: {
+        // update exits count of the adjacent object
+        mergeObjectShapes(connectorObject, otherConnectorObject);
+
+        // check completion of the adjacent object to score it
+        checkObjectCompletion(connectorObject);
         break;
     }
     default:
