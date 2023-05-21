@@ -18,13 +18,6 @@ Item {
     width: 1280
     height: 980
 
-    Image {
-        id: background
-        source: "qrc:/img/startBackground.jpg"
-        height: parent.height
-        fillMode: Image.PreserveAspectFit
-    }
-
     Column {
         anchors.centerIn: parent
         spacing: 5
