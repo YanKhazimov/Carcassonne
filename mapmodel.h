@@ -22,7 +22,7 @@ class MapModel : public QObject
     Tile* latestTile = nullptr;
 
     bool canMergeRegularTile(int x, int y, const TileData& tile) const;
-    bool canMergeAbbeyTile(int x, int y, const TileData& tile) const;
+    bool canMergeAbbeyTile(int x, int y) const;
     int maxCapacity() const;
 
     void checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY);
@@ -35,6 +35,8 @@ public:
     Q_INVOKABLE bool isFreeAdjacent(int x, int y) const;
     Q_INVOKABLE bool canMergeAsIs(int x, int y, Tile* tile) const;
     Q_INVOKABLE bool canMergeRotated(int x, int y, Tile* tile) const;
+    bool fitsCurrentBoard(Tile* tile) const;
+    bool canMergeAbbeyTile() const;
 
     Tile* nextTileNorth(int x, int y) const;
     Tile* nextTileSouth(int x, int y) const;

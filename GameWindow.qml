@@ -289,7 +289,7 @@ Item {
                     id: fixTileButton
                     text: "Поставить"
                     onClicked: {
-                        engine.mapModel.fixTile(board.activeTile.tileData/*engine.getTile(tiles.length - 1)*/)
+                        engine.mapModel.fixTile(board.activeTile.tileData)
                         lastPlacedTile = board.activeTile
                         engine.updateHighlight()
                         board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
@@ -306,6 +306,7 @@ Item {
                         engine.highlight(-1)
                         root.activeMeeple = null
                         engine.GameState = GameEngine.NewTurn
+                        engine.processGameEnd(tiles.length)
                     }
                 }
 
@@ -321,6 +322,7 @@ Item {
                         }
                         engine.highlight(-1)
                         engine.GameState = GameEngine.NewTurn
+                        engine.processGameEnd(tiles.length)
                     }
                 }
             }
@@ -470,6 +472,54 @@ Item {
         closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
     }
 
+    Popup {
+        id: gameEndPopup
+
+        anchors.centerIn: parent
+        width: 600
+        height: 200
+        modal: true
+        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+
+        Rectangle {
+            color: "lightgrey"
+            anchors.fill: parent
+
+            Column {
+                anchors.centerIn: parent
+                spacing: 10
+
+                Text {
+                    id: endGamePopupText
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.pixelSize: 25
+                }
+
+                MenuButton {
+                    id: endGamePopupButton
+
+                    property var gameState
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Ок"
+                    onClicked: {
+                        engine.GameState = gameState
+                        gameEndPopup.close()
+                    }
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: engine
+        function onShowMessage(message, state) {
+            endGamePopupText.text = message
+            endGamePopupButton.gameState = state
+            gameEndPopup.visible = true
+        }
+    }
+
     Item {
         id: state
 
@@ -488,10 +538,6 @@ Item {
                 }
                 PropertyChanges {
                     target: fixMeepleButton
-                    enabled: false
-                }
-                PropertyChanges {
-                    target: skipMeepleButton
                     enabled: false
                 }
             },
@@ -548,6 +594,25 @@ Item {
                 }
                 PropertyChanges {
                     target: fixTileButton
+                    enabled: false
+                }
+            },
+            State {
+                name: GameEngine.GameEnd
+                PropertyChanges {
+                    target: rotateTileButton
+                    enabled: false
+                }
+                PropertyChanges {
+                    target: fixTileButton
+                    enabled: false
+                }
+                PropertyChanges {
+                    target: fixMeepleButton
+                    enabled: false
+                }
+                PropertyChanges {
+                    target: skipMeepleButton
                     enabled: false
                 }
             }

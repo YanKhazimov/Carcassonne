@@ -51,11 +51,26 @@ bool MapModel::canMergeRegularTile(int x, int y, const TileData &tile) const
             (!nextTileEast(x, y) || nextTileEast(x, y)->CanConnect(tile, Direction::West));
 }
 
-bool MapModel::canMergeAbbeyTile(int x, int y, const TileData &tile) const
+bool MapModel::canMergeAbbeyTile(int x, int y) const
 {
-    return tile.isAbbeyTile &&
-            tiles[y + size/2][x + size/2] == nullptr &&
+    return tiles[y + size/2][x + size/2] == nullptr &&
             nextTileNorth(x, y) && nextTileSouth(x, y) && nextTileWest(x, y) && nextTileEast(x, y);
+}
+
+bool MapModel::canMergeAbbeyTile() const
+{
+    QPair<int, int> xCheckRange {minX + 1, maxX - 1};
+    QPair<int, int> yCheckRange {minY + 1, maxY - 1};
+    for (int x = xCheckRange.first; x <= xCheckRange.second; ++x)
+        for (int y = yCheckRange.first; y <= yCheckRange.second; ++y)
+        {
+            if (canMergeAbbeyTile(x, y))
+            {
+                return true;
+            }
+        }
+
+    return false;
 }
 
 int MapModel::maxCapacity() const
@@ -126,12 +141,6 @@ void MapModel::fixTile(Tile *tile)
     tiles[position.y() + size/2][position.x() + size/2] = tile;
     tile->setFixed(true);
 
-    if (position.x() != 0 || position.y() != 0)
-    {
-        latestTile = tile;
-        emit latestTileChanged();
-    }
-
     // update minmax
     if (position.x() < minX || position.x() > maxX)
     {
@@ -163,10 +172,14 @@ void MapModel::fixTile(Tile *tile)
     }
 
     checkNearbyMonasteryAbbeyCompletion(position.x(), position.y());
+
     for (unsigned fieldObjectId: tile->getFieldObjectIds())
     {
         emit fieldIntegrityCheckRequested(fieldObjectId);
     }
+
+    latestTile = tile;
+    emit latestTileChanged();
 }
 
 bool MapModel::isFreeAdjacent(int x, int y) const
@@ -180,7 +193,7 @@ bool MapModel::isFreeAdjacent(int x, int y) const
 
 bool MapModel::canMergeAsIs(int x, int y, Tile *tile) const
 {
-    return tile && (canMergeRegularTile(x, y, *tile) || canMergeAbbeyTile(x, y, *tile));
+    return tile && (canMergeRegularTile(x, y, *tile) || tile->isAbbeyTile && canMergeAbbeyTile(x, y));
 }
 
 bool MapModel::canMergeRotated(int x, int y, Tile *tile) const
@@ -193,4 +206,23 @@ bool MapModel::canMergeRotated(int x, int y, Tile *tile) const
     return canMergeRegularTile(x, y, copy.rotateClockwise()) ||
             canMergeRegularTile(x, y, copy.rotateClockwise()) ||
             canMergeRegularTile(x, y, copy.rotateClockwise());
+}
+
+bool MapModel::fitsCurrentBoard(Tile *tile) const
+{
+   QPair<int, int> xCheckRange {qMin(minX - 1, -maxCapacity()), qMax(maxX + 1, maxCapacity())};
+   QPair<int, int> yCheckRange {qMin(minY - 1, -maxCapacity()), qMax(maxY + 1, maxCapacity())};
+   for (int x = xCheckRange.first; x <= xCheckRange.second; ++x)
+       for (int y = yCheckRange.first; y <= yCheckRange.second; ++y)
+       {
+           if (isFreeAdjacent(x, y))
+           {
+               if (canMergeAsIs(x, y, tile) || canMergeRotated(x, y, tile))
+               {
+                   return true;
+               }
+           }
+       }
+
+   return false;
 }

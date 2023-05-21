@@ -255,10 +255,11 @@ Rectangle {
             id: deckBackMouseArea
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            visible: tilesInDeck > 0 && playerData && playerData.IsActive && (engine.GameState === GameEngine.NewTurn ||
-                                                                engine.GameState === GameEngine.TilePlaced &&
-                                                                engine.getAbbeyTile(engine.ActivePlayer).IsPlaced &&
-                                                                !engine.getAbbeyTile(engine.ActivePlayer).IsFixed)
+            visible: tilesInDeck > 0 && !engine.AllFttingTilesPlayed && playerData && playerData.IsActive &&
+                     (engine.GameState === GameEngine.NewTurn ||
+                      engine.GameState === GameEngine.TilePlaced &&
+                      engine.getAbbeyTile(engine.ActivePlayer).IsPlaced &&
+                      !engine.getAbbeyTile(engine.ActivePlayer).IsFixed)
             onClicked: tileClicked()
         }
 

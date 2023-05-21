@@ -29,6 +29,7 @@ class QmlPresenter : public QObject
     Q_PROPERTY(qreal TilePictureOpacity MEMBER tilePictureOpacity NOTIFY tilePictureOpacityChanged)
     Q_PROPERTY(QVariantList PossibleColors READ getPossibleColors CONSTANT)
     Q_PROPERTY(RemainingTilesModel* remainingTilesModel READ getRemainingTiles NOTIFY remainingTilesChanged)
+    Q_PROPERTY(bool AllFttingTilesPlayed MEMBER allFttingTilesPlayed NOTIFY allFttingTilesPlayedChanged)
 
 public:
     enum class GameState {
@@ -36,7 +37,8 @@ public:
         TileDrawn,
         TilePlaced,
         TileFixed,
-        MeeplePlaced
+        MeeplePlaced,
+        GameEnd
     };
     Q_ENUM(GameState)
 
@@ -100,6 +102,8 @@ private:
 
     QVariantList getPossibleColors() const;
 
+    bool allFttingTilesPlayed = false;
+
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
 
@@ -117,6 +121,7 @@ public:
     Q_INVOKABLE bool canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile *tile) const;
     Q_INVOKABLE bool isFieldObject(unsigned objectId) const;
     Q_INVOKABLE void setWaitingCursor(bool value);
+    Q_INVOKABLE void processGameEnd(int fixedTilesCount);
 
 signals:
     void tilesChanged();
@@ -132,6 +137,8 @@ signals:
     void maxRoadChanged();
     void tilePictureOpacityChanged();
     void remainingTilesChanged();
+    void allFttingTilesPlayedChanged();
+    void showMessage(QString message, GameState stateToSet);
 };
 
 #endif // QMLPRESENTER_H

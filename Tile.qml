@@ -114,7 +114,7 @@ Item {
         anchors.fill: parent
         drag.target: parent
         visible: (!tileData.IsFixed) && (playerIndex === engine.ActivePlayer) && (!tileData.Abbey ||
-                                                                              engine.GameState < GameEngine.TileFixed)
+                                                                              engine.GameState < GameEngine.TileDrawn)
         cursorShape: Qt.SizeAllCursor
     }
 

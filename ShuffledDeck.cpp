@@ -24,6 +24,13 @@ void ShuffledDeck::setSource(QAbstractItemModel *source)
     }
 }
 
+void ShuffledDeck::forceReorder(int source, int destination)
+{
+    // swapping
+    std::swap(sourceIndexes[source], sourceIndexes[destination]);
+    invalidate();
+}
+
 bool ShuffledDeck::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
 {
     if (sourceIndexes.empty())

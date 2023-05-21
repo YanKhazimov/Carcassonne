@@ -407,6 +407,52 @@ QVariantList QmlPresenter::getPossibleColors() const
     return playerColors;
 }
 
+void QmlPresenter::processGameEnd(int fixedTilesCount)
+{
+    QStringList messages;
+
+    if (!allFttingTilesPlayed && shuffledDeck.rowCount() > fixedTilesCount)
+    {
+        Tile* nextTile = shuffledDeck.index(fixedTilesCount, 0).data(DataRoles::TilePtr).value<Tile*>();
+        if (mapModel.fitsCurrentBoard(nextTile))
+        {
+            return;
+        }
+
+        for (int swapCandidate = fixedTilesCount + 1; swapCandidate < shuffledDeck.rowCount(); swapCandidate++)
+        {
+            nextTile = shuffledDeck.index(swapCandidate, 0).data(DataRoles::TilePtr).value<Tile*>();
+            if (mapModel.fitsCurrentBoard(nextTile))
+            {
+                // make tile at index "swapCandidate" go to index "fixedTilesCount"
+                shuffledDeck.forceReorder(swapCandidate, fixedTilesCount);
+                return;
+            }
+        }
+
+        // disallow drawing more regular tiles
+        allFttingTilesPlayed = true;
+        emit allFttingTilesPlayedChanged();
+
+        messages.append("Оставшиеся фишки невозможно выставить.");
+    }
+
+    if (mapModel.canMergeAbbeyTile())
+    {
+        for (int i = 0; i < players.rowCount(); ++i)
+            if (!getAbbeyTile(i)->fixed())
+            {
+                messages.append("Игроки должны выставить фишки аббатств.");
+                emit showMessage(messages.join('\n'), GameState::NewTurn);
+                return;
+            }
+    }
+
+    // game end
+    messages.append("Переход к подсчету очков.");
+    emit showMessage(messages.join('\n'), GameState::GameEnd);
+}
+
 void QmlPresenter::switchActivePlayer()
 {
     setActivePlayer((activePlayer() + 1) % players.rowCount());
