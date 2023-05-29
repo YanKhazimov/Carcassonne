@@ -11,6 +11,7 @@ public:
     explicit ShuffledDeck(QObject *parent = nullptr);
     void setSource(QAbstractItemModel* source);
     void forceReorder(int source, int destination);
+    QModelIndex mapToSource(const QModelIndex& index) const override;
 
 protected:
     bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override;

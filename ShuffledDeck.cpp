@@ -31,6 +31,19 @@ void ShuffledDeck::forceReorder(int source, int destination)
     invalidate();
 }
 
+QModelIndex ShuffledDeck::mapToSource(const QModelIndex &index) const
+{
+    if (sourceModel())
+    {
+        if (sourceIndexes.size() == sourceModel()->rowCount())
+            return sourceModel()->index(sourceIndexes[index.row()], index.column(), index.parent());
+        else
+            return sourceModel()->index(index.row(), index.column(), index.parent());
+    }
+
+    return QModelIndex();
+}
+
 bool ShuffledDeck::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
 {
     if (sourceIndexes.empty())
