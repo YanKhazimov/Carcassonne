@@ -16,11 +16,6 @@ Rectangle {
     property real centerTileCenterHOffset: centerTileHOffset + 0.5
     property real centerTileCenterVOffset: centerTileVOffset + 0.5
 
-    property int playableTop: -grid.size
-    property int playableBottom: grid.size
-    property int playableLeft: -grid.size
-    property int playableRight: grid.size
-
     property bool activeDrag: false
     property var activeTile: null
 
@@ -110,13 +105,10 @@ Rectangle {
                         expandSouthWest()
                 }
             }
-
-            checkUnplayable()
         }
     }
 
     onActiveTileChanged: {
-        //console.log("activeTile", activeTile)
         if (activeTile)
         {
             activeTile.tileData.layoutChanged.connect(updateActiveTileRotation)
@@ -161,22 +153,6 @@ Rectangle {
         boardRepositioned()
     }
 
-    function checkUnplayable()
-    {
-        if (engine.mapModel.MaxX - engine.mapModel.MinX + 1 == maxCapacity - 2)
-        {
-            root.playableLeft = engine.mapModel.MinX - 1
-            root.playableRight = engine.mapModel.MaxX + 1
-            clipper.anchors.margins = 0
-        }
-        if (engine.mapModel.MaxY - engine.mapModel.MinY + 1 == maxCapacity - 2)
-        {
-            root.playableTop = engine.mapModel.MinY - 1
-            root.playableBottom = engine.mapModel.MaxY + 1
-            clipper.anchors.margins = 0
-        }
-    }
-
     function expandNorthWest() {
         capacity++
         Constants.tileSize = internal.boardLength / capacity
@@ -216,7 +192,7 @@ Rectangle {
     Item {
         id: clipper
         anchors.fill: parent
-        anchors.margins: 10
+        anchors.margins: maxCapacityReached ? 0 : 10
 
         clip: true
 
@@ -256,7 +232,11 @@ Rectangle {
                 Rectangle {
                     width: Constants.tileSize
                     height: Constants.tileSize
-                    color: dropArea.playable ? "transparent" : "cyan"
+                    color: (dropArea.yIndex >= engine.mapModel.MinPlayableY && dropArea.yIndex <= engine.mapModel.MaxPlayableY ||
+                            !engine.mapModel.YRangeDefined) &&
+                           (dropArea.xIndex >= engine.mapModel.MinPlayableX && dropArea.xIndex <= engine.mapModel.MaxPlayableX ||
+                            !engine.mapModel.XRangeDefined)
+                           ? "transparent" : "cyan"
                     border.color: activeTile && activeTile.dragActive ? "silver" : "transparent"
 
                     Behavior on width { NumberAnimation { duration: 200 } }
@@ -265,18 +245,15 @@ Rectangle {
                     DropArea {
                         id: dropArea
 
-                        anchors.fill: parent
-                        keys: ["tile"]
-                        readonly property bool playable: yIndex >= playableTop &&
-                                                         yIndex <= playableBottom &&
-                                                         xIndex >= playableLeft &&
-                                                         xIndex <= playableRight
                         readonly property int xIndex: index%grid.size - Math.floor(grid.size/2)
                         readonly property int yIndex: Math.floor(index/grid.size) - Math.floor(grid.size/2)
                         readonly property color activeHighlightColor: redHighlight.visible ? redHighlight.color
                                                                                            : greenHighlight.visible ? greenHighlight.color
                                                                                                                     : yellowHighlight.visible ? yellowHighlight.color
                                                                                                                                               : "transparent"
+
+                        anchors.fill: parent
+                        keys: ["tile"]
 
                         Rectangle {
                             anchors.fill: parent

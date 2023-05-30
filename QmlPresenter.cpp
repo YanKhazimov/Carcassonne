@@ -132,7 +132,7 @@ void QmlPresenter::scoreCompletionBonuses(unsigned objectId)
 }
 
 QmlPresenter::QmlPresenter(ObjectManager& objManager, QObject *parent)
-    : QObject(parent), mapModel(13), objectManager(objManager), gameState(GameState::NewTurn)
+    : QObject(parent), objectManager(objManager), gameState(GameState::NewTurn)
 {
     connect(&players, &QAbstractListModel::rowsInserted, this, &QmlPresenter::playerCountChanged);
 

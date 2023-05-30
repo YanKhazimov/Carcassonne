@@ -9,27 +9,40 @@ class MapModel : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(int MinX MEMBER minX NOTIFY minMaxChanged)
-    Q_PROPERTY(int MaxX MEMBER maxX NOTIFY minMaxChanged)
-    Q_PROPERTY(int MinY MEMBER minY NOTIFY minMaxChanged)
-    Q_PROPERTY(int MaxY MEMBER maxY NOTIFY minMaxChanged)
-    Q_PROPERTY(int MaxCapacity READ maxCapacity CONSTANT)
+    Q_PROPERTY(int MinX MEMBER minOccupiedX NOTIFY minMaxChanged)
+    Q_PROPERTY(int MaxX MEMBER maxOccupiedX NOTIFY minMaxChanged)
+    Q_PROPERTY(int MinY MEMBER minOccupiedY NOTIFY minMaxChanged)
+    Q_PROPERTY(int MaxY MEMBER maxOccupiedY NOTIFY minMaxChanged)
+    Q_PROPERTY(int MinPlayableX MEMBER minPlayableX NOTIFY minMaxChanged)
+    Q_PROPERTY(int MaxPlayableX MEMBER maxPlayableX NOTIFY minMaxChanged)
+    Q_PROPERTY(int MinPlayableY MEMBER minPlayableY NOTIFY minMaxChanged)
+    Q_PROPERTY(int MaxPlayableY MEMBER maxPlayableY NOTIFY minMaxChanged)
+    Q_PROPERTY(bool XRangeDefined READ xRangeDefined NOTIFY minMaxChanged)
+    Q_PROPERTY(bool YRangeDefined READ yRangeDefined NOTIFY minMaxChanged)
+    Q_PROPERTY(int MaxCapacity READ playSize CONSTANT)
     Q_PROPERTY(Tile* LatestTile MEMBER latestTile NOTIFY latestTileChanged)
 
     std::vector<std::vector<Tile*>> tiles;
-    const unsigned size;
-    int minX, maxX, minY, maxY;
+    unsigned size = 0;
+    int minOccupiedX, maxOccupiedX, minOccupiedY, maxOccupiedY;
+    int minPlayableX, maxPlayableX, minPlayableY, maxPlayableY;
     Tile* latestTile = nullptr;
 
     bool canMergeRegularTile(int x, int y, const TileData& tile) const;
     bool canMergeAbbeyTile(int x, int y) const;
-    int maxCapacity() const;
+    int playSize() const;
+    Tile* tileAt(int x, int y) const;
+    bool inPlayableRange(int x, int y) const;
+    void updateMinMax(int x, int y);
+    bool xRangeDefined() const;
+    bool yRangeDefined() const;
 
     void checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY);
 
 public:
-    MapModel(unsigned mapSize, QObject* parent = 0);
+    explicit MapModel(QObject* parent = 0);
 
+    Q_INVOKABLE void setSize(unsigned playableSize);
     Q_INVOKABLE void placeTile(Tile* tile, int x, int y);
     Q_INVOKABLE void fixTile(Tile* tile);
     Q_INVOKABLE bool isFreeAdjacent(int x, int y) const;

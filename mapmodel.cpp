@@ -4,22 +4,22 @@
 
 Tile* MapModel::nextTileNorth(int x, int y) const
 {
-    return (y + size/2 > 0) ? tiles[y + size/2 - 1][x + size/2] : nullptr;
+    return (y + size/2 > 0) ? tileAt(x, y - 1) : nullptr;
 }
 
 Tile* MapModel::nextTileSouth(int x, int y) const
 {
-    return (y + size/2 + 1 < size) ? tiles[y + size/2 + 1][x + size/2] : nullptr;
+    return (y + size/2 < size - 1) ? tileAt(x, y + 1) : nullptr;
 }
 
 Tile* MapModel::nextTileWest(int x, int y) const
 {
-    return (x + size/2 > 0) ? tiles[y + size/2][x + size/2 - 1] : nullptr;
+    return (x + size/2 > 0) ? tileAt(x - 1, y) : nullptr;
 }
 
 Tile* MapModel::nextTileEast(int x, int y) const
 {
-    return (x + size/2 + 1 < size) ? tiles[y + size/2][x + size/2 + 1] : nullptr;
+    return (x + size/2 < size - 1) ? tileAt(x + 1, y) : nullptr;
 }
 
 Tile *MapModel::nextTileNorthEast(int x, int y) const
@@ -44,7 +44,8 @@ Tile *MapModel::nextTileNorthWest(int x, int y) const
 
 bool MapModel::canMergeRegularTile(int x, int y, const TileData &tile) const
 {
-    return tiles[y + size/2][x + size/2] == nullptr &&
+    return inPlayableRange(x, y) &&
+            tileAt(x, y) == nullptr &&
             (!nextTileNorth(x, y) || nextTileNorth(x, y)->CanConnect(tile, Direction::South)) &&
             (!nextTileSouth(x, y) || nextTileSouth(x, y)->CanConnect(tile, Direction::North)) &&
             (!nextTileWest(x, y) || nextTileWest(x, y)->CanConnect(tile, Direction::East)) &&
@@ -53,14 +54,14 @@ bool MapModel::canMergeRegularTile(int x, int y, const TileData &tile) const
 
 bool MapModel::canMergeAbbeyTile(int x, int y) const
 {
-    return tiles[y + size/2][x + size/2] == nullptr &&
+    return tileAt(x, y) == nullptr &&
             nextTileNorth(x, y) && nextTileSouth(x, y) && nextTileWest(x, y) && nextTileEast(x, y);
 }
 
 bool MapModel::canMergeAbbeyTile() const
 {
-    QPair<int, int> xCheckRange {minX + 1, maxX - 1};
-    QPair<int, int> yCheckRange {minY + 1, maxY - 1};
+    QPair<int, int> xCheckRange { minOccupiedX + 1, maxOccupiedX - 1 };
+    QPair<int, int> yCheckRange { minOccupiedY + 1, maxOccupiedY - 1 };
     for (int x = xCheckRange.first; x <= xCheckRange.second; ++x)
         for (int y = yCheckRange.first; y <= yCheckRange.second; ++y)
         {
@@ -73,9 +74,14 @@ bool MapModel::canMergeAbbeyTile() const
     return false;
 }
 
-int MapModel::maxCapacity() const
+int MapModel::playSize() const
 {
-    return size/2;
+    return (size - 3) / 2 + 3;
+}
+
+Tile* MapModel::tileAt(int x, int y) const
+{
+    return tiles[y + size/2][x + size/2];
 }
 
 void MapModel::checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY)
@@ -107,7 +113,7 @@ void MapModel::checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY)
     };
 
     std::vector<Tile*> monasteryTiles = getTilesAround(newTileX, newTileY);
-    monasteryTiles.push_back(tiles[newTileY + size/2][newTileX + size/2]);
+    monasteryTiles.push_back(tileAt(newTileX, newTileY));
 
     for (Tile* monasteryTile: monasteryTiles)
     {
@@ -122,15 +128,90 @@ void MapModel::checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY)
     }
 }
 
-MapModel::MapModel(unsigned mapSize, QObject *parent)
-    : QObject(parent), tiles {mapSize, std::vector<Tile*>{mapSize, nullptr}},
-      size(mapSize), minX(0), maxX(0), minY(0), maxY(0)
+MapModel::MapModel(QObject *parent)
+    : QObject(parent)
 {
+}
+
+void MapModel::setSize(unsigned playableSize)
+{
+    // 3x3 is the guaranteed center
+    size = 3 + (playableSize - 3) * 2;
+    tiles = { size, std::vector<Tile*>{size, nullptr} };
+
+    minOccupiedX = maxOccupiedX = minOccupiedY = maxOccupiedY = 0;
+    maxPlayableX = maxPlayableY = playableSize - 2;
+    minPlayableX = -maxPlayableX;
+    minPlayableY = -maxPlayableY;
+}
+
+bool MapModel::inPlayableRange(int x, int y) const
+{
+    return minPlayableX <= x && x <= maxPlayableX
+            && minPlayableY <= y && y <= maxPlayableY;
+}
+
+void MapModel::updateMinMax(int x, int y)
+{
+    auto updatePlayableX = [this]() {
+        int occupied = maxOccupiedX - minOccupiedX + 1;
+        int undetermined = playSize() - (occupied + 2);
+        if (undetermined >= 0) {
+            minPlayableX = minOccupiedX - 1 - undetermined;
+            maxPlayableX = maxOccupiedX + 1 + undetermined;
+        }
+    };
+
+    auto updatePlayableY = [this]() {
+        int occupied = maxOccupiedY - minOccupiedY + 1;
+        int undetermined = playSize() - (occupied + 2);
+        if (undetermined >= 0) {
+            minPlayableY = minOccupiedY - 1 - undetermined;
+            maxPlayableY = maxOccupiedY + 1 + undetermined;
+        }
+    };
+
+    if (x < minOccupiedX)
+    {
+        minOccupiedX = x;
+        updatePlayableX();
+    }
+    else if (x > maxOccupiedX)
+    {
+        maxOccupiedX = x;
+        updatePlayableX();
+    }
+    else if (y < minOccupiedY)
+    {
+        minOccupiedY = y;
+        updatePlayableY();
+    }
+    else if (y > maxOccupiedY)
+    {
+        maxOccupiedY = y;
+        updatePlayableY();
+    }
+    else
+    {
+        return;
+    }
+
+    emit minMaxChanged();
+}
+
+bool MapModel::xRangeDefined() const
+{
+    return (maxPlayableX - minPlayableX) - (maxOccupiedX - minOccupiedX) <= 2;
+}
+
+bool MapModel::yRangeDefined() const
+{
+    return (maxPlayableY - minPlayableY) - (maxOccupiedY - minOccupiedY) <= 2;
 }
 
 void MapModel::placeTile(Tile *tile, int x, int y)
 {
-    Q_ASSERT(y + size/2 >= 0 && y + size/2 >= 0 && y + size/2 < size && y + size/2 < size);
+    Q_ASSERT(inPlayableRange(x, y));
 
     tile->place(x, y);
 }
@@ -142,18 +223,7 @@ void MapModel::fixTile(Tile *tile)
     tile->setFixed(true);
 
     // update minmax
-    if (position.x() < minX || position.x() > maxX)
-    {
-        minX = std::min(minX, position.x());
-        maxX = std::max(maxX, position.x());
-        emit minMaxChanged();
-    }
-    else if (position.y() < minY || position.y() > maxY) // one or the other, cannot expand diagonally
-    {
-        minY = std::min(minY, position.y());
-        maxY = std::max(maxY, position.y());
-        emit minMaxChanged();
-    }
+    updateMinMax(position.x(), position.y());
 
     // merge objects
     std::set<Tile*> updatedTiles;
@@ -184,11 +254,12 @@ void MapModel::fixTile(Tile *tile)
 
 bool MapModel::isFreeAdjacent(int x, int y) const
 {
-    return tiles[y + size/2][x + size/2] == nullptr &&
-            ((x + size/2 + 1 < size && tiles[y + size/2][x + size/2 + 1] != nullptr) ||
-            (y + size/2 + 1 < size && tiles[y + size/2 + 1][x + size/2] != nullptr) ||
-            (x + size/2 > 0 && tiles[y + size/2][x + size/2 - 1] != nullptr) ||
-            (y + size/2 > 0 && tiles[y + size/2 - 1][x + size/2] != nullptr));
+    return inPlayableRange(x, y) &&
+            tileAt(x, y) == nullptr &&
+            (nextTileNorth(x, y) != nullptr ||
+            nextTileSouth(x, y) != nullptr ||
+            nextTileEast(x, y) != nullptr ||
+            nextTileWest(x, y) != nullptr);
 }
 
 bool MapModel::canMergeAsIs(int x, int y, Tile *tile) const
@@ -210,8 +281,8 @@ bool MapModel::canMergeRotated(int x, int y, Tile *tile) const
 
 bool MapModel::fitsCurrentBoard(Tile *tile) const
 {
-   QPair<int, int> xCheckRange {qMin(minX - 1, -maxCapacity()), qMax(maxX + 1, maxCapacity())};
-   QPair<int, int> yCheckRange {qMin(minY - 1, -maxCapacity()), qMax(maxY + 1, maxCapacity())};
+   QPair<int, int> xCheckRange { qMax(minOccupiedX - 1, minPlayableX), qMin(maxOccupiedX + 1, maxPlayableX) };
+   QPair<int, int> yCheckRange { qMax(minOccupiedY - 1, minPlayableY), qMin(maxOccupiedY + 1, maxPlayableY) };
    for (int x = xCheckRange.first; x <= xCheckRange.second; ++x)
        for (int y = yCheckRange.first; y <= yCheckRange.second; ++y)
        {

@@ -264,6 +264,17 @@ Item {
             width: 10
         }
 
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "7x7"
+            font.pixelSize: 30
+        }
+
+        Item {
+            height: 10
+            width: 10
+        }
+
         MenuButton {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Начать игру"
@@ -275,6 +286,7 @@ Item {
                     names.push(playerRepeater.itemAt(i).text)
                 }
                 engine.populatePlayers(colors, names)
+                engine.mapModel.setSize(7)
                 root.urlRequested("qrc:/GameWindow.qml")
             }
         }
