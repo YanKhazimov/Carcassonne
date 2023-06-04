@@ -28,6 +28,7 @@ Item {
     function resetPosition() {
         x = internal.defaultX
         y = internal.defaultY
+        rotation = 0
     }
 
     Component.onCompleted: {

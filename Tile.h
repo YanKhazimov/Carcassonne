@@ -304,7 +304,7 @@ class Tile : public QObject, public TileData
     void checkObjectCompletion(std::shared_ptr<MapObjectData> object) override;
 
 public:
-    explicit Tile(std::vector<TileObject> &&objects, const QUrl& imageUrl, int imageRotation, QObject *parent = nullptr);
+    explicit Tile(const std::vector<std::pair<TileObject, TileData::ObjectLocation>>& objects, const QUrl& imageUrl, int imageRotation, QObject *parent = nullptr);
     Tile(Tile&& other) noexcept;
     Q_INVOKABLE void rotateClockwise();
     Q_INVOKABLE void rotateCounterclockwise();

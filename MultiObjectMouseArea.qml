@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import QmlPresenter 1.0
 
 MouseArea {
     id: root
@@ -51,16 +52,14 @@ MouseArea {
 
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
-    acceptedButtons: Qt.LeftButton | Qt.RightButton
     onClicked: {
-        if (mouse.button == Qt.LeftButton)
+        if (engine.GameState === GameEngine.GameEnd)
+        {
+            engine.scoreField(objectAt(mouseX, mouseY).currentId)
+        }
+        else
         {
             engine.highlight(objectAt(mouseX, mouseY).currentId)
-        }
-        else if (mouse.button == Qt.RightButton)
-        {
-            if (engine.HighlightedObjectId === objectAt(mouseX, mouseY).currentId) // && isGameOver
-                engine.scoreHighlightedField()
         }
     }
 }

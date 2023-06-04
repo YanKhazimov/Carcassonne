@@ -199,7 +199,5 @@ std::vector<std::shared_ptr<MapObjectData> > MapObjectData::group() const
 void MapObjectData::addMeeple(int playerIndex, MeepleType meepleType, Tile *tile)
 {
     playerPresence.meeples.push_back({ playerIndex, meepleType, tile });
-    //qDebug() << "object" << initialId;
-    //qDebug() << "add meeple" << playerIndex << (int)meepleType;
     playerPresence.hasBeenTaken = true;
 }

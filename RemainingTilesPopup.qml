@@ -38,9 +38,8 @@ Popup {
                 id: remainingTilesRepeater
                 model: engine.remainingTilesModel
 
-                delegate: Tile {
+                delegate: Image {
                     required property int index // https://bugreports.qt.io/browse/QTBUG-86009
-                    board: null
                     width: Constants.tilePreviewSize
                     height: Constants.tilePreviewSize
 
@@ -48,17 +47,11 @@ Popup {
                     Rectangle {
                         anchors.fill: parent
                         color: Qt.rgba(0.5, 0.5, 0.5, 0.6)
-                        visible: tileData.IsFixed
+                        visible: index > 0 && engine.getRemainingTile(index).IsFixed // index > 0 seems to initialize engine.getRemainingTile(index) to not be null
                     }
 
                     Component.onCompleted: {
-                        tileData = engine.getRemainingTile(index)
-                    }
-
-                    Text {
-                        text: tileData.Picture.toString().slice(tileData.Picture.toString().lastIndexOf("/")+1)
-                        font.bold: true
-                        visible: Preferences.schematicView
+                        source = engine.getRemainingTile(index).Picture
                     }
 
                     Rectangle {

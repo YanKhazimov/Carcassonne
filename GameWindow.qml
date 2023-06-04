@@ -146,7 +146,7 @@ Item {
                 }
             })
             obj.reset.connect(function() {
-               zones[obj.playerIndex].addMeeple(obj.type, 1)
+                zones[obj.playerIndex].addMeeple(obj.type, 1)
                 root.activeMeeple = null
             })
             return obj

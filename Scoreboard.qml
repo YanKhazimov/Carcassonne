@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtGraphicalEffects 1.15
+import QmlPresenter 1.0
 
 Item {
     id: root
@@ -139,12 +140,21 @@ Item {
                 }
 
                 MouseArea {
+                    id: townLeadMouseArea
+
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    visible: TOWN_LEAD // && isGameOver
+                    visible: TOWN_LEAD && engine.GameState === GameEngine.GameEnd
                     onClicked: {
                         engine.getPlayer(index).scorePoints(engine.MaxTown)
                         engine.getPlayer(index).setTownLead(false)
+                    }
+
+                    Loader { // just putting ElementActionIndicator does not work
+                        anchors.fill: parent
+                        sourceComponent: ElementActionIndicator {
+                            target: parent
+                        }
                     }
                 }
             }
@@ -167,10 +177,17 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    visible: ROAD_LEAD // && isGameOver
+                    visible: ROAD_LEAD && engine.GameState === GameEngine.GameEnd
                     onClicked: {
                         engine.getPlayer(index).scorePoints(engine.MaxRoad)
                         engine.getPlayer(index).setRoadLead(false)
+                    }
+
+                    Loader { // just putting ElementActionIndicator does not work
+                        anchors.fill: parent
+                        sourceComponent: ElementActionIndicator {
+                            target: parent
+                        }
                     }
                 }
             }
@@ -193,12 +210,19 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    visible: (WHEAT_LEAD || BARRELS_LEAD || CLOTH_LEAD) // && isGameOver
+                    visible: (WHEAT_LEAD || BARRELS_LEAD || CLOTH_LEAD) && engine.GameState === GameEngine.GameEnd
                     onClicked: {
                         engine.getPlayer(index).scorePoints(WHEAT_LEAD * 10 + BARRELS_LEAD * 10 + CLOTH_LEAD * 10)
                         engine.getPlayer(index).setWheatLead(false)
                         engine.getPlayer(index).setBarrelsLead(false)
                         engine.getPlayer(index).setClothLead(false)
+                    }
+
+                    Loader { // just putting ElementActionIndicator does not work
+                        anchors.fill: parent
+                        sourceComponent: ElementActionIndicator {
+                            target: parent
+                        }
                     }
                 }
             }

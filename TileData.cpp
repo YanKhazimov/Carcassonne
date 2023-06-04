@@ -759,6 +759,11 @@ int TileData::townWholeId() const
     return commonId(N(), E(), S(), W());
 }
 
+bool TileData::isAbbeyTile() const
+{
+    return tileObjects.size() == 1 && tileObjects[0].objPtr->type == ObjectType::Abbey;
+}
+
 bool TileData::hasRoadNorth() const
 {
     return N() &&
@@ -1224,7 +1229,19 @@ void TileData::getAdjacentTowns(std::shared_ptr<MapObjectData> &object, std::set
                     towns.insert(object->currentObject());
             };
 
-            for (auto& locationPoint: tileObject.location)
+            std::vector<std::pair<int, int>> location;
+            for (int i = 0; i < 5; ++i)
+            {
+                for (int j = 0; j < 5; ++j)
+                {
+                    if (grid5x5[i][j] == object)
+                    {
+                        location.push_back({i, j});
+                    }
+                }
+            }
+
+            for (auto& locationPoint: location)
             {
                 switch(locationPoint.first) {
                 case 0:
@@ -1327,29 +1344,42 @@ TileData TileData::copy() const
 
 TileData& TileData::rotateClockwise(int times)
 {
-    while (times-- > 0) {
-        RotateClockwise();
+    switch (times % 4)
+    {
+        case 3: {
+            RotateCounterclockwise();
+            break;
+        }
+        case 2: {
+            RotateClockwise();
+            RotateClockwise();
+            break;
+        }
+        case 1: {
+            RotateClockwise();
+            break;
+        }
     }
 
     return *this;
 }
 
-TileData::TileData(std::vector<TileObject> &&objects)
+TileData::TileData(const std::vector<std::pair<TileObject, ObjectLocation>>& objects)
     : grid5x5 {
-          {nullptr,nullptr,nullptr,nullptr,nullptr},
-          {nullptr,nullptr,nullptr,nullptr,nullptr},
-          {nullptr,nullptr,nullptr,nullptr,nullptr},
-          {nullptr,nullptr,nullptr,nullptr,nullptr},
-          {nullptr,nullptr,nullptr,nullptr,nullptr}
-          },
-      tileObjects(std::move(objects)),
-      isAbbeyTile(tileObjects.size() == 1 && tileObjects[0].objPtr->type == ObjectType::Abbey)
+              {nullptr,nullptr,nullptr,nullptr,nullptr},
+              {nullptr,nullptr,nullptr,nullptr,nullptr},
+              {nullptr,nullptr,nullptr,nullptr,nullptr},
+              {nullptr,nullptr,nullptr,nullptr,nullptr},
+              {nullptr,nullptr,nullptr,nullptr,nullptr}
+          }
 {
-    for (auto& tileObject: tileObjects)
+    for (auto& tileObject: objects)
     {
-        for (auto& location: tileObject.location)
+        tileObjects.push_back(tileObject.first);
+
+        for (auto& location: tileObject.second)
         {
-            grid5x5[location.first][location.second] = tileObject.objPtr;
+            grid5x5[location.first][location.second] = tileObject.first.objPtr;
         }
     }
 }
@@ -1425,23 +1455,9 @@ bool TileData::CanConnect(const TileData &other, Direction from) const
     return false;
 }
 
-TileObject::TileObject(std::shared_ptr<MapObjectData> _objPtr, std::vector<std::pair<int, int> > _location, TileData *_tile)
-    : objPtr(_objPtr), location(_location), tile(_tile)
+TileObject::TileObject(std::shared_ptr<MapObjectData> _objPtr, TileData *_tile)
+    : objPtr(_objPtr), tile(_tile)
 {
-}
-
-TileObject::TileObject(const TileObject &other)
-    : objPtr(other.objPtr), location(other.location), tile(other.tile)
-{
-    //if (objPtr->initialId == 1)
-    //    qDebug() << objPtr->initialId << " copy ctor";
-}
-
-TileObject::TileObject(TileObject &&other) noexcept
-    : objPtr(std::move(other.objPtr)), location(std::move(other.location)), tile(std::move(other.tile))
-{
-    if (objPtr->initialId == 1)
-        qDebug() << objPtr->initialId << " move ctor";
 }
 
 void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updatedTiles)

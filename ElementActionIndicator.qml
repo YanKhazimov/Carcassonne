@@ -7,7 +7,7 @@ Rectangle {
     anchors.fill: target
     anchors.margins: -margin
     radius: margin
-    color: "grey"
+    color: Constants.color.activeElement
     z: -1
 
     SequentialAnimation on opacity {

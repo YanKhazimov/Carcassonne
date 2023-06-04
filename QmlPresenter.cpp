@@ -288,11 +288,11 @@ void QmlPresenter::scoreCompletedObject(unsigned objectId)
             getPlayer(playerIndex)->scorePoints(points);
         }
 
-        object->freeMeeples({ QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeepleBuilder });
+        removeMeepleFromObject(object, { QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeepleBuilder });
     }
 }
 
-void QmlPresenter::processBarnPresence(unsigned objectId, int meepleScore)
+void QmlPresenter::scoreFieldMeeples(unsigned objectId, int meepleScore)
 {
     if (auto object = objectManager.GetObject(objectId); object && object->type == ObjectType::Field)
     {
@@ -309,7 +309,7 @@ void QmlPresenter::processBarnPresence(unsigned objectId, int meepleScore)
             }
         }
 
-        object->freeMeeples({ QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeeplePig });
+        removeMeepleFromObject(object, { QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeeplePig });
     }
 }
 
@@ -319,14 +319,9 @@ void QmlPresenter::checkFieldIntegrity(unsigned fieldObjectId)
     {
         if (fieldObjectId == objectManager.GetObject(barnFieldInitialId.first)->initialId)
         {
-            processBarnPresence(fieldObjectId, 1);
+            scoreFieldMeeples(fieldObjectId, 1);
         }
     }
-}
-
-void QmlPresenter::scoreFieldMeeples(unsigned fieldObjectId)
-{
-    processBarnPresence(fieldObjectId, 3);
 }
 
 void QmlPresenter::scoreBarnes(unsigned fieldObjectId)
@@ -342,7 +337,7 @@ void QmlPresenter::scoreBarnes(unsigned fieldObjectId)
                 getPlayer(playerIndex)->scorePoints(4 * objectManager.countTownsAround(fieldObjectId));
             }
 
-            barnField->freeMeeples({ QmlEnums::MeepleBarn });
+            removeMeepleFromObject(barnField, { QmlEnums::MeepleBarn });
             idsToDelete.push_back(barnFieldInitialId.first);
         }
     }
@@ -407,6 +402,31 @@ QVariantList QmlPresenter::getPossibleColors() const
     return playerColors;
 }
 
+QVariantList QmlPresenter::getScorableFields() const
+{
+    return QVariantList(scorableFields.begin(), scorableFields.end());
+}
+
+void QmlPresenter::addMeepleToObject(std::shared_ptr<MapObjectData> &object, QmlEnums::MeepleType meepleType, int playerIndex, Tile *tile)
+{
+    object->addMeeple(playerIndex, meepleType, tile);
+    if (object->type == ObjectType::Field)
+    {
+        if (scorableFields.insert(object->currentObject()->initialId).second)
+            emit scorableFieldsChanged();
+    }
+}
+
+void QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
+{
+    object->freeMeeples(typesToRemove);
+    if (object->type == ObjectType::Field && object->mostPresentPlayers().empty())
+    {
+        if (scorableFields.erase(object->currentObject()->initialId) > 0)
+            emit scorableFieldsChanged();
+    }
+}
+
 void QmlPresenter::processGameEnd(int fixedTilesCount)
 {
     QStringList messages;
@@ -462,7 +482,7 @@ void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectI
 {
     if (auto object = objectManager.GetObject(objectId); object)
     {
-        object->addMeeple(playerIndex, (QmlEnums::MeepleType)meepleType, tile);
+        addMeepleToObject(object, (QmlEnums::MeepleType)meepleType, playerIndex, tile);
 
         if (object->isCompleted())
         {
@@ -471,17 +491,17 @@ void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectI
 
         if ((QmlEnums::MeepleType)meepleType == QmlEnums::MeepleType::MeepleBarn)
         {
-            processBarnPresence(object->initialId, 3);
+            scoreFieldMeeples(object->initialId, 3);
             barnFieldInitialIds[object->initialId].push_back(playerIndex);
         }
     }
 }
 
-void QmlPresenter::scoreHighlightedField()
+void QmlPresenter::scoreField(unsigned fieldCurrentId)
 {
-    if (auto object = objectManager.GetObject(highlightedObjId); object && object->type == ObjectType::Field)
+    if (auto object = objectManager.GetObject(fieldCurrentId); object && object->type == ObjectType::Field)
     {
-        scoreFieldMeeples(object->initialId);
+        scoreFieldMeeples(object->initialId, 3);
         scoreBarnes(object->initialId);
     }
 }

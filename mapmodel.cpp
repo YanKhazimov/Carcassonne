@@ -264,7 +264,7 @@ bool MapModel::isFreeAdjacent(int x, int y) const
 
 bool MapModel::canMergeAsIs(int x, int y, Tile *tile) const
 {
-    return tile && (canMergeRegularTile(x, y, *tile) || tile->isAbbeyTile && canMergeAbbeyTile(x, y));
+    return tile && (canMergeRegularTile(x, y, *tile) || tile->isAbbeyTile() && canMergeAbbeyTile(x, y));
 }
 
 bool MapModel::canMergeRotated(int x, int y, Tile *tile) const

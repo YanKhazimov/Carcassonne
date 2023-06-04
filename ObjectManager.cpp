@@ -163,7 +163,6 @@ int ObjectManager::countTownsAround(unsigned objectId)
             tileObject->tile->getAdjacentTowns(tileObject, adjacentTowns);
         }
 
-        //qDebug() << adjacentTowns.size() << "towns around field" << object->initialId;
         return adjacentTowns.size();
     }
     else

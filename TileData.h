@@ -10,12 +10,9 @@ class TileData;
 
 struct TileObject {
     std::shared_ptr<MapObjectData> objPtr;
-    std::vector<std::pair<int, int>> location;
     TileData* tile;
 
-    TileObject(std::shared_ptr<MapObjectData> objPtr, std::vector<std::pair<int, int>> location, TileData* tile = nullptr);
-    TileObject(const TileObject& other);
-    TileObject(TileObject&& other) noexcept;
+    TileObject(std::shared_ptr<MapObjectData> objPtr, TileData* tile = nullptr);
 };
 
 class TileData {
@@ -41,10 +38,13 @@ public:
     unsigned NWBarnCornerId() const;
     unsigned SEBarnCornerId() const;
     unsigned SWBarnCornerId() const;
+    bool isAbbeyTile() const;
+
+    using ObjectLocation = std::vector<std::pair<int, int>>;
 
 protected:
     std::vector<TileObject> tileObjects;
-    TileData(std::vector<TileObject> &&objects);
+    TileData(const std::vector<std::pair<TileObject, ObjectLocation>>& objects);
     std::shared_ptr<const MapObjectData> checkConnector(Direction direction) const;
     virtual void checkObjectCompletion(std::shared_ptr<MapObjectData> object);
 
@@ -294,9 +294,6 @@ protected:
 
     bool hasTownWhole() const;
     int townWholeId() const;
-
-public:
-    const bool isAbbeyTile;
 };
 
 #endif // TILEDATA_H

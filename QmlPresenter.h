@@ -30,6 +30,7 @@ class QmlPresenter : public QObject
     Q_PROPERTY(QVariantList PossibleColors READ getPossibleColors CONSTANT)
     Q_PROPERTY(RemainingTilesModel* remainingTilesModel READ getRemainingTiles NOTIFY remainingTilesChanged)
     Q_PROPERTY(bool AllFttingTilesPlayed MEMBER allFttingTilesPlayed NOTIFY allFttingTilesPlayedChanged)
+    Q_PROPERTY(QVariantList ScorableFields READ getScorableFields NOTIFY scorableFieldsChanged)
 
 public:
     enum class GameState {
@@ -89,13 +90,12 @@ private:
     void scoreLongestRoad(unsigned roadId);
 
     void scoreCompletedObject(unsigned objectId);
-    void processBarnPresence(unsigned objectId, int meepleScore);
+    void scoreFieldMeeples(unsigned objectId, int meepleScore);
 
     // initial id -> player indecies
     std::map<unsigned, std::vector<int>> barnFieldInitialIds;
 
     void checkFieldIntegrity(unsigned fieldObjectId);
-    void scoreFieldMeeples(unsigned fieldObjectId);
     void scoreBarnes(unsigned fieldObjectId);
 
     bool isFieldCorner(Tile* tile, unsigned objectId) const;
@@ -103,6 +103,11 @@ private:
     QVariantList getPossibleColors() const;
 
     bool allFttingTilesPlayed = false;
+
+    std::set<unsigned> scorableFields;
+    QVariantList getScorableFields() const;
+    void addMeepleToObject(std::shared_ptr<MapObjectData>& object, QmlEnums::MeepleType meepleType, int playerIndex, Tile* tile);
+    void removeMeepleFromObject(std::shared_ptr<MapObjectData>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
 
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
@@ -117,7 +122,7 @@ public:
     Q_INVOKABLE Tile* getAbbeyTile(int i);
     Q_INVOKABLE void switchActivePlayer();
     Q_INVOKABLE void placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile *tile);
-    Q_INVOKABLE void scoreHighlightedField();
+    Q_INVOKABLE void scoreField(unsigned fieldCurrentId);
     Q_INVOKABLE bool canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile *tile) const;
     Q_INVOKABLE bool isFieldObject(unsigned objectId) const;
     Q_INVOKABLE void setWaitingCursor(bool value);
@@ -139,6 +144,7 @@ signals:
     void remainingTilesChanged();
     void allFttingTilesPlayedChanged();
     void showMessage(QString message, GameState stateToSet);
+    void scorableFieldsChanged();
 };
 
 #endif // QMLPRESENTER_H

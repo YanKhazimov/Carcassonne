@@ -18,6 +18,23 @@ QtObject {
             readonly property color roadBorder: "darkslategrey"
             readonly property color town: "chocolate"
             readonly property color townBorder: "brown"
+
+            property color scorableField: "lightgreen"
+            SequentialAnimation on scorableField {
+                loops: Animation.Infinite
+
+                ColorAnimation  {
+                    from: color.schematic.field
+                    to: color.activeElement
+                    duration: 500
+                }
+                ColorAnimation  {
+                    from: color.activeElement
+                    to: color.schematic.field
+                    duration: 500
+                }
+            }
         }
+        readonly property color activeElement: "grey"
     }
 }

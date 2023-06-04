@@ -2,8 +2,8 @@
 #include <QPoint>
 #include <QQmlEngine>
 
-Tile::Tile(std::vector<TileObject> &&objects, const QUrl &image, int imgRotation, QObject *parent)
-    : QObject(parent), TileData(std::move(objects)),
+Tile::Tile(const std::vector<std::pair<TileObject, TileData::ObjectLocation>>& objects, const QUrl &image, int imgRotation, QObject *parent)
+    : QObject(parent), TileData(objects),
       imageUrl(image), imageRotation(imgRotation), x(-100), y(-100), isFixed(false), isPlaced(false)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
