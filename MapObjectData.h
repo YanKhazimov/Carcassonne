@@ -46,8 +46,7 @@ struct MapObjectData {
     std::vector<int> mostPresentPlayers() const;
     bool taken() const;
     std::set<int> pigs() const;
-    bool commonMeeplesPresent(int playerIndex) const;
-    bool barnPresent() const;
+    bool meeplePresent(const std::set<QmlEnums::MeepleType> &types, int playerIndex = -1) const;
 
 private:
     PlayerPresence playerPresence;

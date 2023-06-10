@@ -5,10 +5,8 @@ import QmlPresenter 1.0
 Item {
     id: root
 
-    Component.onCompleted: {
-        width = childrenRect.width
-        height = childrenRect.height
-    }
+    width: childrenRect.width
+    height: childrenRect.height
 
     Row {
         id: header

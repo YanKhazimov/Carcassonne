@@ -1,8 +1,8 @@
 #include "DataTypes.h"
 
-Direction opposite(Direction direction)
+TileSide opposite(TileSide side)
 {
-    return static_cast<Direction>(Direction::Last - direction);
+    return static_cast<TileSide>(TileSide::Last - side);
 }
 
 QVariantList playerColors = {

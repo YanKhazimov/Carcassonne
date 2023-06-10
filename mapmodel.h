@@ -44,12 +44,13 @@ public:
 
     Q_INVOKABLE void setSize(unsigned playableSize);
     Q_INVOKABLE void placeTile(Tile* tile, int x, int y);
-    Q_INVOKABLE void fixTile(Tile* tile);
+    void fixTile(Tile* tile);
     Q_INVOKABLE bool isFreeAdjacent(int x, int y) const;
     Q_INVOKABLE bool canMergeAsIs(int x, int y, Tile* tile) const;
     Q_INVOKABLE bool canMergeRotated(int x, int y, Tile* tile) const;
     bool fitsCurrentBoard(Tile* tile) const;
     bool canMergeAbbeyTile() const;
+    bool builderObjectProgression(Tile* tile, int activePlayer) const;
 
     Tile* nextTileNorth(int x, int y) const;
     Tile* nextTileSouth(int x, int y) const;

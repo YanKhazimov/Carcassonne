@@ -1,4 +1,4 @@
-#include "mapmodel.h"
+#include "MapModel.h"
 #include <QPoint>
 #include <set>
 
@@ -46,10 +46,10 @@ bool MapModel::canMergeRegularTile(int x, int y, const TileData &tile) const
 {
     return inPlayableRange(x, y) &&
             tileAt(x, y) == nullptr &&
-            (!nextTileNorth(x, y) || nextTileNorth(x, y)->CanConnect(tile, Direction::South)) &&
-            (!nextTileSouth(x, y) || nextTileSouth(x, y)->CanConnect(tile, Direction::North)) &&
-            (!nextTileWest(x, y) || nextTileWest(x, y)->CanConnect(tile, Direction::East)) &&
-            (!nextTileEast(x, y) || nextTileEast(x, y)->CanConnect(tile, Direction::West));
+           (!nextTileNorth(x, y) || nextTileNorth(x, y)->CanConnect(tile, TileSide::South)) &&
+           (!nextTileSouth(x, y) || nextTileSouth(x, y)->CanConnect(tile, TileSide::North)) &&
+           (!nextTileWest(x, y) || nextTileWest(x, y)->CanConnect(tile, TileSide::East)) &&
+           (!nextTileEast(x, y) || nextTileEast(x, y)->CanConnect(tile, TileSide::West));
 }
 
 bool MapModel::canMergeAbbeyTile(int x, int y) const
@@ -70,6 +70,22 @@ bool MapModel::canMergeAbbeyTile() const
                 return true;
             }
         }
+
+    return false;
+}
+
+bool MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
+{
+    QPoint position = tile->position();
+    
+    if (Tile* nextNorth = nextTileNorth(position.x(), position.y()); nextNorth && nextNorth->isPlayerBuilderPresent(TileSide::South, activePlayer))
+        return true;
+    if (Tile* nextEast = nextTileEast(position.x(), position.y()); nextEast && nextEast->isPlayerBuilderPresent(TileSide::West, activePlayer))
+        return true;
+    if (Tile* nextSouth = nextTileSouth(position.x(), position.y()); nextSouth && nextSouth->isPlayerBuilderPresent(TileSide::North, activePlayer))
+        return true;
+    if (Tile* nextWest = nextTileWest(position.x(), position.y()); nextWest && nextWest->isPlayerBuilderPresent(TileSide::East, activePlayer))
+        return true;
 
     return false;
 }
@@ -228,13 +244,13 @@ void MapModel::fixTile(Tile *tile)
     // merge objects
     std::set<Tile*> updatedTiles;
     if (Tile* nextNorth = nextTileNorth(position.x(), position.y()); nextNorth)
-        nextNorth->Connect(*tile, Direction::South, updatedTiles);
+        nextNorth->Connect(*tile, TileSide::South, updatedTiles);
     if (Tile* nextEast = nextTileEast(position.x(), position.y()); nextEast)
-        nextEast->Connect(*tile, Direction::West, updatedTiles);
+        nextEast->Connect(*tile, TileSide::West, updatedTiles);
     if (Tile* nextSouth = nextTileSouth(position.x(), position.y()); nextSouth)
-        nextSouth->Connect(*tile, Direction::North, updatedTiles);
+        nextSouth->Connect(*tile, TileSide::North, updatedTiles);
     if (Tile* nextWest = nextTileWest(position.x(), position.y()); nextWest)
-        nextWest->Connect(*tile, Direction::East, updatedTiles);
+        nextWest->Connect(*tile, TileSide::East, updatedTiles);
 
     for (Tile* tile: updatedTiles)
     {

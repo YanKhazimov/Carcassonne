@@ -18,15 +18,15 @@ struct TileObject {
 class TileData {
     std::shared_ptr<MapObjectData> grid5x5[5][5];
 
-    std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData>> getSideConnectors(Direction direction) const;
-    std::shared_ptr<MapObjectData> getConnector(Direction direction);
+    std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData>> getSideConnectors(TileSide direction) const;
+    std::shared_ptr<MapObjectData> getConnector(TileSide direction);
     void mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject, std::shared_ptr<MapObjectData> absorbedObject) const;
 
 public:
     void RotateClockwise();
     void RotateCounterclockwise();
-    bool CanConnect(const TileData& other, Direction from) const;
-    void Connect(TileData& other, Direction from, std::set<Tile*>& updatedTiles);
+    bool CanConnect(const TileData& other, TileSide from) const;
+    void Connect(TileData& newTile, TileSide side, std::set<Tile*>& updatedTiles);
     TileData copy() const;
     TileData& rotateClockwise(int times = 1);
     void print() const;
@@ -39,13 +39,14 @@ public:
     unsigned SEBarnCornerId() const;
     unsigned SWBarnCornerId() const;
     bool isAbbeyTile() const;
+    bool isPlayerBuilderPresent(TileSide side, int activePlayer) const;
 
     using ObjectLocation = std::vector<std::pair<int, int>>;
 
 protected:
     std::vector<TileObject> tileObjects;
     TileData(const std::vector<std::pair<TileObject, ObjectLocation>>& objects);
-    std::shared_ptr<const MapObjectData> checkConnector(Direction direction) const;
+    std::shared_ptr<const MapObjectData> checkConnector(TileSide direction) const;
     virtual void checkObjectCompletion(std::shared_ptr<MapObjectData> object);
 
     const std::shared_ptr<MapObjectData> NW() const;

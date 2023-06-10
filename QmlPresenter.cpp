@@ -473,6 +473,19 @@ void QmlPresenter::processGameEnd(int fixedTilesCount)
     emit showMessage(messages.join('\n'), GameState::GameEnd);
 }
 
+void QmlPresenter::fixTile(Tile *tile)
+{
+    if (builderBonus)
+    {
+        builderBonus = false;
+    }
+    else if (mapModel.builderObjectProgression(tile, activePlayer()))
+    {
+        builderBonus = true;
+    }
+    mapModel.fixTile(tile);
+}
+
 void QmlPresenter::switchActivePlayer()
 {
     setActivePlayer((activePlayer() + 1) % players.rowCount());
@@ -517,14 +530,14 @@ bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, 
             return !object->taken() && object->mostPresentPlayers().empty();
         case QmlEnums::MeepleBarn:
             return object->type == ObjectType::Field
-                    && !object->barnPresent()
+                   && !object->meeplePresent({ QmlEnums::MeepleType::MeepleBarn })
                     && isFieldCorner(tile, objectId);
         case QmlEnums::MeeplePig:
             return object->type == ObjectType::Field
-                    && object->commonMeeplesPresent(playerIndex);
+                    && object->meeplePresent({ QmlEnums::MeepleType::MeepleSmall, QmlEnums::MeepleType::MeepleBig }, playerIndex);
         case QmlEnums::MeepleBuilder:
             return (object->type == ObjectType::Town || object->type == ObjectType::Road)
-                    && object->commonMeeplesPresent(playerIndex);
+                    && object->meeplePresent({ QmlEnums::MeepleType::MeepleSmall, QmlEnums::MeepleType::MeepleBig }, playerIndex);
         default:
             std::cerr << "placing unknown meeple type " << type << std::endl;
         }

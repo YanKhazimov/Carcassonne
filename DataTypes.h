@@ -5,7 +5,7 @@
 #include <QColor>
 #include <QVariantList>
 
-enum Direction {
+enum TileSide {
     East,
     North,
     South,
@@ -48,7 +48,7 @@ namespace QmlEnums {
     Q_ENUM_NS(MeepleType)
 
 }
-Direction opposite(Direction direction);
+    TileSide opposite(TileSide side);
 
 extern QVariantList playerColors;
 

@@ -764,6 +764,12 @@ bool TileData::isAbbeyTile() const
     return tileObjects.size() == 1 && tileObjects[0].objPtr->type == ObjectType::Abbey;
 }
 
+bool TileData::isPlayerBuilderPresent(TileSide side, int activePlayer) const
+{
+    std::shared_ptr<const MapObjectData> connectorObject = checkConnector(side);
+    return connectorObject && connectorObject->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer);
+}
+
 bool TileData::hasRoadNorth() const
 {
     return N() &&
@@ -865,8 +871,8 @@ bool TileData::hasC_ToTown_WestSouthRoad() const
 
 bool TileData::hasRoadNorthSouth() const
 {
-    auto [nw, ne] = getSideConnectors(Direction::North);
-    auto [sw, se] = getSideConnectors(Direction::South);
+    auto [nw, ne] = getSideConnectors(TileSide::North);
+    auto [sw, se] = getSideConnectors(TileSide::South);
     return N() && S() &&
            sameType(ObjectType::Road, N()->type, S()->type) &&
            N()->initialId == S()->initialId &&
@@ -892,8 +898,8 @@ int TileData::roadEastWestId() const
 
 bool TileData::hasRoadDownThroughTownNorthSouth() const
 {
-    auto [nw, ne] = getSideConnectors(Direction::North);
-    auto [sw, se] = getSideConnectors(Direction::South);
+    auto [nw, ne] = getSideConnectors(TileSide::North);
+    auto [sw, se] = getSideConnectors(TileSide::South);
     return N() && S() &&
            sameType(ObjectType::Road, N()->type, S()->type) &&
            N()->initialId == S()->initialId &&
@@ -1132,35 +1138,35 @@ bool TileData::hasAnyJ_Road() const
             hasJ_SouthWestRoad();
 }
 
-std::shared_ptr<MapObjectData> TileData::getConnector(Direction direction)
+std::shared_ptr<MapObjectData> TileData::getConnector(TileSide direction)
 {
     switch (direction) {
-    case Direction::North: return grid5x5[0][2]; break;
-    case Direction::East: return grid5x5[2][4]; break;
-    case Direction::South: return grid5x5[4][2]; break;
-    case Direction::West: return grid5x5[2][0]; break;
+    case TileSide::North: return grid5x5[0][2]; break;
+    case TileSide::East: return grid5x5[2][4]; break;
+    case TileSide::South: return grid5x5[4][2]; break;
+    case TileSide::West: return grid5x5[2][0]; break;
     default: qDebug() << "Unknown direction" << (int)direction; return nullptr;
     }
 }
 
-std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > TileData::getSideConnectors(Direction direction) const
+std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > TileData::getSideConnectors(TileSide direction) const
 {
     switch (direction) {
-    case Direction::North: return { NNW() ? NNW() : NW(), NNE() ? NNE() : NE() }; break;
-    case Direction::East: return { NEE() ? NEE() : NE(), SEE() ? SEE() : SE() }; break;
-    case Direction::South: return { SSW() ? SSW() : SW(), SSE() ? SSE() : SE() }; break;
-    case Direction::West: return { NWW() ? NWW() : NW(), SWW() ? SWW() : SW() }; break;
+    case TileSide::North: return { NNW() ? NNW() : NW(), NNE() ? NNE() : NE() }; break;
+    case TileSide::East: return { NEE() ? NEE() : NE(), SEE() ? SEE() : SE() }; break;
+    case TileSide::South: return { SSW() ? SSW() : SW(), SSE() ? SSE() : SE() }; break;
+    case TileSide::West: return { NWW() ? NWW() : NW(), SWW() ? SWW() : SW() }; break;
     default: qDebug() << "Unknown direction" << (int)direction; return { nullptr, nullptr };
     }
 }
 
-std::shared_ptr<const MapObjectData> TileData::checkConnector(Direction direction) const
+std::shared_ptr<const MapObjectData> TileData::checkConnector(TileSide direction) const
 {
     switch (direction) {
-        case Direction::North: return N(); break;
-        case Direction::East: return E(); break;
-        case Direction::South: return S(); break;
-        case Direction::West: return W(); break;
+    case TileSide::North: return N(); break;
+    case TileSide::East: return E(); break;
+    case TileSide::South: return S(); break;
+    case TileSide::West: return W(); break;
         default: qDebug() << "Unknown direction" << (int)direction; return nullptr;
     }
 }
@@ -1438,17 +1444,17 @@ void TileData::RotateCounterclockwise()
     grid5x5[1][0] = swap;
 }
 
-bool TileData::CanConnect(const TileData &other, Direction from) const
+bool TileData::CanConnect(const TileData &other, TileSide from) const
 {
     switch (from) {
-    case Direction::North:
-        return checkConnector(Direction::North)->type == other.checkConnector(Direction::South)->type;
-    case Direction::East:
-        return checkConnector(Direction::East)->type == other.checkConnector(Direction::West)->type;
-    case Direction::South:
-        return checkConnector(Direction::South)->type == other.checkConnector(Direction::North)->type;
-    case Direction::West:
-        return checkConnector(Direction::West)->type == other.checkConnector(Direction::East)->type;
+    case TileSide::North:
+        return checkConnector(TileSide::North)->type == other.checkConnector(TileSide::South)->type;
+    case TileSide::East:
+        return checkConnector(TileSide::East)->type == other.checkConnector(TileSide::West)->type;
+    case TileSide::South:
+        return checkConnector(TileSide::South)->type == other.checkConnector(TileSide::North)->type;
+    case TileSide::West:
+        return checkConnector(TileSide::West)->type == other.checkConnector(TileSide::East)->type;
     }
 
     qDebug() << "Unknown direction" << (int)from;
@@ -1460,13 +1466,13 @@ TileObject::TileObject(std::shared_ptr<MapObjectData> _objPtr, TileData *_tile)
 {
 }
 
-void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updatedTiles)
+void TileData::Connect(TileData &newTile, TileSide side, std::set<Tile*>& updatedTiles)
 {
     // not checking the connection validity
 
     // merge objects
-    std::shared_ptr<MapObjectData> connectorObject = getConnector(from);
-    std::shared_ptr<MapObjectData> otherConnectorObject = other.getConnector(opposite(from));
+    std::shared_ptr<MapObjectData> connectorObject = getConnector(side);
+    std::shared_ptr<MapObjectData> otherConnectorObject = newTile.getConnector(opposite(side));
 
     switch (otherConnectorObject->type) {
     case ObjectType::Town: {
@@ -1496,8 +1502,8 @@ void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updated
         checkObjectCompletion(connectorObject);
 
         // merge side fields
-        auto [sideConnector1, sideConnector2] = getSideConnectors(from);
-        auto [otherSideConnector1, otherSideConnector2] = other.getSideConnectors(opposite(from));
+        auto [sideConnector1, sideConnector2] = getSideConnectors(side);
+        auto [otherSideConnector1, otherSideConnector2] = newTile.getSideConnectors(opposite(side));
 
         sideConnector1->mergeObject(otherSideConnector1, updatedTiles);
         sideConnector2->mergeObject(otherSideConnector2, updatedTiles);
@@ -1513,6 +1519,6 @@ void TileData::Connect(TileData &other, Direction from, std::set<Tile*>& updated
         break;
     }
     default:
-        qDebug() << "Error: cannot connect" << ObjectTypeStrings[static_cast<int>(connectorObject->type)];
+        qWarning() << "Error: cannot connect" << ObjectTypeStrings[static_cast<int>(connectorObject->type)];
     }
 }

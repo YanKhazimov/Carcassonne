@@ -154,29 +154,15 @@ std::set<int> MapObjectData::pigs() const
     return result;
 }
 
-bool MapObjectData::commonMeeplesPresent(int playerIndex) const
+bool MapObjectData::meeplePresent(const std::set<QmlEnums::MeepleType> &types, int playerIndex) const
 {
     for (const auto& object: group())
     {
         for (const auto& meeple: object->playerPresence.meeples)
         {
-            if ((meeple.meepleType == MeepleType::MeepleSmall ||
-                    meeple.meepleType == MeepleType::MeepleBig) &&
-                    meeple.playerIndex == playerIndex)
-                return true;
-        }
-    }
-
-    return false;
-}
-
-bool MapObjectData::barnPresent() const
-{
-    for (const auto& object: group())
-    {
-        for (const auto& meeple: object->playerPresence.meeples)
-        {
-            if (meeple.meepleType == MeepleType::MeepleBarn)
+            auto typeIter = types.find(meeple.meepleType);
+            if (typeIter != types.end() &&
+                (playerIndex == -1 || meeple.playerIndex == playerIndex))
                 return true;
         }
     }

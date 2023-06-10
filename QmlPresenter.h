@@ -31,6 +31,7 @@ class QmlPresenter : public QObject
     Q_PROPERTY(RemainingTilesModel* remainingTilesModel READ getRemainingTiles NOTIFY remainingTilesChanged)
     Q_PROPERTY(bool AllFttingTilesPlayed MEMBER allFttingTilesPlayed NOTIFY allFttingTilesPlayedChanged)
     Q_PROPERTY(QVariantList ScorableFields READ getScorableFields NOTIFY scorableFieldsChanged)
+    Q_PROPERTY(bool BuilderBonus MEMBER builderBonus CONSTANT)
 
 public:
     enum class GameState {
@@ -109,6 +110,8 @@ private:
     void addMeepleToObject(std::shared_ptr<MapObjectData>& object, QmlEnums::MeepleType meepleType, int playerIndex, Tile* tile);
     void removeMeepleFromObject(std::shared_ptr<MapObjectData>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
 
+    bool builderBonus = false;
+
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
 
@@ -127,6 +130,7 @@ public:
     Q_INVOKABLE bool isFieldObject(unsigned objectId) const;
     Q_INVOKABLE void setWaitingCursor(bool value);
     Q_INVOKABLE void processGameEnd(int fixedTilesCount);
+    Q_INVOKABLE void fixTile(Tile* tile);
 
 signals:
     void tilesChanged();

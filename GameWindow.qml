@@ -193,6 +193,15 @@ Item {
         }
     }
 
+    function endTurn() {
+        engine.highlight(-1)
+        if (!engine.BuilderBonus) {
+            engine.switchActivePlayer()
+        }
+        engine.GameState = GameEngine.NewTurn
+        engine.processGameEnd(tiles.length)
+    }
+
     Component.onCompleted: {
         tilesInDeck = engine.deck.rowCount() - 1
         for (var zone = 0; zone < zones.length; ++zone)
@@ -228,7 +237,6 @@ Item {
         opacity: 0.5
         Keys.onTabPressed: {
             engine.switchActivePlayer()
-            console.log("active player", engine.ActivePlayer)
         }
         Component.onCompleted: forceActiveFocus()
     }
@@ -245,7 +253,7 @@ Item {
         Component.onCompleted: {
             // place and fix the starting tile
             engine.mapModel.placeTile(engine.getTile(0), 0, 0)
-            engine.mapModel.fixTile(engine.getTile(0))
+            engine.fixTile(engine.getTile(0))
 
             // create an Item for it
             tiles.push(createTileItem(board.x + board.getX(0), board.y + board.getY(0)))
@@ -289,7 +297,7 @@ Item {
                     id: fixTileButton
                     text: "Поставить"
                     onClicked: {
-                        engine.mapModel.fixTile(board.activeTile.tileData)
+                        engine.fixTile(board.activeTile.tileData)
                         lastPlacedTile = board.activeTile
                         engine.updateHighlight()
                         board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
@@ -303,10 +311,8 @@ Item {
                     text: "Занять"
                     onClicked: {
                         lastPlacedTile.fixMeeple()
-                        engine.highlight(-1)
                         root.activeMeeple = null
-                        engine.GameState = GameEngine.NewTurn
-                        engine.processGameEnd(tiles.length)
+                        endTurn()
                     }
                 }
 
@@ -320,9 +326,7 @@ Item {
                                 zones[engine.ActivePlayer].addMeeple(root.activeMeeple.type, 1)
                             root.activeMeeple = null
                         }
-                        engine.highlight(-1)
-                        engine.GameState = GameEngine.NewTurn
-                        engine.processGameEnd(tiles.length)
+                        endTurn()
                     }
                 }
             }

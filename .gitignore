@@ -3,6 +3,7 @@
 img/dev/*
 img/pnp/tiles/*_.png
 *копия*
+build/*
 
 *~
 *.autosave

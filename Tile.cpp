@@ -133,10 +133,10 @@ std::tuple<int, int, int> Tile::resources() const
 void Tile::updateBonuses()
 {
     bonusTypes = {
-        checkConnector(Direction::North)->getBonusType(),
-        checkConnector(Direction::East)->getBonusType(),
-        checkConnector(Direction::South)->getBonusType(),
-        checkConnector(Direction::West)->getBonusType()
+                  checkConnector(TileSide::North)->getBonusType(),
+        checkConnector(TileSide::East)->getBonusType(),
+        checkConnector(TileSide::South)->getBonusType(),
+        checkConnector(TileSide::West)->getBonusType()
     };
     emit tileBonusesChanged();
 }
