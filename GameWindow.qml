@@ -345,7 +345,7 @@ Item {
                         height: 32
                     }
                     Text {
-                        text: "x" + engine.UnassignedBarrels
+                        text: engine ? ("x" + engine.UnassignedBarrels) : ""
                         font.pixelSize: 20
                     }
                 }
@@ -358,7 +358,7 @@ Item {
                         height: 32
                     }
                     Text {
-                        text: "x" + engine.UnassignedWheat
+                        text: engine ? ("x" + engine.UnassignedWheat) : ""
                         font.pixelSize: 20
                     }
                 }
@@ -371,7 +371,7 @@ Item {
                         height: 32
                     }
                     Text {
-                        text: "x" + engine.UnassignedCloth
+                        text: engine ? ("x" + engine.UnassignedCloth) : ""
                         font.pixelSize: 20
                     }
                 }
@@ -416,7 +416,7 @@ Item {
             width: parent.width
             height: (root.height - parent.spacing - 2 * parent.anchors.margins)/2
             playerIndex: 0
-            visible: engine.PlayerCount > playerIndex
+            visible: engine && engine.PlayerCount > playerIndex
             tilesInDeck: playerData && playerData.IsActive ? root.tilesInDeck : Math.max(0, root.tilesInDeck - 1)
             onTileClicked: drawTile(leftPlayers, playerZoneNW, playerIndex)
         }
@@ -427,7 +427,7 @@ Item {
             width: parent.width
             height: (root.height - parent.spacing - 2 * parent.anchors.margins)/2
             playerIndex: 2
-            visible: engine.PlayerCount > playerIndex
+            visible: engine && engine.PlayerCount > playerIndex
             tilesInDeck: playerData && playerData.IsActive ? root.tilesInDeck : Math.max(0, root.tilesInDeck - 1)
             onTileClicked: drawTile(leftPlayers, playerZoneSW, playerIndex)
         }
@@ -448,7 +448,7 @@ Item {
             width: parent.width
             height: (root.height - parent.spacing - 2 * parent.anchors.margins)/2
             playerIndex: 1
-            visible: engine.PlayerCount > playerIndex
+            visible: engine && engine.PlayerCount > playerIndex
             tilesInDeck: playerData && playerData.IsActive ? root.tilesInDeck : Math.max(0, root.tilesInDeck - 1)
             onTileClicked: drawTile(rightPlayers, playerZoneNE, playerIndex)
         }
@@ -459,7 +459,7 @@ Item {
             width: parent.width
             height: (root.height - parent.spacing - 2 * parent.anchors.margins)/2
             playerIndex: 3
-            visible: engine.PlayerCount > playerIndex
+            visible: engine && engine.PlayerCount > playerIndex
             tilesInDeck: playerData && playerData.IsActive ? root.tilesInDeck : Math.max(0, root.tilesInDeck - 1)
             onTileClicked: drawTile(rightPlayers, playerZoneSE, playerIndex)
         }
@@ -527,7 +527,7 @@ Item {
     Item {
         id: state
 
-        state: engine.GameState
+        state: engine ? engine.GameState : "undefined"
 
         states: [
             State {

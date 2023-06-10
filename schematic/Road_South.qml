@@ -2,6 +2,6 @@ import QtQuick 2.15
 
 Road_North {
     rotation: 180
-    visible: tileData.RoadSouth
-    currentId: tileData.RoadSouthId
+    currentId: tileData ? tileData.RoadSouthId : invalidId
+    visible: tileData && tileData.RoadSouth
 }

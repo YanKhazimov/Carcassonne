@@ -6,7 +6,7 @@ BaseMapObject {
     id: root
 
     currentId: -1
-    visible: tileData.RoadBlock
+    visible: tileData && tileData.RoadBlock
 
     ShapePath {
         startX: side/2 - 2 * halfRoadWidth

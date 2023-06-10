@@ -1,12 +1,11 @@
 import QtQuick 2.15
 import QtQuick.Shapes 1.15
-import "qrc:/"
 
 BaseMapObject {
     id: root
 
-    currentId: tileData.FieldHalfQuarterSEEId
-    visible: tileData.FieldHalfQuarterSEE
+    currentId: tileData ? tileData.FieldHalfQuarterSEEId : invalidId
+    visible: tileData && tileData.FieldHalfQuarterSEE
 
     ShapePath {
         startX: side

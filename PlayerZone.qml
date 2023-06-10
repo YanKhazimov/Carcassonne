@@ -9,7 +9,7 @@ Rectangle {
     id: root
 
     required property int playerIndex
-    readonly property Player playerData: engine.getPlayer(playerIndex)
+    readonly property Player playerData: engine ? engine.getPlayer(playerIndex) : null
     readonly property color activeColor: playerData ? playerData.Color : "transparent"
 
     readonly property real smallMeeplePositionX: meeplePositioner.x + smallMeeplePlaceholder.x
@@ -203,7 +203,7 @@ Rectangle {
             visible: playerData && playerData.TownLead
 
             Text {
-                text: "город: " + engine.MaxTown
+                text: engine ? ("город: " + engine.MaxTown) : ""
                 font.pixelSize: 20
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -216,7 +216,7 @@ Rectangle {
             visible: playerData && playerData.RoadLead
 
             Text {
-                text: "дорога: " + engine.MaxRoad
+                text: engine ? ("дорога: " + engine.MaxRoad) : ""
                 font.pixelSize: 20
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -255,7 +255,7 @@ Rectangle {
             id: deckBackMouseArea
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            visible: tilesInDeck > 0 && !engine.AllFttingTilesPlayed && playerData && playerData.IsActive &&
+            visible: engine && tilesInDeck > 0 && !engine.AllFttingTilesPlayed && playerData && playerData.IsActive &&
                      (engine.GameState === GameEngine.NewTurn ||
                       engine.GameState === GameEngine.TilePlaced &&
                       engine.getAbbeyTile(engine.ActivePlayer).IsPlaced &&

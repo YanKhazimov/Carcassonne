@@ -165,13 +165,14 @@ Item {
 
                         Repeater {
                             id: colorRepeater
-                            model: 10 * engine.PossibleColors.length
+                            model: engine ? 10 * engine.PossibleColors.length : 0
                             delegate: Rectangle {
                                 id: playerColorBar
 
                                 width: 300
                                 height: 30
-                                color: engine.PossibleColors[root.colorIndex(index)]
+                                color: engine ? engine.PossibleColors[root.colorIndex(index)]
+                                              : "transparent"
                             }
                         }
                     }
@@ -219,7 +220,8 @@ Item {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: engine.PossibleColors[root.colorIndex(playerRow.colorOffset - 1)]
+                        color: engine ? engine.PossibleColors[root.colorIndex(playerRow.colorOffset - 1)]
+                                      : "transparent"
                         opacity: 0.4
                     }
 
@@ -244,7 +246,8 @@ Item {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: engine.PossibleColors[root.colorIndex(playerRow.colorOffset + 1)]
+                        color: engine ? engine.PossibleColors[root.colorIndex(playerRow.colorOffset + 1)]
+                                      : "transparent"
                         opacity: 0.4
                     }
 

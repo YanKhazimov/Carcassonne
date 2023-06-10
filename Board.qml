@@ -8,7 +8,7 @@ Rectangle {
     color: "#444444"
 
     property int capacity
-    readonly property int maxCapacity: engine.mapModel.MaxCapacity
+    readonly property int maxCapacity: engine ? engine.mapModel.MaxCapacity : 0
     readonly property bool maxCapacityReached: capacity === maxCapacity
     property real centerTileHOffset
     property real centerTileVOffset
@@ -28,7 +28,7 @@ Rectangle {
     }
 
     Connections {
-        target: engine.mapModel
+        target: engine ? engine.mapModel : null
         function onMinMaxChanged() {
             // checking horizontal placement
             var mapCenterHOffset = (engine.mapModel.MinX + engine.mapModel.MaxX)/2 + centerTileCenterHOffset
@@ -232,7 +232,8 @@ Rectangle {
                 Rectangle {
                     width: Constants.tileSize
                     height: Constants.tileSize
-                    color: (dropArea.yIndex >= engine.mapModel.MinPlayableY && dropArea.yIndex <= engine.mapModel.MaxPlayableY ||
+                    color: !engine ||
+                           (dropArea.yIndex >= engine.mapModel.MinPlayableY && dropArea.yIndex <= engine.mapModel.MaxPlayableY ||
                             !engine.mapModel.YRangeDefined) &&
                            (dropArea.xIndex >= engine.mapModel.MinPlayableX && dropArea.xIndex <= engine.mapModel.MaxPlayableX ||
                             !engine.mapModel.XRangeDefined)

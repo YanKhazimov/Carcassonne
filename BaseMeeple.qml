@@ -11,7 +11,9 @@ Item {
     property bool draggable
     property var type
     required property int playerIndex
-    readonly property color playerColor: playerIndex < engine.PlayerCount ? engine.getPlayer(playerIndex).Color : "white"
+    readonly property color playerColor: engine && playerIndex < engine.PlayerCount
+                                         ? engine.getPlayer(playerIndex).Color
+                                         : "white"
 
     QtObject {
         id: internal
@@ -43,6 +45,7 @@ Item {
         cursorShape: Qt.SizeAllCursor
         propagateComposedEvents: true
         visible: root.draggable &&
+                 engine &&
                  (engine.GameState === GameEngine.TileFixed || engine.GameState === GameEngine.MeeplePlaced) &&
                  playerIndex === engine.ActivePlayer
     }

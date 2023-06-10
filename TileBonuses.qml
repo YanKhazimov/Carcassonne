@@ -12,8 +12,9 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/shield.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Shield ||
-                 mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.DoubleShield
+        visible: mapObject.tileData &&
+                 (mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Shield ||
+                  mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.DoubleShield)
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -21,7 +22,7 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/shield.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.DoubleShield
+        visible: mapObject.tileData && mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.DoubleShield
         x: secondaryPoint.x - width/2
         y: secondaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -29,7 +30,7 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/wheat.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Wheat
+        visible: mapObject.tileData && mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Wheat
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -37,7 +38,7 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/barrel.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Barrel
+        visible: mapObject.tileData && mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Barrel
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -45,7 +46,7 @@ Item {
 
     TileBonusIndicator {
         source: "qrc:/img/cloth.png"
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Cloth
+        visible: mapObject.tileData && mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.Cloth
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
         rotation: -mapObject.rotation
@@ -57,7 +58,7 @@ Item {
         radius: 10
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.RoadLake
+        visible: mapObject.tileData && mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.RoadLake
         color: "lightblue"
         border.width: 2
         border.color: "blue"
@@ -69,7 +70,7 @@ Item {
         color: "white"
         x: primaryPoint.x - width/2
         y: primaryPoint.y - height/2
-        visible: mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.TownCenter
+        visible: mapObject.tileData && mapObject.tileData.BonusTypes[mapObject.bonusSideIndex] === EngineEnums.TownCenter
 
         Text {
             anchors.centerIn: parent

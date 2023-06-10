@@ -106,15 +106,15 @@ Item {
         id: objectsArea
         anchors.fill: root
         objectList: mapObjects.children
-        visible: tileData.IsPlaced
+        visible: tileData && tileData.IsPlaced
     }
 
     MouseArea {
         id: dragArea
         anchors.fill: parent
         drag.target: parent
-        visible: (!tileData.IsFixed) && (playerIndex === engine.ActivePlayer) && (!tileData.Abbey ||
-                                                                              engine.GameState < GameEngine.TileDrawn)
+        visible: tileData && !tileData.IsFixed && (playerIndex === engine.ActivePlayer) &&
+                 (!tileData.Abbey || engine.GameState < GameEngine.TileDrawn)
         cursorShape: Qt.SizeAllCursor
     }
 
@@ -168,7 +168,7 @@ Item {
 
         anchors.fill: parent
         keys: ["meeple"]
-        enabled: engine.mapModel.LatestTile === tileData
+        enabled: engine && (engine.mapModel.LatestTile === tileData)
 
         function acceptsActiveMeeple() {
             // operating meeple, selectedObject, tileData
@@ -211,9 +211,9 @@ Item {
     Image {
         id: picture
 
-        source: tileData.Picture
+        source: tileData ? tileData.Picture : ""
         anchors.fill: parent
-        rotation: tileData.ImageRotation
+        rotation: tileData ? tileData.ImageRotation : 0
         opacity: Preferences.schematicView ? 0 : 1//tileData.Abbey ? 1 : 0.8//engine.TilePictureOpacity
 
         Behavior on rotation {
@@ -230,7 +230,7 @@ Item {
             color: "transparent"
             border.width: 2
             border.color: "black"
-            visible: !tileData.IsFixed
+            visible: tileData && !tileData.IsFixed
         }
     }
 

@@ -8,7 +8,8 @@ Shape {
     id: root
 
     required property int currentId
-    readonly property bool highlighted: engine.HighlightedObjectId === currentId
+    readonly property int invalidId: 0
+    readonly property bool highlighted: engine && engine.HighlightedObjectId === currentId
     readonly property int side: parent.width
     readonly property real town1eOffset: side / 5
     readonly property real town1eRadius: (side * side) / (8 * town1eOffset) + town1eOffset / 2
@@ -19,7 +20,7 @@ Shape {
     required property TileData tileData
     readonly property int bonusSideIndex: (rotation + 360) % 360 / 90
 
-    readonly property color fieldColor: (engine.GameState === GameEngine.GameEnd && engine.ScorableFields.includes(currentId))
+    readonly property color fieldColor: (engine && engine.GameState === GameEngine.GameEnd && engine.ScorableFields.includes(currentId))
                                         ? Constants.color.schematic.scorableField : Constants.color.schematic.field
 
     width: side

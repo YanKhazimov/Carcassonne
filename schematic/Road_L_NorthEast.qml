@@ -5,8 +5,8 @@ import "qrc:/"
 BaseMapObject {
     id: root
 
-    currentId: tileData.L_NorthEastRoadId
-    visible: tileData.L_NorthEastRoad
+    currentId: tileData ? tileData.L_NorthEastRoadId : invalidId
+    visible: tileData && tileData.L_NorthEastRoad
 
     ShapePath {
         startX: side/2 + halfRoadWidth

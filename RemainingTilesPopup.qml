@@ -36,7 +36,7 @@ Popup {
             spacing: 25
             Repeater {
                 id: remainingTilesRepeater
-                model: engine.remainingTilesModel
+                model: engine ? engine.remainingTilesModel : []
 
                 delegate: Image {
                     required property int index // https://bugreports.qt.io/browse/QTBUG-86009
@@ -47,7 +47,7 @@ Popup {
                     Rectangle {
                         anchors.fill: parent
                         color: Qt.rgba(0.5, 0.5, 0.5, 0.6)
-                        visible: index > 0 && engine.getRemainingTile(index).IsFixed // index > 0 seems to initialize engine.getRemainingTile(index) to not be null
+                        visible: index > 0 && engine && engine.getRemainingTile(index).IsFixed // index > 0 seems to initialize engine.getRemainingTile(index) to not be null
                     }
 
                     Component.onCompleted: {

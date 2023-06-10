@@ -1,9 +1,7 @@
 import QtQuick 2.15
-import QtQuick.Shapes 1.15
-import "qrc:/"
 
 Field_JTriangle_NorthWest {
     rotation: 180
-    currentId: tileData.FieldJTriangleSouthEastId
-    visible: tileData.FieldJTriangleSouthEast
+    currentId: tileData ? tileData.FieldJTriangleSouthEastId : invalidId
+    visible: tileData && tileData.FieldJTriangleSouthEast
 }

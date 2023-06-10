@@ -70,7 +70,7 @@ Item {
     }
 
     Repeater {
-        model: engine.Players
+        model: engine ? engine.Players : []
         delegate: Row {
             y: PLACE * 30
             z: placeAnimation.running ? 1 : 0
