@@ -84,14 +84,16 @@ Monastery::Monastery(unsigned id, ObjectManager *manager)
     pointValue = 9;
 }
 
-void MapObjectData::freeMeeples(const std::set<QmlEnums::MeepleType>& typesToRemove)
+std::list<MapObjectData::MeepleInfo> MapObjectData::freeMeeples(const std::set<QmlEnums::MeepleType>& typesToRemove)
 {
+    std::list<MeepleInfo> removedMeeples;
     for (const auto& object: group())
     {
         for (auto iter = object->playerPresence.meeples.begin(); iter != object->playerPresence.meeples.end(); )
         {
             if (typesToRemove.find(iter->meepleType) != typesToRemove.end())
             {
+                removedMeeples.push_back(*iter);
                 emit iter->tile->meepleReset();
                 iter = object->playerPresence.meeples.erase(iter);
             }
@@ -101,6 +103,8 @@ void MapObjectData::freeMeeples(const std::set<QmlEnums::MeepleType>& typesToRem
             }
         }
     }
+
+    return removedMeeples;
 }
 
 std::vector<int> MapObjectData::mostPresentPlayers() const

@@ -272,7 +272,7 @@ Rectangle {
     Text {
         anchors.bottom: regularTilePlaceholder.top; anchors.bottomMargin: 5
         anchors.horizontalCenter: regularTilePlaceholder.horizontalCenter
-        text: "Осталось: " + tilesInDeck
+        text: "x" + tilesInDeck
         font.pixelSize: 20
     }
 

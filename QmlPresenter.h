@@ -32,6 +32,7 @@ class QmlPresenter : public QObject
     Q_PROPERTY(bool AllFttingTilesPlayed MEMBER allFttingTilesPlayed NOTIFY allFttingTilesPlayedChanged)
     Q_PROPERTY(QVariantList ScorableFields READ getScorableFields NOTIFY scorableFieldsChanged)
     Q_PROPERTY(bool BuilderBonus MEMBER builderBonus CONSTANT)
+    Q_PROPERTY(QAbstractListModel* GameLog READ getLogMessages NOTIFY gameLogChanged)
 
 public:
     enum class GameState {
@@ -108,9 +109,11 @@ private:
     std::set<unsigned> scorableFields;
     QVariantList getScorableFields() const;
     void addMeepleToObject(std::shared_ptr<MapObjectData>& object, QmlEnums::MeepleType meepleType, int playerIndex, Tile* tile);
-    void removeMeepleFromObject(std::shared_ptr<MapObjectData>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
+    std::list<MapObjectData::MeepleInfo> removeMeepleFromObject(std::shared_ptr<MapObjectData>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
 
     bool builderBonus = false;
+
+    QAbstractListModel* getLogMessages();
 
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
@@ -123,13 +126,13 @@ public:
     Q_INVOKABLE void populatePlayers(QVariantList colors, QVariantList names);
     Q_INVOKABLE Player* getPlayer(int i);
     Q_INVOKABLE Tile* getAbbeyTile(int i);
-    Q_INVOKABLE void switchActivePlayer();
+    Q_INVOKABLE void passTurn(int fixedTilesCount);
     Q_INVOKABLE void placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile *tile);
     Q_INVOKABLE void scoreField(unsigned fieldCurrentId);
     Q_INVOKABLE bool canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile *tile) const;
     Q_INVOKABLE bool isFieldObject(unsigned objectId) const;
     Q_INVOKABLE void setWaitingCursor(bool value);
-    Q_INVOKABLE void processGameEnd(int fixedTilesCount);
+    bool processGameEnd(int fixedTilesCount);
     Q_INVOKABLE void fixTile(Tile* tile);
 
 signals:
@@ -149,6 +152,7 @@ signals:
     void allFttingTilesPlayedChanged();
     void showMessage(QString message, GameState stateToSet);
     void scorableFieldsChanged();
+    void gameLogChanged();
 };
 
 #endif // QMLPRESENTER_H

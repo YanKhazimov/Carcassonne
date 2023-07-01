@@ -42,6 +42,8 @@ set(PROJECT_SOURCES
         RemainingTilesModel.cpp
         ShuffledDeck.h
         ShuffledDeck.cpp
+        Logger.h
+        Logger.cpp
         main.cpp
         qml.qrc
 )

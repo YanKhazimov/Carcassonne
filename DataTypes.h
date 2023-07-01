@@ -21,6 +21,7 @@ enum class ObjectType {
     Monastery,
     Abbey
 };
+Q_DECLARE_METATYPE(ObjectType)
 
 namespace QmlEnums {
     Q_NAMESPACE
@@ -47,9 +48,26 @@ namespace QmlEnums {
     };
     Q_ENUM_NS(MeepleType)
 
+    enum LogRecordType
+    {
+        LogNone = 0,
+        LogScoring,
+        LogObjectCompletion,
+        LogFreeTurn,
+        LogRoadLeadChange,
+        LogTownLeadChange,
+        LogMeeplePlaced,
+        LogMeepleReleased,
+        LogNewTurn,
+        LogResourceLeadChange,
+        LogGameEnd
+    };
+    Q_ENUM_NS(LogRecordType)
 }
-    TileSide opposite(TileSide side);
+
+TileSide opposite(TileSide side);
 
 extern QVariantList playerColors;
+extern QMap<QString, QMap<ObjectType, QString>> objectStrings;
 
 #endif // DATATYPES_H

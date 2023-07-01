@@ -38,6 +38,9 @@ Item {
         if (event.key === Qt.Key_R) {
             remainingTilesPopup.visible = !remainingTilesPopup.visible
         }
+        if (event.key === Qt.Key_L) {
+            gameLogPopup.visible = !gameLogPopup.visible
+        }
     }
 
     function createTileItem(x, y) {
@@ -195,11 +198,7 @@ Item {
 
     function endTurn() {
         engine.highlight(-1)
-        if (!engine.BuilderBonus) {
-            engine.switchActivePlayer()
-        }
-        engine.GameState = GameEngine.NewTurn
-        engine.processGameEnd(tiles.length)
+        engine.passTurn(tiles.length)
     }
 
     Component.onCompleted: {
@@ -236,7 +235,7 @@ Item {
         fillMode: Image.Tile
         opacity: 0.5
         Keys.onTabPressed: {
-            engine.switchActivePlayer()
+            engine.passTurn(tiles.length)
         }
         Component.onCompleted: forceActiveFocus()
     }
@@ -467,6 +466,17 @@ Item {
 
     RemainingTilesPopup {
         id: remainingTilesPopup
+
+        anchors.centerIn: parent
+        width: parent.width - 200
+        height: parent.height - 200
+        visible: false
+        modal: true
+        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+    }
+
+    LogPopup {
+        id: gameLogPopup
 
         anchors.centerIn: parent
         width: parent.width - 200

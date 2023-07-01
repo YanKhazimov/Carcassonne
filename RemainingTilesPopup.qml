@@ -2,6 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 Popup {
+    id: root
+
     implicitWidth: 500
     implicitHeight: 500
     topPadding: 50
@@ -33,6 +35,8 @@ Popup {
 
         Flow {
             width: parent.width
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: Constants.tilePreviewSize/4/2 // making copies not clip
             spacing: 25
             Repeater {
                 id: remainingTilesRepeater
@@ -45,9 +49,20 @@ Popup {
 
                     // dimmer
                     Rectangle {
+                        id: dimmer
                         anchors.fill: parent
                         color: Qt.rgba(0.5, 0.5, 0.5, 0.6)
                         visible: index > 0 && engine && engine.getRemainingTile(index).IsFixed // index > 0 seems to initialize engine.getRemainingTile(index) to not be null
+                    }
+
+                    Rectangle {
+                        id: border
+
+                        anchors.fill: parent
+                        color: "transparent"
+                        border.width: 2
+                        border.color: "black"
+                        visible: !dimmer.visible
                     }
 
                     Component.onCompleted: {

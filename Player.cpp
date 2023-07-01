@@ -2,6 +2,7 @@
 #include <QQmlEngine>
 #include "Tile.h"
 #include "DeckBuilder.h"
+#include "Logger.h"
 
 Player::Player(QColor _color, QString _name, QObject *parent)
     : QObject(parent), color(_color), active(false), name(_name)
@@ -65,6 +66,7 @@ Tile* Player::getAbbeyTile()
 void Player::scorePoints(int points)
 {
     setScore(getScore() + points);
+    Logger::instance()->log(std::make_shared<ScoringLogRecord>(color, name, points));
 }
 
 int Player::getScore() const

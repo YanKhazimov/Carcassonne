@@ -17,7 +17,13 @@ enum DataRoles {
     RoadLead,
     IsTileFixed,
     TileCopies,
-    TileImagePath
+    TileImagePath,
+    EventType,
+    EventPoints,
+    EventObjectType,
+    EventObjectSize,
+    EventMeepleType,
+    EventMeepleTypes
 };
 
 #endif // DATAROLES_H

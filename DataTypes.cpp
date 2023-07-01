@@ -13,3 +13,25 @@ QVariantList playerColors = {
     "darkgreen",
     "pink"
 };
+
+QMap<QString, QMap<ObjectType, QString>> objectStrings = {
+    { {"acc",
+     {
+      { ObjectType::None, "None" },
+      { ObjectType::Town, "город" },
+      { ObjectType::Road, "дорогу" },
+      { ObjectType::Field, "поле" },
+      { ObjectType::Monastery, "монастырь" },
+      { ObjectType::Abbey, "аббатство" }
+     }},
+     {"inst",
+     {
+      { ObjectType::None, "None" },
+      { ObjectType::Town, "городом" },
+      { ObjectType::Road, "дорогой" },
+      { ObjectType::Field, "полем" },
+      { ObjectType::Monastery, "монастырем" },
+      { ObjectType::Abbey, "аббатством" }
+     }}
+     }
+};

@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QGuiApplication>
 #include <QCursor>
+#include "Logger.h"
 
 RemainingTilesModel *QmlPresenter::getRemainingTiles()
 {
@@ -34,6 +35,11 @@ void QmlPresenter::addWheatToActivePlayer(int amount)
     {
         Player* player = getPlayer(i);
         player->setWheatLead(player->getWheat() == maxWheat);
+
+        if (player->getWheatLead())
+        {
+            Logger::instance()->log(std::make_shared<ResourceLeadLogRecord>(player->getColor(), player->getName(), maxWheat, "пшенице"));
+        }
     }
 }
 
@@ -48,6 +54,11 @@ void QmlPresenter::addBarrelsToActivePlayer(int amount)
     {
         Player* player = getPlayer(i);
         player->setBarrelsLead(player->getBarrels() == maxBarrels);
+
+        if (player->getBarrelsLead())
+        {
+            Logger::instance()->log(std::make_shared<ResourceLeadLogRecord>(player->getColor(), player->getName(), maxBarrels, "бочкам"));
+        }
     }
 }
 
@@ -62,6 +73,11 @@ void QmlPresenter::addClothToActivePlayer(int amount)
     {
         Player* player = getPlayer(i);
         player->setClothLead(player->getCloth() == maxCloth);
+
+        if (player->getClothLead())
+        {
+            Logger::instance()->log(std::make_shared<ResourceLeadLogRecord>(player->getColor(), player->getName(), maxCloth, "ткани"));
+        }
     }
 }
 
@@ -155,6 +171,11 @@ void QmlPresenter::AddTiles(std::list<Tile> &tiles)
         unassignedBarrels += barrels;
         unassignedCloth += cloth;
 
+        connect(&tile, &Tile::objectCompleted, this, [this](unsigned objectId) {
+            Player* player = getPlayer(activePlayer());
+            Logger::instance()->log(std::make_shared<CompletionLogRecord>(player->getColor(), player->getName(),
+                                                                          objectManager.GetObject(objectId)->type, objectManager.countObjectTiles(objectId)));
+        });
         connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
         connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::scoreCompletionBonuses);
     }
@@ -197,6 +218,8 @@ void QmlPresenter::populatePlayers(QVariantList colors, QVariantList names)
     {
         Player* player0 = players.index(0, 0).data(DataRoles::PlayerPtr).value<Player*>();
         player0->setActive(true);
+
+        Logger::instance()->log(std::make_shared<NewTurnLogRecord>(player0->getColor(), player0->getName(), Logger::incrementTurn()));
     }
 
     emit players.dataChanged(players.index(0, 0), players.index(players.rowCount() - 1, 0), {DataRoles::PlayerScore});
@@ -253,6 +276,11 @@ void QmlPresenter::scoreLargestTown(unsigned townId)
         {
             Player* player = getPlayer(i);
             player->setTownLead(i == currentActivePlayer);
+
+            if (player->getTownLead())
+            {
+                Logger::instance()->log(std::make_shared<TownLeadLogRecord>(player->getColor(), player->getName(), maxTown));
+            }
         }
     }
 }
@@ -272,6 +300,11 @@ void QmlPresenter::scoreLongestRoad(unsigned roadId)
         {
             Player* player = getPlayer(i);
             player->setRoadLead(i == currentActivePlayer);
+
+            if (player->getRoadLead())
+            {
+                Logger::instance()->log(std::make_shared<RoadLeadLogRecord>(player->getColor(), player->getName(), maxRoad));
+            }
         }
     }
 }
@@ -302,14 +335,20 @@ void QmlPresenter::scoreFieldMeeples(unsigned objectId, int meepleScore)
             std::set<int> pigs = object->pigs();
             int fieldTowns = objectManager.countTownsAround(object->initialId);
 
+            auto removedMeeples = removeMeepleFromObject(object, { QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeeplePig });
+            if (gameState != GameState::GameEnd)
+            {
+                Player* player = getPlayer(activePlayer());
+                Logger::instance()->log(std::make_shared<FieldMeepleReleaseLogRecord>(player->getColor(), player->getName(),
+                                                                                      QList<MapObjectData::MeepleInfo>(removedMeeples.begin(), removedMeeples.end())));
+            }
+
             for (auto playerIndex: mostPresentPlayers)
             {
                 bool pig = pigs.find(playerIndex) != pigs.end();
                 getPlayer(playerIndex)->scorePoints(fieldTowns * (pig ? (meepleScore + 1) : meepleScore));
             }
         }
-
-        removeMeepleFromObject(object, { QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeeplePig });
     }
 }
 
@@ -354,7 +393,7 @@ bool QmlPresenter::isFieldCorner(Tile *tile, unsigned objectId) const
     int y = tile->position().y();
 
     Tile* north = mapModel.nextTileNorth(x, y);
-    Tile* west = mapModel.nextTileNorth(x, y);
+    Tile* west = mapModel.nextTileWest(x, y);
     Tile* south = mapModel.nextTileSouth(x, y);
     Tile* east = mapModel.nextTileEast(x, y);
 
@@ -417,17 +456,24 @@ void QmlPresenter::addMeepleToObject(std::shared_ptr<MapObjectData> &object, Qml
     }
 }
 
-void QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
+std::list<MapObjectData::MeepleInfo> QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
 {
-    object->freeMeeples(typesToRemove);
+    auto removedMeepleles = object->freeMeeples(typesToRemove);
     if (object->type == ObjectType::Field && object->mostPresentPlayers().empty())
     {
         if (scorableFields.erase(object->currentObject()->initialId) > 0)
             emit scorableFieldsChanged();
     }
+
+    return removedMeepleles;
 }
 
-void QmlPresenter::processGameEnd(int fixedTilesCount)
+QAbstractListModel *QmlPresenter::getLogMessages()
+{
+    return Logger::instance();
+}
+
+bool QmlPresenter::processGameEnd(int fixedTilesCount)
 {
     QStringList messages;
 
@@ -436,7 +482,7 @@ void QmlPresenter::processGameEnd(int fixedTilesCount)
         Tile* nextTile = shuffledDeck.index(fixedTilesCount, 0).data(DataRoles::TilePtr).value<Tile*>();
         if (mapModel.fitsCurrentBoard(nextTile))
         {
-            return;
+            return false;
         }
 
         for (int swapCandidate = fixedTilesCount + 1; swapCandidate < shuffledDeck.rowCount(); swapCandidate++)
@@ -446,7 +492,7 @@ void QmlPresenter::processGameEnd(int fixedTilesCount)
             {
                 // make tile at index "swapCandidate" go to index "fixedTilesCount"
                 shuffledDeck.forceReorder(swapCandidate, fixedTilesCount);
-                return;
+                return false;
             }
         }
 
@@ -464,13 +510,14 @@ void QmlPresenter::processGameEnd(int fixedTilesCount)
             {
                 messages.append("Игроки должны выставить фишки аббатств.");
                 emit showMessage(messages.join('\n'), GameState::NewTurn);
-                return;
+                return false;
             }
     }
 
     // game end
     messages.append("Переход к подсчету очков.");
     emit showMessage(messages.join('\n'), GameState::GameEnd);
+    return true;
 }
 
 void QmlPresenter::fixTile(Tile *tile)
@@ -484,11 +531,33 @@ void QmlPresenter::fixTile(Tile *tile)
         builderBonus = true;
     }
     mapModel.fixTile(tile);
+
+    if (builderBonus)
+    {
+        Player* player = getPlayer(activePlayer());
+        Logger::instance()->log(std::make_shared<FreeTurnLogRecord>(player->getColor(), player->getName()));
+    }
 }
 
-void QmlPresenter::switchActivePlayer()
+void QmlPresenter::passTurn(int fixedTilesCount)
 {
-    setActivePlayer((activePlayer() + 1) % players.rowCount());
+    gameState = GameState::NewTurn;
+    emit gameStateChanged();
+
+    Player* player = getPlayer(activePlayer());
+    if (!processGameEnd(fixedTilesCount))
+    {
+        if (!builderBonus)
+        {
+            setActivePlayer((activePlayer() + 1) % players.rowCount());
+        }
+
+        Logger::instance()->log(std::make_shared<NewTurnLogRecord>(player->getColor(), player->getName(), Logger::incrementTurn()));
+    }
+    else
+    {
+        Logger::instance()->log(std::make_shared<GameEndLogRecord>(player->getColor(), player->getName()));
+    }
 }
 
 void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile* tile)
@@ -496,6 +565,9 @@ void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectI
     if (auto object = objectManager.GetObject(objectId); object)
     {
         addMeepleToObject(object, (QmlEnums::MeepleType)meepleType, playerIndex, tile);
+
+        Player* player = getPlayer(activePlayer());
+        Logger::instance()->log(std::make_shared<MeeplePlaceLogRecord>(player->getColor(), player->getName(), object->type, (QmlEnums::MeepleType)meepleType));
 
         if (object->isCompleted())
         {

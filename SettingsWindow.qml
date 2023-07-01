@@ -269,7 +269,7 @@ Item {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "7x7"
+            text: "15x15"
             font.pixelSize: 30
         }
 
@@ -289,7 +289,7 @@ Item {
                     names.push(playerRepeater.itemAt(i).text)
                 }
                 engine.populatePlayers(colors, names)
-                engine.mapModel.setSize(7)
+                engine.mapModel.setSize(15)
                 root.urlRequested("qrc:/GameWindow.qml")
             }
         }
