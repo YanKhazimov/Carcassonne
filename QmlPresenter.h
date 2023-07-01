@@ -115,6 +115,8 @@ private:
 
     QAbstractListModel* getLogMessages();
 
+    void updateScorableFieldIds();
+
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
 

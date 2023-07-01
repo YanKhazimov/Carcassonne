@@ -473,6 +473,17 @@ QAbstractListModel *QmlPresenter::getLogMessages()
     return Logger::instance();
 }
 
+void QmlPresenter::updateScorableFieldIds()
+{
+    std::vector<unsigned> currentIds;
+    for (auto fieldId: scorableFields)
+    {
+        currentIds.push_back(objectManager.GetObject(fieldId)->initialId);
+    }
+    scorableFields.insert(currentIds.begin(), currentIds.end());
+    emit scorableFieldsChanged();
+}
+
 bool QmlPresenter::processGameEnd(int fixedTilesCount)
 {
     QStringList messages;
@@ -517,6 +528,8 @@ bool QmlPresenter::processGameEnd(int fixedTilesCount)
     // game end
     messages.append("Переход к подсчету очков.");
     emit showMessage(messages.join('\n'), GameState::GameEnd);
+
+    updateScorableFieldIds();
     return true;
 }
 
