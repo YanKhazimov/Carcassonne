@@ -2,9 +2,9 @@ pragma Singleton
 import QtQuick 2.15
 
 QtObject {
-    readonly property real defaultTileSize: 144
+    readonly property real defaultTileSize: 192
     property int tilePreviewSize: 120
-    property int tileSize: 144
+    property int tileSize: 192
     readonly property int smallMeepleSize: 20
 
     property var color: QtObject {

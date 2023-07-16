@@ -15,11 +15,27 @@ Item {
         return index % engine.PossibleColors.length
     }
 
-    width: 1280
-    height: 980
+    Item {
+        id: backgroundStripe
+
+        width: 400
+        height: parent.height
+        anchors.left: parent.left; anchors.leftMargin: 200
+
+        RadialGradient {
+            anchors.fill: parent
+            angle: 0
+            horizontalRadius: 400
+            verticalRadius: height
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(0.8, 0.8, 0.8, 1.0) }
+                GradientStop { position: 1.0; color: Qt.rgba(0.8, 0.8, 0.8, 0.0) }
+            }
+        }
+    }
 
     Column {
-        anchors.centerIn: parent
+        anchors.centerIn: backgroundStripe
         spacing: 5
 
         Item {

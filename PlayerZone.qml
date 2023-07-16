@@ -33,6 +33,8 @@ Rectangle {
     readonly property real regularTilePositionX: regularTilePlaceholder.x
     readonly property real regularTilePositionY: regularTilePlaceholder.y
 
+    property int buttonsOffset: 0
+
     required property int tilesInDeck
 
     signal tileClicked()
@@ -52,11 +54,13 @@ Rectangle {
     color: "white"
     border.width: 2
     border.color: activeColor
+    radius: 10
 
     Rectangle {
         anchors.fill: parent
         color: activeColor
         opacity: 0.3
+        radius: root.radius
     }
 
     TextEdit {
@@ -67,6 +71,7 @@ Rectangle {
         font.pixelSize: 20
         text: playerData ? playerData.Name : ""
         selectByMouse: true
+        Keys.onEscapePressed: focus = false
     }
 
     Binding {
@@ -134,10 +139,10 @@ Rectangle {
         }
     }
 
-    Column {
+    Row {
         anchors.top: timerRow.bottom; anchors.topMargin: 5
         anchors.left: parent.left; anchors.leftMargin: 10
-        spacing: 5
+        spacing: 15
 
         Row {
             TileBonusIndicator {
@@ -148,11 +153,7 @@ Rectangle {
             }
             Text {
                 text: playerData ? " x" + playerData.Barrels : ""
-                font.pixelSize: 20
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            LeadIndicator {
-                visible: playerData && playerData.BarrelsLead
+                font.pixelSize: playerData && playerData.BarrelsLead ? 40 : 20
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -166,11 +167,7 @@ Rectangle {
             }
             Text {
                 text: playerData ? " x" + playerData.Wheat : ""
-                font.pixelSize: 20
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            LeadIndicator {
-                visible: playerData && playerData.WheatLead
+                font.pixelSize: playerData && playerData.WheatLead ? 40 : 20
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -184,19 +181,16 @@ Rectangle {
             }
             Text {
                 text: playerData ? " x" + playerData.Cloth : ""
-                font.pixelSize: 20
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            LeadIndicator {
-                visible: playerData && playerData.ClothLead
+                font.pixelSize: playerData && playerData.ClothLead ? 40 : 20
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
     }
 
-    Column {
-        anchors.top: timerRow.bottom; anchors.topMargin: 5
-        anchors.right: parent.right; anchors.rightMargin: 10
+    Row {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.margins: 10
         spacing: 5
 
         Row {
@@ -230,10 +224,10 @@ Rectangle {
     Rectangle {
         id: regularTilePlaceholder
 
-        anchors.bottom: abbeyPlaceholder.top; anchors.bottomMargin: 15
-        anchors.right: parent.right; anchors.rightMargin: 10
-        width: Constants.tileSize
-        height: Constants.tileSize
+        anchors.bottom: parent.bottom; anchors.bottomMargin: 10
+        anchors.right: abbeyPlaceholder.left; anchors.rightMargin: 10
+        width: Constants.tilePreviewSize
+        height: Constants.tilePreviewSize
         color: "transparent"
         border.width: 2
         border.color: Constants.color.schematic.road
@@ -279,10 +273,10 @@ Rectangle {
     Rectangle {
         id: abbeyPlaceholder
 
-        anchors.top: parent.bottom; anchors.topMargin: -Constants.defaultTileSize - 10
-        anchors.right: parent.right; anchors.rightMargin: 10
-        width: Constants.tileSize
-        height: Constants.tileSize
+        anchors.bottom: parent.bottom; anchors.bottomMargin: 10
+        anchors.right: parent.right; anchors.rightMargin: root.buttonsOffset + 10
+        width: Constants.tilePreviewSize
+        height: Constants.tilePreviewSize
         color: "transparent"
         border.width: 2
         border.color: Constants.color.schematic.road
@@ -293,11 +287,11 @@ Rectangle {
         }
     }
 
-    ColumnLayout {
+    RowLayout {
         id: meeplePositioner
 
-        anchors.left: parent.left
-        anchors.verticalCenter: abbeyPlaceholder.top; anchors.verticalCenterOffset: -10/2
+        anchors.right: regularTilePlaceholder.left
+        anchors.bottom: regularTilePlaceholder.bottom
         anchors.margins: 10
         spacing: 10
         opacity: 0.2
@@ -340,32 +334,32 @@ Rectangle {
 
     Text {
         text: "x" + smallMeepleCount
-        y: smallMeeplePositionY + Constants.smallMeepleSize/2 - height/2
-        anchors.left: meeplePositioner.right; anchors.leftMargin: 10/2
+        x: smallMeeplePositionX + Constants.smallMeepleSize/2 - width/2
+        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
         font.pixelSize: 20
     }
     Text {
         text: "x" + bigMeepleCount
-        y: bigMeeplePositionY + 2 * Constants.smallMeepleSize/2 - height/2
-        anchors.left: meeplePositioner.right; anchors.leftMargin: 10/2
+        x: bigMeeplePositionX + 2 * Constants.smallMeepleSize/2 - width/2
+        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
         font.pixelSize: 20
     }
     Text {
         text: "x" + barnCount
-        y: barnPositionY + 2 * Constants.smallMeepleSize/2 - height/2
-        anchors.left: meeplePositioner.right; anchors.leftMargin: 10/2
+        x: barnPositionX + 2 * Constants.smallMeepleSize/2 - width/2
+        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
         font.pixelSize: 20
     }
     Text {
         text: "x" + builderCount
-        y: builderPositionY + 2 * Constants.smallMeepleSize/2 - height/2
-        anchors.left: meeplePositioner.right; anchors.leftMargin: 10/2
+        x: builderPositionX + Constants.smallMeepleSize/2 - width/2
+        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
         font.pixelSize: 20
     }
     Text {
         text: "x" + pigCount
-        y: pigPositionY + Constants.smallMeepleSize/2 - height/2
-        anchors.left: meeplePositioner.right; anchors.leftMargin: 10/2
+        x: pigPositionX + 2 * Constants.smallMeepleSize/2 - width/2
+        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
         font.pixelSize: 20
     }
 }

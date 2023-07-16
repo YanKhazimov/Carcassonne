@@ -58,7 +58,7 @@ void ShuffledDeck::shuffle()
     std::iota(sourceIndexes.begin(), sourceIndexes.end(), 0); // fill with values 0, 1, ...
     if (!sourceIndexes.empty())
     {
-        std::random_shuffle(sourceIndexes.begin() + 1, sourceIndexes.end(), myrandom); // leaving startng tile first
+        //std::random_shuffle(sourceIndexes.begin() + 1, sourceIndexes.end(), myrandom); // leaving startng tile first
         invalidate();
     }
 }

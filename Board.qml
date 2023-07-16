@@ -192,7 +192,7 @@ Rectangle {
     Item {
         id: clipper
         anchors.fill: parent
-        anchors.margins: maxCapacityReached ? 0 : 10
+        anchors.margins: maxCapacityReached ? 0 : 5
 
         clip: true
 

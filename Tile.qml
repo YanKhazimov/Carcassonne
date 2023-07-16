@@ -18,8 +18,10 @@ Item {
     readonly property alias dragActive: dragArea.drag.active
     readonly property bool acceptsActiveMeeple: dropArea.accepts
 
-    width: isPreview ? Constants.tilePreviewSize : Constants.tileSize
-    height: isPreview ? Constants.tilePreviewSize : Constants.tileSize
+    property bool isInHand: true
+
+    width: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
+    height: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
 
     QtObject {
         id: internal
@@ -141,6 +143,7 @@ Item {
             {
                 tileData.displace()
                 resetPosition()
+                root.isInHand = true
 
                 dragCancelled()
 
@@ -153,6 +156,7 @@ Item {
         }
         else
         {
+            root.isInHand = false
             board.activeTile = root
             board.activeDrag = true
 

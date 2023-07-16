@@ -8,8 +8,8 @@ import "schematic"
 Window {
     id: root
 
-    width: 1280
-    height: 980
+    width: 1920
+    height: 990
     visible: true
     title: qsTr("Carcassonne")
     flags: Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint |
@@ -17,20 +17,23 @@ Window {
 
     Image {
         id: background
-        source: "qrc:/img/startBackground.jpg"
-        height: parent.height
-        fillMode: Image.PreserveAspectFit
-        visible: loader.source != "qrc:/GameWindow.qml" || loader.status == Loader.Loading
+        source: "qrc:/img/startBackgroundGPT.jpg"
+        anchors.fill: parent
+        fillMode: Image.Stretch
     }
 
     Loader {
         id: loader
 
-        anchors.centerIn: parent
+        anchors.fill: parent
         source: "qrc:/SettingsWindow.qml"
         asynchronous: true
         visible: status == Loader.Ready
-        onStatusChanged: engine.setWaitingCursor(status == Loader.Loading)
+        onStatusChanged: {
+            engine.setWaitingCursor(status == Loader.Loading)
+            if (status == Loader.Ready && "onLoaded" in item)
+                item.onLoaded()
+        }
     }
 
     Image {

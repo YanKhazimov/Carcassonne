@@ -168,6 +168,6 @@
         <file alias="cloth.png">img/cloth.png</file>
         <file alias="wheat.png">img/wheat.png</file>
         <file alias="star.png">img/star.png</file>
-        <file alias="startBackground.jpg">img/startBackground.jpg</file>
+        <file alias="startBackgroundGPT.jpg">img/startBackgroundGPT.jpg</file>
     </qresource>
 </RCC>
