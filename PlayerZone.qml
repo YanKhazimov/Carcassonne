@@ -14,19 +14,19 @@ Rectangle {
 
     readonly property real smallMeeplePositionX: meeplePositioner.x + smallMeeplePlaceholder.x
     readonly property real smallMeeplePositionY: meeplePositioner.y + smallMeeplePlaceholder.y
-    property int smallMeepleCount: 8
+    property int smallMeepleCount: 0
     readonly property real bigMeeplePositionX: meeplePositioner.x + bigMeeplePlaceholder.x
     readonly property real bigMeeplePositionY: meeplePositioner.y + bigMeeplePlaceholder.y
-    property int bigMeepleCount: 2
+    property int bigMeepleCount: 0
     readonly property real barnPositionX: meeplePositioner.x + barnPlaceholder.x
     readonly property real barnPositionY: meeplePositioner.y + barnPlaceholder.y
-    property int barnCount: 1
-    readonly property real pigPositionX: meeplePositioner.x + pigPlaceholder.x
-    readonly property real pigPositionY: meeplePositioner.y + pigPlaceholder.y
-    property int pigCount: 1
+    property int barnCount: 0
     readonly property real builderPositionX: meeplePositioner.x + builderPlaceholder.x
     readonly property real builderPositionY: meeplePositioner.y + builderPlaceholder.y
-    property int builderCount: 1
+    property int builderCount: 0
+    readonly property real pigPositionX: meeplePositioner.x + pigPlaceholder.x
+    readonly property real pigPositionY: meeplePositioner.y + pigPlaceholder.y
+    property int pigCount: 0
 
     readonly property real abbeyPositionX: abbeyPlaceholder.x
     readonly property real abbeyPositionY: abbeyPlaceholder.y
@@ -153,7 +153,7 @@ Rectangle {
             }
             Text {
                 text: playerData ? " x" + playerData.Barrels : ""
-                font.pixelSize: playerData && playerData.BarrelsLead ? 40 : 20
+                color: playerData && playerData.BarrelsLead ? "black" : "grey"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -167,7 +167,7 @@ Rectangle {
             }
             Text {
                 text: playerData ? " x" + playerData.Wheat : ""
-                font.pixelSize: playerData && playerData.WheatLead ? 40 : 20
+                color: playerData && playerData.WheatLead ? "black" : "grey"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -181,7 +181,7 @@ Rectangle {
             }
             Text {
                 text: playerData ? " x" + playerData.Cloth : ""
-                font.pixelSize: playerData && playerData.ClothLead ? 40 : 20
+                color: playerData && playerData.ClothLead ? "black" : "grey"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -230,7 +230,7 @@ Rectangle {
         height: Constants.tilePreviewSize
         color: "transparent"
         border.width: 2
-        border.color: Constants.color.schematic.road
+        border.color: "grey"
 
         Image {
             anchors.centerIn: parent
@@ -279,7 +279,7 @@ Rectangle {
         height: Constants.tilePreviewSize
         color: "transparent"
         border.width: 2
-        border.color: Constants.color.schematic.road
+        border.color: "grey"
 
         Image {
             anchors.centerIn: parent

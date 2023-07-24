@@ -17,6 +17,41 @@ Item {
 
     signal urlRequested(var urlAddress)
 
+    function onLoaded() {
+        initialAnimation.start()
+    }
+
+    SequentialAnimation {
+        id: initialAnimation
+
+        signal meeplesSpawned()
+        signal abbeyTilesSpawned()
+
+        NumberAnimation {
+            id: slideInAnimation
+
+            property real progressPercentage: 0.0
+
+            duration: 1500
+            from: 0.0
+            to: 1.0
+            target: slideInAnimation
+            property: "progressPercentage"
+        }
+
+        ScriptAction {
+            script: {
+                initialAnimation.meeplesSpawned.connect(spawnAbbeyTiles)
+                initialAnimation.abbeyTilesSpawned.connect(function() {
+                    // game start
+                    engine.passTurn(tiles.length)
+                })
+
+                spawnMeepleItems()
+            }
+        }
+    }
+
     Binding {
         target: engine
         property: "TilePictureOpacity"
@@ -40,13 +75,13 @@ Item {
         }
     }
 
-    function createTileItem(x, y) {
+    function createTileItem(x, y, getX) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
             var obj = comp.createObject(root,
                                      {
                                          "tileData": engine.getTile(tiles.length),
-                                         "x": x,
+                                         "x": getX ? Qt.binding(getX) : x,
                                          "y": y,
                                          "board": board
                                      })
@@ -89,7 +124,8 @@ Item {
                                             "y": y,
                                             "board": board,
                                             "z": 1,
-                                            "playerIndex": playerIndex
+                                            "playerIndex": playerIndex,
+                                            "opacity": 0
                                         })
             obj.dragStarted.connect(function() {
                 if (tiles[tiles.length - 1].tileData.IsPlaced &&
@@ -109,6 +145,31 @@ Item {
         }
         console.error("Abbey tile component status:", comp.status, comp.errorString())
         return null
+    }
+
+    function spawnAbbeyTiles() {
+        for (let zone = 0; zone < zones.length; ++zone)
+        {
+            if (zones[zone].playerData) {
+                abbeyTiles.push(createAbbeyTileItem(
+                                    playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].abbeyPositionX,
+                                    playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].abbeyPositionY,
+                                    zone))
+            }
+        }
+
+
+        for (let i = 0; i < abbeyTiles.length; ++i)
+            abbeyTiles[i].appeared.connect(function() {
+                connectedAbbeyTiles++
+                if (connectedAbbeyTiles < abbeyTiles.length)
+                    abbeyTiles[connectedAbbeyTiles].appear()
+                else
+                    initialAnimation.abbeyTilesSpawned()
+            })
+
+        var connectedAbbeyTiles = 0
+        abbeyTiles[0].appear()
     }
 
     function createMeepleItem(type, x, y, playerIndex) {
@@ -160,40 +221,93 @@ Item {
         return null
     }
 
-    function createMeepleItems() {
-        var i
+    function spawnMeepleItems() {
+        const smallMeepleTotal = 8
+        const bigMeepleTotal = 2
+        const barnMeepleTotal = 1
+        const builderMeepleTotal = 1
+        const pigMeepleTotal = 1
+        const meepleCountSum = smallMeepleTotal + bigMeepleTotal + barnMeepleTotal + builderMeepleTotal + pigMeepleTotal
+
         for (var zone = 0; zone < zones.length; ++zone)
         {
             if (zones[zone].playerData)
             {
-                for (i = 0; i < 8; ++i)
-                {
+                for (let i = 0; i < smallMeepleTotal; ++i)
                     meeples.push(createMeepleItem("MeepleSmall.qml",
                                               playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].smallMeeplePositionX,
                                               playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].smallMeeplePositionY,
                                               zone))
-                }
-                for (i = 0; i < 2; ++i)
-                {
+
+                for (let i = 0; i < bigMeepleTotal; ++i) // false positive warnings
                     meeples.push(createMeepleItem("MeepleBig.qml",
                                               playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].bigMeeplePositionX,
                                               playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].bigMeeplePositionY,
                                               zone))
-                }
-                meeples.push(createMeepleItem("MeepleBarn.qml",
-                                          playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].barnPositionX,
-                                          playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].barnPositionY,
-                                          zone))
-                meeples.push(createMeepleItem("MeeplePig.qml",
-                                          playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].pigPositionX,
-                                          playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].pigPositionY,
-                                          zone))
-                meeples.push(createMeepleItem("MeepleBuilder.qml",
-                                          playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].builderPositionX,
-                                          playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].builderPositionY,
-                                          zone))
+
+                for (let i = 0; i < barnMeepleTotal; ++i)
+                    meeples.push(createMeepleItem("MeepleBarn.qml",
+                                                  playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].barnPositionX,
+                                                  playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].barnPositionY,
+                                                  zone))
+
+                for (let i = 0; i < builderMeepleTotal; ++i)
+                    meeples.push(createMeepleItem("MeepleBuilder.qml",
+                                                  playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].builderPositionX,
+                                                  playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].builderPositionY,
+                                                  zone))
+
+                for (let i = 0; i < pigMeepleTotal; ++i)
+                    meeples.push(createMeepleItem("MeeplePig.qml",
+                                                  playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].pigPositionX,
+                                                  playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].pigPositionY,
+                                                  zone))
             }
         }
+
+        for (let i = 0; i < meeples.length; ++i)
+            meeples[i].appeared.connect(function() {
+                let playerIndex = Math.floor(connectedMeeplesCount / meepleCountSum)
+                let meepleIndex = connectedMeeplesCount % meepleCountSum
+                if (meepleIndex < smallMeepleTotal) {
+                    zones[playerIndex].smallMeepleCount++
+                }
+                else {
+                    meepleIndex -= smallMeepleTotal
+                    if (meepleIndex < bigMeepleTotal) {
+                        zones[playerIndex].bigMeepleCount++
+                    }
+                    else {
+                        meepleIndex -= bigMeepleTotal
+                        if (meepleIndex < barnMeepleTotal) {
+                            zones[playerIndex].barnCount++
+                        }
+                        else {
+                            meepleIndex -= barnMeepleTotal
+                            if (meepleIndex < builderMeepleTotal) {
+                                zones[playerIndex].builderCount++
+                            }
+                            else {
+                                meepleIndex -= builderMeepleTotal
+                                if (meepleIndex < pigMeepleTotal) {
+                                    zones[playerIndex].pigCount++
+                                }
+                                else
+                                    console.log("check me!")
+                            }
+                        }
+                    }
+                }
+
+                connectedMeeplesCount++
+                if (connectedMeeplesCount < meeples.length)
+                    meeples[connectedMeeplesCount].appear()
+                else
+                    initialAnimation.meeplesSpawned()
+            })
+
+        var connectedMeeplesCount = 0
+        meeples[0].appear()
     }
 
     function endTurn() {
@@ -203,34 +317,15 @@ Item {
 
     Component.onCompleted: {
         tilesInDeck = engine.deck.rowCount() - 1
-        for (var zone = 0; zone < zones.length; ++zone)
-        {
-            if (zones[zone].playerData) {
-                abbeyTiles.push(createAbbeyTileItem(
-                                    playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].abbeyPositionX,
-                                    playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].abbeyPositionY,
-                                    zone))
-            }
-        }
-        board.boardRepositioned.connect(function() {
-            for (var zone = 0; zone < abbeyTiles.length; ++zone)
-            {
-                abbeyTiles[zone].setDefaultPosition(
-                            playersSpace.x + playersColumn.x + zones[zone].x + zones[zone].abbeyPositionX,
-                            playersSpace.y + playersColumn.y + zones[zone].y + zones[zone].abbeyPositionY)
-                if (!abbeyTiles[zone].tileData.IsFixed)
-                    abbeyTiles[zone].resetPosition()
-            }
-        })
-
-        createMeepleItems()
     }
 
     Image {
         id: background
 
         source: "qrc:/img/background.png"
-        anchors.fill: parent
+        width: boardFinalPosition.x
+        height: parent.height
+        x: width * (-1 + slideInAnimation.progressPercentage)
         sourceSize.width: 144
         sourceSize.height: 144
         fillMode: Image.Tile
@@ -241,7 +336,7 @@ Item {
     }
 
     Item {
-        id: boardPosition
+        id: boardFinalPosition
 
         width: board.width
         height: board.height
@@ -254,8 +349,8 @@ Item {
 
         height: 990
         width: height
-        anchors.bottom: boardPosition.bottom
-        anchors.right: boardPosition.right
+        anchors.bottom: boardFinalPosition.bottom
+        anchors.right: boardFinalPosition.right; anchors.rightMargin: width * (-1 + slideInAnimation.progressPercentage)
 
         Component.onCompleted: {
             // place and fix the starting tile
@@ -263,7 +358,10 @@ Item {
             engine.fixTile(engine.getTile(0))
 
             // create an Item for it
-            let tile = createTileItem(boardPosition.x + board.getX(0), boardPosition.y + board.getY(0))
+            let tile = createTileItem(boardFinalPosition.x + board.getX(0), boardFinalPosition.y + board.getY(0),
+                                      function() {
+                                          return board.x + board.getX(0)
+                                      })
             tile.isInHand = false
             tiles.push(tile)
         }
@@ -281,8 +379,8 @@ Item {
 
         anchors.top: parent.top
         height: 160
-        width: boardPosition.x - 2 * anchors.margins
-        anchors.right: boardPosition.left
+        width: boardFinalPosition.x - 2 * anchors.margins
+        anchors.right: background.right
         anchors.margins: 10
         color: "#DDDDDD"
 
@@ -347,7 +445,8 @@ Item {
 
     function drawTile(zoneColumn, playerZone, playerIndex) {
         var tile = createTileItem(playersSpace.x + zoneColumn.x + playerZone.x + playerZone.regularTilePositionX,
-                                  playersSpace.y + zoneColumn.y + playerZone.y + playerZone.regularTilePositionY)
+                                  playersSpace.y + zoneColumn.y + playerZone.y + playerZone.regularTilePositionY,
+                                  null)
         tile.playerIndex = playerIndex
         board.activeTile = tile
         tiles.push(tile)
@@ -360,8 +459,8 @@ Item {
         anchors.top: generalInfo.bottom
         anchors.bottom: parent.bottom
         anchors.margins: 10
-        width: boardPosition.x - 2 * anchors.margins
-        anchors.right: boardPosition.left
+        width: boardFinalPosition.x - 2 * anchors.margins
+        anchors.right: background.right
 
         Column {
             id: playersColumn
@@ -434,7 +533,8 @@ Item {
         Column {
             id: buttonPanel
 
-            y: engine ?
+            visible: engine.ActivePlayer !== -1
+            y: engine && (engine.ActivePlayer !== -1) ?
                    playersColumn.y + zones[engine.ActivePlayer].y + zones[engine.ActivePlayer].height - 10 - height :
                    0
             Behavior on y { NumberAnimation { duration: 300 } }
@@ -561,11 +661,30 @@ Item {
     }
 
     Item {
-        id: state
+        id: stateItem
 
         state: engine ? engine.GameState : "undefined"
 
         states: [
+            State {
+                name: GameEngine.Initialization
+                PropertyChanges {
+                    target: rotateTileButton
+                    enabled: false
+                }
+                PropertyChanges {
+                    target: fixTileButton
+                    enabled: false
+                }
+                PropertyChanges {
+                    target: fixMeepleButton
+                    enabled: false
+                }
+                PropertyChanges {
+                    target: skipMeepleButton
+                    enabled: false
+                }
+            },
             State {
                 name: GameEngine.NewTurn
                 PropertyChanges {

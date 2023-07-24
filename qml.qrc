@@ -151,6 +151,7 @@
         <file>schematic/Field_JTriangle_SouthEast.qml</file>
         <file>schematic/Field_JTriangle_SouthWest.qml</file>
         <file>LogPopup.qml</file>
+        <file>AnimatedItem.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>

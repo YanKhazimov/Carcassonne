@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QmlPresenter 1.0
 
-Item {
+AnimatedItem {
     id: root
 
     z: 2
@@ -14,6 +14,12 @@ Item {
     readonly property color playerColor: engine && playerIndex < engine.PlayerCount
                                          ? engine.getPlayer(playerIndex).Color
                                          : "white"
+    required property var imageSource
+    required property real imageWidth
+    required property real imageHeight
+
+    width: imageWidth
+    height: imageHeight
 
     QtObject {
         id: internal
@@ -35,6 +41,7 @@ Item {
 
     Component.onCompleted: {
         draggable = true
+        opacity = 0
     }
 
     MouseArea {
@@ -88,6 +95,14 @@ Item {
                 //TODO indicate an unsuccessful drag
             }
         }
+    }
+
+    ColoredImage {
+        id: image
+
+        source: imageSource
+        color: playerColor
+        anchors.fill: root
     }
 
     ElementActionIndicator {

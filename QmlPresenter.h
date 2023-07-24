@@ -36,6 +36,7 @@ class QmlPresenter : public QObject
 
 public:
     enum class GameState {
+        Initialization,
         NewTurn,
         TileDrawn,
         TilePlaced,

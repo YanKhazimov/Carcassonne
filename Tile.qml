@@ -4,7 +4,7 @@ import EngineEnums 1.0
 import "qrc:/"
 import "schematic"
 
-Item {
+AnimatedItem {
     id: root
 
     property alias tileData: mapObjects.tileData
@@ -22,6 +22,8 @@ Item {
 
     width: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
     height: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
+    animationDuration: 500
+    pauseDuration: 500
 
     QtObject {
         id: internal
@@ -238,8 +240,8 @@ Item {
         }
     }
 
-    Behavior on x { NumberAnimation { duration: 200 } }
-    Behavior on y { NumberAnimation { duration: 200 } }
+    Behavior on x { NumberAnimation { duration: engine.GameState === GameEngine.Initialization ? 0 : 200 } }
+    Behavior on y { NumberAnimation { duration: engine.GameState === GameEngine.Initialization ? 0 : 200 } }
 
     ElementActionIndicator {
         target: parent

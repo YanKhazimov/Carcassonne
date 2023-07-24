@@ -3,11 +3,7 @@ import EngineEnums 1.0
 
 BaseMeeple {
     type: EngineEnums.MeeplePig
-    width: 2 * Constants.smallMeepleSize
-    height: Constants.smallMeepleSize
-
-    ColoredImage {
-        source: "qrc:/img/pig.png"
-        color: playerColor
-    }
+    imageWidth: 2 * Constants.smallMeepleSize
+    imageHeight: Constants.smallMeepleSize
+    imageSource: "qrc:/img/pig.png"
 }

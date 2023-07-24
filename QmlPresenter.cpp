@@ -100,7 +100,7 @@ int QmlPresenter::activePlayer() const
             return i;
     }
 
-    return players.rowCount();
+    return -1;
 }
 
 void QmlPresenter::setActivePlayer(int index)
@@ -108,7 +108,8 @@ void QmlPresenter::setActivePlayer(int index)
     int currentActivePlayer = activePlayer();
     if (currentActivePlayer != index)
     {
-        getPlayer(currentActivePlayer)->setActive(false);
+        if (Player* prevPlayer = getPlayer(currentActivePlayer); prevPlayer)
+            prevPlayer->setActive(false);
         getPlayer(index)->setActive(true);
         emit activePlayerChanged();
     }
@@ -148,7 +149,7 @@ void QmlPresenter::scoreCompletionBonuses(unsigned objectId)
 }
 
 QmlPresenter::QmlPresenter(ObjectManager& objManager, QObject *parent)
-    : QObject(parent), objectManager(objManager), gameState(GameState::NewTurn)
+    : QObject(parent), objectManager(objManager), gameState(GameState::Initialization)
 {
     connect(&players, &QAbstractListModel::rowsInserted, this, &QmlPresenter::playerCountChanged);
 
@@ -217,8 +218,6 @@ void QmlPresenter::populatePlayers(QVariantList colors, QVariantList names)
     if (colors.length() > 0)
     {
         Player* player0 = players.index(0, 0).data(DataRoles::PlayerPtr).value<Player*>();
-        player0->setActive(true);
-
         Logger::instance()->log(std::make_shared<NewTurnLogRecord>(player0->getColor(), player0->getName(), Logger::incrementTurn()));
     }
 
@@ -557,7 +556,6 @@ void QmlPresenter::passTurn(int fixedTilesCount)
     gameState = GameState::NewTurn;
     emit gameStateChanged();
 
-    Player* player = getPlayer(activePlayer());
     if (!processGameEnd(fixedTilesCount))
     {
         if (!builderBonus)
@@ -565,10 +563,12 @@ void QmlPresenter::passTurn(int fixedTilesCount)
             setActivePlayer((activePlayer() + 1) % players.rowCount());
         }
 
+        Player* player = getPlayer(activePlayer());
         Logger::instance()->log(std::make_shared<NewTurnLogRecord>(player->getColor(), player->getName(), Logger::incrementTurn()));
     }
     else
     {
+        Player* player = getPlayer(activePlayer());
         Logger::instance()->log(std::make_shared<GameEndLogRecord>(player->getColor(), player->getName()));
     }
 }
