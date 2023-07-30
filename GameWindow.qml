@@ -7,7 +7,7 @@ import "schematic"
 Item {
     id: root
 
-    property var tiles: []
+    property var regularTiles: []
     property var abbeyTiles: []
     property var meeples: []
     property var activeMeeple: null
@@ -44,7 +44,7 @@ Item {
                 initialAnimation.meeplesSpawned.connect(spawnAbbeyTiles)
                 initialAnimation.abbeyTilesSpawned.connect(function() {
                     // game start
-                    engine.passTurn(tiles.length)
+                    engine.passTurn(regularTiles.length)
                 })
 
                 spawnMeepleItems()
@@ -80,22 +80,23 @@ Item {
         if (comp.status === Component.Ready) {
             var obj = comp.createObject(root,
                                      {
-                                         "tileData": engine.getTile(tiles.length),
+                                         "tileData": engine.getTile(regularTiles.length),
                                          "x": getX ? Qt.binding(getX) : x,
                                          "y": y,
                                          "board": board
                                      })
+
+            if (engine.ActivePlayer !== -1 &&
+                    abbeyTiles[engine.ActivePlayer].tileData.IsPlaced && !abbeyTiles[engine.ActivePlayer].tileData.IsFixed)
+            {
+                abbeyTiles[engine.ActivePlayer].tileData.displace()
+                abbeyTiles[engine.ActivePlayer].resetPosition()
+                abbeyTiles[engine.ActivePlayer].z = 0
+                engine.GameState = GameEngine.NewTurn
+            }
+
             obj.dragStarted.connect(function() {
                 obj.z = 1
-
-                if (abbeyTiles[engine.ActivePlayer].tileData.IsPlaced && !abbeyTiles[engine.ActivePlayer].tileData.IsFixed)
-                {
-                    abbeyTiles[engine.ActivePlayer].tileData.displace()
-                    abbeyTiles[engine.ActivePlayer].resetPosition()
-                    engine.GameState = engine.deck.rowCount() - tiles.length === tilesInDeck ?
-                                GameEngine.NewTurn : GameEngine.TileDrawn
-                }
-
                 if (engine.GameState === GameEngine.TileDrawn)
                 {
                     // the drag is from a player zone
@@ -126,24 +127,26 @@ Item {
                                             "x": x,
                                             "y": y,
                                             "board": board,
-                                            "z": 1,
                                             "playerIndex": playerIndex,
                                             "opacity": 0
                                         })
             obj.dragStarted.connect(function() {
-                if (tiles[tiles.length - 1].tileData.IsPlaced &&
-                        !tiles[tiles.length - 1].tileData.IsFixed) {
-                    tiles[tiles.length - 1].tileData.displace()
-                    tiles[tiles.length - 1].resetPosition()
+                obj.z = 1
+                if (regularTiles[regularTiles.length - 1].tileData.IsPlaced &&
+                        !regularTiles[regularTiles.length - 1].tileData.IsFixed) {
+                    regularTiles[regularTiles.length - 1].tileData.displace()
+                    regularTiles[regularTiles.length - 1].resetPosition()
                     tilesInDeck++
                     engine.GameState = GameEngine.TileDrawn
                 }
             })
-
             obj.dragCancelled.connect(function() {
-                engine.GameState = engine.deck.rowCount() - tiles.length === tilesInDeck ?
+                obj.z = 0
+                engine.GameState = engine.deck.rowCount() - regularTiles.length === tilesInDeck ?
                             GameEngine.NewTurn : GameEngine.TileDrawn
             })
+            // not setting z=0 on dragFinished for abbey tiles so that their active element indicator
+            // could be visible above regular tiles until they are either fixed or reset
             return obj
         }
         console.error("Abbey tile component status:", comp.status, comp.errorString())
@@ -316,7 +319,7 @@ Item {
 
     function endTurn() {
         engine.highlight(-1)
-        engine.passTurn(tiles.length)
+        engine.passTurn(regularTiles.length)
     }
 
     Component.onCompleted: {
@@ -334,7 +337,7 @@ Item {
         sourceSize.height: 144
         fillMode: Image.Tile
         Keys.onTabPressed: {
-            engine.passTurn(tiles.length)
+            engine.passTurn(regularTiles.length)
         }
         Component.onCompleted: forceActiveFocus()
     }
@@ -367,7 +370,7 @@ Item {
                                           return board.x + board.getX(0)
                                       })
             tile.isInHand = false
-            tiles.push(tile)
+            regularTiles.push(tile)
         }
     }
 
@@ -453,7 +456,7 @@ Item {
                                   null)
         tile.playerIndex = playerIndex
         board.activeTile = tile
-        tiles.push(tile)
+        regularTiles.push(tile)
         engine.GameState = GameEngine.TileDrawn
     }
 
@@ -549,7 +552,7 @@ Item {
                 id: rotateTileButton
                 text: "Повернуть"
                 color: "transparent"
-                onClicked: tiles[tiles.length - 1].tileData.rotateClockwise()
+                onClicked: regularTiles[regularTiles.length - 1].tileData.rotateClockwise()
             }
 
             MenuButton {
@@ -559,6 +562,9 @@ Item {
                 onClicked: {
                     engine.fixTile(board.activeTile.tileData)
                     lastPlacedTile = board.activeTile
+                    if (board.activeTile.tileData.Abbey) {
+                        board.activeTile.z = 0
+                    }
                     engine.updateHighlight()
                     board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
                     board.activeTile = null
@@ -721,6 +727,10 @@ Item {
             },
             State {
                 name: GameEngine.TilePlaced
+                PropertyChanges {
+                    target: rotateTileButton
+                    enabled: board.activeTile && !board.activeTile.tileData.Abbey
+                }
                 PropertyChanges {
                     target: fixTileButton
                     enabled: board.activeTile && board.activeTile.properlyRotated

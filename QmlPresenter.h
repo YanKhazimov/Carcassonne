@@ -116,6 +116,8 @@ private:
 
     void updateScorableFieldIds();
 
+    bool abbeyStage = false;
+
 public:
     explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
 

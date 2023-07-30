@@ -12,11 +12,9 @@ class LogRecord : public QObject
     Q_OBJECT
 
     QmlEnums::LogRecordType m_type = QmlEnums::LogRecordType::LogNone;
-    QColor m_color;
-    QString m_name;
 
 public:
-    explicit LogRecord(QmlEnums::LogRecordType type, QColor color, QString name, QObject* parent = nullptr);
+    explicit LogRecord(QmlEnums::LogRecordType type, QObject* parent = nullptr);
 
     virtual QmlEnums::LogRecordType type();
     virtual QColor color() const;
@@ -28,7 +26,21 @@ public:
     virtual QList<MapObjectData::MeepleInfo> meeples() const;
 };
 
-class NewTurnLogRecord : public LogRecord
+class PlayerSpecificLogRecord : public LogRecord
+{
+    Q_OBJECT
+
+    QColor m_color;
+    QString m_name;
+
+public:
+    explicit PlayerSpecificLogRecord(QmlEnums::LogRecordType type, QColor color, QString name, QObject* parent = nullptr);
+
+    virtual QColor color() const override;
+    virtual QString name() const override;
+};
+
+class NewTurnLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 
@@ -45,10 +57,10 @@ class GameEndLogRecord : public LogRecord
     Q_OBJECT
 
 public:
-    explicit GameEndLogRecord(QColor color, QString name, QObject* parent = nullptr);
+    explicit GameEndLogRecord(QObject* parent = nullptr);
 };
 
-class ScoringLogRecord : public LogRecord
+class ScoringLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 
@@ -60,7 +72,7 @@ public:
     virtual int points() const override;
 };
 
-class CompletionLogRecord : public LogRecord
+class CompletionLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 
@@ -74,7 +86,7 @@ public:
     virtual int objectSize() const override;
 };
 
-class FreeTurnLogRecord : public LogRecord
+class FreeTurnLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 
@@ -88,6 +100,8 @@ class MeeplePlaceLogRecord : public LogRecord
 
     ObjectType m_objectType;
     QmlEnums::MeepleType m_meeple = QmlEnums::MeepleType::MeepleNone;
+    QColor m_color;
+    QString m_name;
 
 public:
     explicit MeeplePlaceLogRecord(QColor color, QString name, ObjectType objectType, QmlEnums::MeepleType meeple, QObject* parent = nullptr);
@@ -96,7 +110,7 @@ public:
     virtual QmlEnums::MeepleType meeple() const override;
 };
 
-class FieldMeepleReleaseLogRecord : public LogRecord
+class FieldMeepleReleaseLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 
@@ -108,7 +122,7 @@ public:
     virtual QList<MapObjectData::MeepleInfo> meeples() const override;
 };
 
-class RoadLeadLogRecord : public LogRecord
+class RoadLeadLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 
@@ -120,7 +134,7 @@ public:
     virtual int objectSize() const override;
 };
 
-class TownLeadLogRecord : public LogRecord
+class TownLeadLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 
@@ -132,7 +146,7 @@ public:
     virtual int objectSize() const override;
 };
 
-class ResourceLeadLogRecord : public LogRecord
+class ResourceLeadLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 

@@ -50,6 +50,7 @@ AnimatedItem {
     function resetPosition() {
         x = internal.defaultX
         y = internal.defaultY
+        root.isInHand = true
     }
 
     function updateXY() {
@@ -118,7 +119,8 @@ AnimatedItem {
         anchors.fill: parent
         drag.target: parent
         visible: tileData && !tileData.IsFixed && engine && (playerIndex === engine.ActivePlayer) &&
-                 (!tileData.Abbey || engine.GameState < GameEngine.TileDrawn)
+                 (!tileData.Abbey || engine.GameState === GameEngine.NewTurn ||
+                  engine.GameState === GameEngine.TilePlaced && board.activeTile == root)
         cursorShape: Qt.SizeAllCursor
     }
 
@@ -145,7 +147,6 @@ AnimatedItem {
             {
                 tileData.displace()
                 resetPosition()
-                root.isInHand = true
 
                 dragCancelled()
 

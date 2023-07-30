@@ -78,7 +78,7 @@ Popup {
                                 images += "<img src=\"%1\" align=\"middle\" width=\"%2\" height=\"%3\">, ".arg(meepleImage[MEEPLE_TYPES[i]]).arg(imageWidth).arg(imageHeight)
                             return "<ul><li>%1 освобождаются</li></ul>".arg(images)
                         case EngineEnums.LogNewTurn:
-                            return "Ход %1".arg(OBJECT_SIZE)
+                            return "<font color=\"%1\">Ход %2</font>".arg(COLOR).arg(OBJECT_SIZE)
                         case EngineEnums.LogResourceLeadChange:
                             return "<ul><li><font color=\"%2\" size=\"7\">%1</font> становится лидером по %3 <font size=\"5\">(%4)</font></li></ul>".arg(NAME).arg(COLOR).arg(OBJECT_TYPE).arg(OBJECT_SIZE)
                         case EngineEnums.LogGameEnd:

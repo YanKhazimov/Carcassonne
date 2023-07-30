@@ -85,8 +85,8 @@ QHash<int, QByteArray> Logger::roleNames() const
     };
 }
 
-LogRecord::LogRecord(QmlEnums::LogRecordType type, QColor color, QString name, QObject *parent)
-    : QObject(parent), m_type(type), m_color(color), m_name(name)
+LogRecord::LogRecord(QmlEnums::LogRecordType type, QObject *parent)
+    : QObject(parent), m_type(type)
 {
 }
 
@@ -97,12 +97,12 @@ QmlEnums::LogRecordType LogRecord::type()
 
 QColor LogRecord::color() const
 {
-    return m_color;
+    return "black";
 }
 
 QString LogRecord::name() const
 {
-    return m_name;
+    return "-";
 }
 
 int LogRecord::points() const
@@ -134,7 +134,7 @@ QList<MapObjectData::MeepleInfo> LogRecord::meeples() const
 }
 
 ScoringLogRecord::ScoringLogRecord(QColor color, QString name, int points, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogScoring, color, name, parent), m_points(points)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogScoring, color, name, parent), m_points(points)
 {
 }
 
@@ -144,7 +144,8 @@ int ScoringLogRecord::points() const
 }
 
 CompletionLogRecord::CompletionLogRecord(QColor color, QString name, ObjectType objectType, int objectSize, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogObjectCompletion, color, name, parent), m_objectType(objectType), m_objectSize(objectSize)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogObjectCompletion, color, name, parent),
+    m_objectType(objectType), m_objectSize(objectSize)
 {
 }
 
@@ -159,12 +160,12 @@ int CompletionLogRecord::objectSize() const
 }
 
 FreeTurnLogRecord::FreeTurnLogRecord(QColor color, QString name, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogFreeTurn, color, name, parent)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogFreeTurn, color, name, parent)
 {
 }
 
 RoadLeadLogRecord::RoadLeadLogRecord(QColor color, QString name, int objectSize, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogRoadLeadChange, color, name, parent), m_objectSize(objectSize)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogRoadLeadChange, color, name, parent), m_objectSize(objectSize)
 {
 }
 
@@ -174,7 +175,7 @@ int RoadLeadLogRecord::objectSize() const
 }
 
 TownLeadLogRecord::TownLeadLogRecord(QColor color, QString name, int objectSize, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogTownLeadChange, color, name, parent), m_objectSize(objectSize)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogTownLeadChange, color, name, parent), m_objectSize(objectSize)
 {
 }
 
@@ -184,7 +185,7 @@ int TownLeadLogRecord::objectSize() const
 }
 
 MeeplePlaceLogRecord::MeeplePlaceLogRecord(QColor color, QString name, ObjectType objectType, QmlEnums::MeepleType meeple, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogMeeplePlaced, color, name, parent), m_objectType(objectType), m_meeple(meeple)
+    : LogRecord(QmlEnums::LogRecordType::LogMeeplePlaced, parent), m_objectType(objectType), m_meeple(meeple), m_color(color), m_name(name)
 {
 }
 
@@ -198,8 +199,9 @@ QmlEnums::MeepleType MeeplePlaceLogRecord::meeple() const
     return m_meeple;
 }
 
-FieldMeepleReleaseLogRecord::FieldMeepleReleaseLogRecord(QColor color, QString name, QList<MapObjectData::MeepleInfo> meeples, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogMeepleReleased, color, name, parent), m_meeples(meeples)
+FieldMeepleReleaseLogRecord::FieldMeepleReleaseLogRecord(QColor color, QString name,
+                                                         QList<MapObjectData::MeepleInfo> meeples, QObject *parent)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogMeepleReleased, color, name, parent), m_meeples(meeples)
 {
 }
 
@@ -209,7 +211,7 @@ QList<MapObjectData::MeepleInfo> FieldMeepleReleaseLogRecord::meeples() const
 }
 
 NewTurnLogRecord::NewTurnLogRecord(QColor color, QString name, int turn, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogNewTurn, color, name, parent), m_turn(turn)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogNewTurn, color, name, parent), m_turn(turn)
 {
 }
 
@@ -219,7 +221,8 @@ int NewTurnLogRecord::objectSize() const
 }
 
 ResourceLeadLogRecord::ResourceLeadLogRecord(QColor color, QString name, int amount, QString resourceType, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogResourceLeadChange, color, name, parent), m_amount(amount), m_resourceType(resourceType)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogResourceLeadChange, color, name, parent),
+    m_amount(amount), m_resourceType(resourceType)
 {
 }
 
@@ -233,7 +236,22 @@ QString ResourceLeadLogRecord::objectType() const
     return m_resourceType;
 }
 
-GameEndLogRecord::GameEndLogRecord(QColor color, QString name, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogGameEnd, color, name, parent)
+GameEndLogRecord::GameEndLogRecord(QObject *parent)
+    : LogRecord(QmlEnums::LogRecordType::LogGameEnd, parent)
 {
+}
+
+PlayerSpecificLogRecord::PlayerSpecificLogRecord(QmlEnums::LogRecordType type, QColor color, QString name, QObject *parent)
+    : LogRecord(type, parent), m_color(color), m_name(name)
+{
+}
+
+QColor PlayerSpecificLogRecord::color() const
+{
+    return m_color;
+}
+
+QString PlayerSpecificLogRecord::name() const
+{
+    return m_name;
 }

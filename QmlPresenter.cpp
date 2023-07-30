@@ -215,12 +215,6 @@ void QmlPresenter::populatePlayers(QVariantList colors, QVariantList names)
         connect(getPlayer(i)->getAbbeyTile(), &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
     }
 
-    if (colors.length() > 0)
-    {
-        Player* player0 = players.index(0, 0).data(DataRoles::PlayerPtr).value<Player*>();
-        Logger::instance()->log(std::make_shared<NewTurnLogRecord>(player0->getColor(), player0->getName(), Logger::incrementTurn()));
-    }
-
     emit players.dataChanged(players.index(0, 0), players.index(players.rowCount() - 1, 0), {DataRoles::PlayerScore});
 }
 
@@ -527,7 +521,11 @@ bool QmlPresenter::processGameEnd(int fixedTilesCount)
             if (!getAbbeyTile(i)->fixed())
             {
                 messages.append("Игроки должны выставить фишки аббатств.");
-                emit showMessage(messages.join('\n'), GameState::NewTurn);
+                if (!abbeyStage)
+                {
+                    emit showMessage(messages.join('\n'), GameState::NewTurn);
+                    abbeyStage = true;
+                }
                 return false;
             }
     }
@@ -536,6 +534,7 @@ bool QmlPresenter::processGameEnd(int fixedTilesCount)
     messages.append("Переход к подсчету очков.");
     emit showMessage(messages.join('\n'), GameState::GameEnd);
 
+    getPlayer(activePlayer())->setActive(false);
     updateScorableFieldIds();
     return true;
 }
@@ -576,8 +575,7 @@ void QmlPresenter::passTurn(int fixedTilesCount)
     }
     else
     {
-        Player* player = getPlayer(activePlayer());
-        Logger::instance()->log(std::make_shared<GameEndLogRecord>(player->getColor(), player->getName()));
+        Logger::instance()->log(std::make_shared<GameEndLogRecord>());
     }
 }
 
