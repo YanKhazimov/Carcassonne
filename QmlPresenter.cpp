@@ -136,7 +136,7 @@ unsigned QmlPresenter::highlightedObjectId() const
 
 void QmlPresenter::scoreCompletionBonuses(unsigned objectId)
 {
-    auto object = objectManager.GetObject(objectId);
+    auto object = ObjectManager::instance()->GetObject(objectId);
     if (object->type == ObjectType::Town)
     {
         scoreTownResorces(objectId);
@@ -148,8 +148,8 @@ void QmlPresenter::scoreCompletionBonuses(unsigned objectId)
     }
 }
 
-QmlPresenter::QmlPresenter(ObjectManager& objManager, QObject *parent)
-    : QObject(parent), objectManager(objManager), gameState(GameState::Initialization)
+QmlPresenter::QmlPresenter(QObject *parent)
+    : QObject(parent), gameState(GameState::Initialization)
 {
     connect(&players, &QAbstractListModel::rowsInserted, this, &QmlPresenter::playerCountChanged);
 
@@ -174,8 +174,9 @@ void QmlPresenter::AddTiles(std::list<Tile> &tiles)
 
         connect(&tile, &Tile::objectCompleted, this, [this](unsigned objectId) {
             Player* player = getPlayer(activePlayer());
+            auto objectManager = ObjectManager::instance();
             Logger::instance()->log(std::make_shared<CompletionLogRecord>(player->getColor(), player->getName(),
-                                                                          objectManager.GetObject(objectId)->type, objectManager.countObjectTiles(objectId)));
+                                                                          objectManager->GetObject(objectId)->type, objectManager->countObjectTiles(objectId)));
         });
         connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
         connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::scoreCompletionBonuses);
@@ -196,13 +197,13 @@ Tile *QmlPresenter::getRemainingTile(int i)
 
 void QmlPresenter::highlight(int id)
 {
-    auto targetObject = objectManager.GetObject(id);
+    auto targetObject = ObjectManager::instance()->GetObject(id);
     setHighlightedObjectId(targetObject->initialId);
 }
 
 void QmlPresenter::updateHighlight()
 {
-    highlight(objectManager.GetObject(highlightedObjId)->initialId);
+    highlight(ObjectManager::instance()->GetObject(highlightedObjId)->initialId);
 }
 
 void QmlPresenter::populatePlayers(QVariantList colors, QVariantList names)
@@ -211,7 +212,7 @@ void QmlPresenter::populatePlayers(QVariantList colors, QVariantList names)
     for (int i = 0; i < colors.length(); ++i)
     {
         players.AddPlayer(colors[i].value<QColor>(), names[i].value<QString>());
-        getPlayer(i)->createAbbeyTile(objectManager);
+        getPlayer(i)->createAbbeyTile();
         connect(getPlayer(i)->getAbbeyTile(), &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
     }
 
@@ -230,7 +231,7 @@ Tile *QmlPresenter::getAbbeyTile(int i)
 
 void QmlPresenter::scoreTownResorces(unsigned townId)
 {
-    auto [wheat, barrels, cloth] = objectManager.getTownResources(townId);
+    auto [wheat, barrels, cloth] = ObjectManager::instance()->getTownResources(townId);
 
     if (wheat > 0)
     {
@@ -256,7 +257,7 @@ void QmlPresenter::scoreTownResorces(unsigned townId)
 
 void QmlPresenter::scoreLargestTown(unsigned townId)
 {
-    int townSize = objectManager.countObjectTiles(townId);
+    int townSize = ObjectManager::instance()->countObjectTiles(townId);
     int currentActivePlayer = activePlayer();
     Player* activePlayer = getPlayer(currentActivePlayer);
 
@@ -284,7 +285,7 @@ void QmlPresenter::scoreLargestTown(unsigned townId)
 
 void QmlPresenter::scoreLongestRoad(unsigned roadId)
 {
-    int roadSize = objectManager.countObjectTiles(roadId);
+    int roadSize = ObjectManager::instance()->countObjectTiles(roadId);
     int currentActivePlayer = activePlayer();
     Player* activePlayer = getPlayer(currentActivePlayer);
 
@@ -312,9 +313,10 @@ void QmlPresenter::scoreLongestRoad(unsigned roadId)
 
 void QmlPresenter::scoreCompletedObject(unsigned objectId)
 {
-    if (auto object = objectManager.GetObject(objectId); object)
+    auto objectManager = ObjectManager::instance();
+    if (auto object = objectManager->GetObject(objectId); object)
     {
-        int points = objectManager.getPoints(objectId);
+        int points = objectManager->getPoints(objectId);
         std::vector<int> mostPresentPlayers = object->mostPresentPlayers();
 
         for (auto playerIndex: mostPresentPlayers)
@@ -328,13 +330,14 @@ void QmlPresenter::scoreCompletedObject(unsigned objectId)
 
 void QmlPresenter::scoreFieldMeeples(unsigned objectId, int meepleScore)
 {
-    if (auto object = objectManager.GetObject(objectId); object && object->type == ObjectType::Field)
+    auto objectManager = ObjectManager::instance();
+    if (auto object = objectManager->GetObject(objectId); object && object->type == ObjectType::Field)
     {
         std::vector<int> mostPresentPlayers = object->mostPresentPlayers();
         if (!mostPresentPlayers.empty())
         {
             std::set<int> pigs = object->pigs();
-            int fieldTowns = objectManager.countTownsAround(object->initialId);
+            int fieldTowns = objectManager->countTownsAround(object->initialId);
 
             auto removedMeeples = removeMeepleFromObject(object, { QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeeplePig });
             if (gameState != GameState::GameEnd)
@@ -357,7 +360,7 @@ void QmlPresenter::checkFieldIntegrity(unsigned fieldObjectId)
 {
     for (auto& barnFieldInitialId: barnFieldInitialIds)
     {
-        if (fieldObjectId == objectManager.GetObject(barnFieldInitialId.first)->initialId)
+        if (fieldObjectId == ObjectManager::instance()->GetObject(barnFieldInitialId.first)->initialId)
         {
             scoreFieldMeeples(fieldObjectId, 1);
         }
@@ -369,12 +372,12 @@ void QmlPresenter::scoreBarnes(unsigned fieldObjectId)
     std::vector<unsigned> idsToDelete;
     for (auto& barnFieldInitialId: barnFieldInitialIds)
     {
-        auto barnField = objectManager.GetObject(barnFieldInitialId.first);
+        auto barnField = ObjectManager::instance()->GetObject(barnFieldInitialId.first);
         if (fieldObjectId == barnField->initialId)
         {
             for (auto& playerIndex: barnFieldInitialId.second)
             {
-                getPlayer(playerIndex)->scorePoints(4 * objectManager.countTownsAround(fieldObjectId));
+                getPlayer(playerIndex)->scorePoints(4 * ObjectManager::instance()->countTownsAround(fieldObjectId));
             }
 
             removeMeepleFromObject(barnField, { QmlEnums::MeepleBarn });
@@ -479,7 +482,7 @@ void QmlPresenter::updateScorableFieldIds()
     std::vector<unsigned> currentIds;
     for (auto fieldId: scorableFields)
     {
-        currentIds.push_back(objectManager.GetObject(fieldId)->initialId);
+        currentIds.push_back(ObjectManager::instance()->GetObject(fieldId)->initialId);
     }
     scorableFields.insert(currentIds.begin(), currentIds.end());
     emit scorableFieldsChanged();
@@ -581,7 +584,7 @@ void QmlPresenter::passTurn(int fixedTilesCount)
 
 void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile* tile)
 {
-    if (auto object = objectManager.GetObject(objectId); object)
+    if (auto object = ObjectManager::instance()->GetObject(objectId); object)
     {
         addMeepleToObject(object, (QmlEnums::MeepleType)meepleType, playerIndex, tile);
 
@@ -603,7 +606,7 @@ void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectI
 
 void QmlPresenter::scoreField(unsigned fieldCurrentId)
 {
-    if (auto object = objectManager.GetObject(fieldCurrentId); object && object->type == ObjectType::Field)
+    if (auto object = ObjectManager::instance()->GetObject(fieldCurrentId); object && object->type == ObjectType::Field)
     {
         scoreFieldMeeples(object->initialId, 3);
         scoreBarnes(object->initialId);
@@ -612,7 +615,7 @@ void QmlPresenter::scoreField(unsigned fieldCurrentId)
 
 bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile* tile) const
 {
-    if (auto object = objectManager.GetObject(objectId); object)
+    if (auto object = ObjectManager::instance()->GetObject(objectId); object)
     {
         switch ((QmlEnums::MeepleType)type)
         {
@@ -639,7 +642,7 @@ bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, 
 
 bool QmlPresenter::isFieldObject(unsigned objectId) const
 {
-    return objectManager.GetObject(objectId)->type == ObjectType::Field;
+    return ObjectManager::instance()->GetObject(objectId)->type == ObjectType::Field;
 }
 
 void QmlPresenter::setWaitingCursor(bool value)

@@ -4,11 +4,9 @@
 #include <memory>
 #include <set>
 
-class ObjectManager;
 class Tile;
 
 struct MapObjectData {
-    ObjectManager* manager;
     Tile* tile;
     ObjectType type = ObjectType::None;
     //! id in context of the object's tile
@@ -21,7 +19,7 @@ struct MapObjectData {
     int valency = -1;
 
     void mergeObject(std::shared_ptr<MapObjectData> other, std::set<Tile *> &updatedTiles);
-    MapObjectData(ObjectType type, unsigned id, int valency, ObjectManager* manager);
+    MapObjectData(ObjectType type, unsigned id, int valency);
     void setTile(Tile* tilePtr);
 
     QmlEnums::BonusType bonusType;
@@ -59,33 +57,33 @@ protected:
 class Town : public MapObjectData
 {
 public:
-    Town(int valency, unsigned id, QmlEnums::BonusType bonusType, ObjectManager* manager);
+    Town(int valency, unsigned id, QmlEnums::BonusType bonusType);
     bool isCompleted() const override;
 };
 
 class Road : public MapObjectData
 {
 public:
-    Road(int valency, unsigned id, QmlEnums::BonusType bonusType, ObjectManager* manager);
+    Road(int valency, unsigned id, QmlEnums::BonusType bonusType);
     bool isCompleted() const override;
 };
 
 class Field : public MapObjectData
 {
 public:
-    Field(unsigned id, ObjectManager* manager);
+    Field(unsigned id);
 };
 
 class Abbey : public MapObjectData
 {
 public:
-    Abbey(unsigned id, ObjectManager* manager);
+    Abbey(unsigned id);
 };
 
 class Monastery : public MapObjectData
 {
 public:
-    Monastery(unsigned id, ObjectManager* manager);
+    Monastery(unsigned id);
 };
 
 

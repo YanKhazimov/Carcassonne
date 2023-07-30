@@ -4,19 +4,19 @@
 
 using namespace QmlEnums;
 
-MapObjectData::MapObjectData(ObjectType t, unsigned i, int v, ObjectManager *m)
-    : manager(m), type(t), initialId(i), initialValency(v)
+MapObjectData::MapObjectData(ObjectType t, unsigned i, int v)
+    : type(t), initialId(i), initialValency(v)
 {
 }
 
 std::shared_ptr<MapObjectData> MapObjectData::currentObject() const
 {
-    return manager->GetObject(initialId);
+    return ObjectManager::instance()->GetObject(initialId);
 }
 
 void MapObjectData::mergeObject(std::shared_ptr<MapObjectData> other, std::set<Tile*>& updatedTiles)
 {
-    manager->MergeObjectIds(std::make_shared<MapObjectData>(*this), other, updatedTiles);
+    ObjectManager::instance()->MergeObjectIds(std::make_shared<MapObjectData>(*this), other, updatedTiles);
 }
 
 void MapObjectData::setTile(Tile *tilePtr)
@@ -34,8 +34,8 @@ bool MapObjectData::isCompleted() const
     return completedCentralObject;
 }
 
-Town::Town(int _valency, unsigned id, QmlEnums::BonusType _bonusType, ObjectManager *manager)
-    : MapObjectData(ObjectType::Town, id, _valency, manager)
+Town::Town(int _valency, unsigned id, QmlEnums::BonusType _bonusType)
+    : MapObjectData(ObjectType::Town, id, _valency)
 {
     valency = _valency;
     bonusType = _bonusType;
@@ -52,8 +52,8 @@ void MapObjectData::markCompleted()
     completedCentralObject = true;
 }
 
-Road::Road(int _valency, unsigned id, QmlEnums::BonusType _bonusType, ObjectManager *manager)
-    : MapObjectData(ObjectType::Road, id, _valency, manager)
+Road::Road(int _valency, unsigned id, QmlEnums::BonusType _bonusType)
+    : MapObjectData(ObjectType::Road, id, _valency)
 {
     valency = _valency;
     bonusType = _bonusType;
@@ -65,21 +65,21 @@ bool Road::isCompleted() const
     return valency == 0;
 }
 
-Field::Field(unsigned id, ObjectManager *manager)
-    : MapObjectData(ObjectType::Field, id, -1, manager)
+Field::Field(unsigned id)
+    : MapObjectData(ObjectType::Field, id, -1)
 {
 }
 
-Abbey::Abbey(unsigned id, ObjectManager *manager)
-    : MapObjectData(ObjectType::Abbey, id, -1, manager)
+Abbey::Abbey(unsigned id)
+    : MapObjectData(ObjectType::Abbey, id, -1)
 {
     // setting valency to 1 so that it closes every connection
     valency = 1;
     pointValue = 9;
 }
 
-Monastery::Monastery(unsigned id, ObjectManager *manager)
-    : MapObjectData(ObjectType::Monastery, id, -1, manager)
+Monastery::Monastery(unsigned id)
+    : MapObjectData(ObjectType::Monastery, id, -1)
 {
     pointValue = 9;
 }
@@ -181,8 +181,8 @@ bool MapObjectData::taken() const
 
 std::vector<std::shared_ptr<MapObjectData> > MapObjectData::group() const
 {
-    auto dependencies = manager->GetObjectDependencies(currentObject()->initialId);
-    dependencies.push_back(manager->GetObject(initialId));
+    auto dependencies = ObjectManager::instance()->GetObjectDependencies(currentObject()->initialId);
+    dependencies.push_back(ObjectManager::instance()->GetObject(initialId));
     return dependencies;
 }
 

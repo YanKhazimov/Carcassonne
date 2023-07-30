@@ -53,9 +53,9 @@ void Player::setActive(bool value)
     }
 }
 
-void Player::createAbbeyTile(ObjectManager &objectManager)
+void Player::createAbbeyTile()
 {
-    abbeyTile = DeckBuilder::createAbbeyTile(objectManager, "img/pnp/tiles", "png");
+    abbeyTile = DeckBuilder::createAbbeyTile("img/pnp/tiles", "png");
 }
 
 Tile* Player::getAbbeyTile()

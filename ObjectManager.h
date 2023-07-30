@@ -14,8 +14,11 @@ class ObjectManager
     unsigned voidId;
     std::shared_ptr<MapObjectData> generateVoid();
 
-public:
     ObjectManager();
+    static ObjectManager* m_instance;
+
+public:
+    static ObjectManager* instance();
     std::shared_ptr<MapObjectData> GenerateRoad(unsigned valency, QmlEnums::BonusType bonusType = QmlEnums::BonusType::None);
     std::shared_ptr<MapObjectData> GenerateTown(unsigned valency, QmlEnums::BonusType bonusType = QmlEnums::BonusType::None);
     std::shared_ptr<MapObjectData> GenerateField();

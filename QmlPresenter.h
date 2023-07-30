@@ -56,7 +56,6 @@ private:
     MapModel mapModel;
     MapModel* getMapModel();
 
-    ObjectManager& objectManager;
     unsigned highlightedObjId = -1;
     int maxWheat = 0, maxBarrels = 0, maxCloth = 0;
     int maxTown = 0, maxRoad = 0;
@@ -119,7 +118,7 @@ private:
     bool abbeyStage = false;
 
 public:
-    explicit QmlPresenter(ObjectManager& objManager, QObject *parent = nullptr);
+    explicit QmlPresenter(QObject *parent = nullptr);
 
     void AddTiles(std::list<Tile> &tiles);
     Q_INVOKABLE Tile* getTile(int i);

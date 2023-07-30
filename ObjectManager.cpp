@@ -2,9 +2,11 @@
 #include "Tile.h"
 #include <iostream>
 
+ObjectManager* ObjectManager::m_instance = nullptr;
+
 std::shared_ptr<MapObjectData> ObjectManager::generateVoid()
 {
-    mapObjects[-1] = { std::make_shared<MapObjectData>(ObjectType::None, -1, -1, this), 0, {} };
+    mapObjects[-1] = { std::make_shared<MapObjectData>(ObjectType::None, -1, -1), 0, {} };
     return std::get<0>(mapObjects[-1]);
 }
 
@@ -13,33 +15,42 @@ ObjectManager::ObjectManager()
     voidId = generateVoid()->initialId;
 }
 
+ObjectManager *ObjectManager::instance()
+{
+    if (!m_instance)
+    {
+        m_instance = new ObjectManager;
+    }
+    return m_instance;
+}
+
 std::shared_ptr<MapObjectData> ObjectManager::GenerateRoad(unsigned valency, QmlEnums::BonusType bonusType)
 {
-    mapObjects[objectCounter] = { std::make_shared<Road>(valency, objectCounter, bonusType, this), 0, {} };
+    mapObjects[objectCounter] = { std::make_shared<Road>(valency, objectCounter, bonusType), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
 std::shared_ptr<MapObjectData> ObjectManager::GenerateTown(unsigned valency, QmlEnums::BonusType bonusType)
 {
-    mapObjects[objectCounter] = { std::make_shared<Town>(valency, objectCounter, bonusType, this), 0, {} };
+    mapObjects[objectCounter] = { std::make_shared<Town>(valency, objectCounter, bonusType), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
 std::shared_ptr<MapObjectData> ObjectManager::GenerateField()
 {
-    mapObjects[objectCounter] = { std::make_shared<Field>(objectCounter, this), 0, {} };
+    mapObjects[objectCounter] = { std::make_shared<Field>(objectCounter), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
 std::shared_ptr<MapObjectData> ObjectManager::GenerateAbbey()
 {
-    mapObjects[objectCounter] = { std::make_shared<Abbey>(objectCounter, this), 0, {} };
+    mapObjects[objectCounter] = { std::make_shared<Abbey>(objectCounter), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
 std::shared_ptr<MapObjectData> ObjectManager::GenerateMonastery()
 {
-    mapObjects[objectCounter] = { std::make_shared<Monastery>(objectCounter, this), 0, {} };
+    mapObjects[objectCounter] = { std::make_shared<Monastery>(objectCounter), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 

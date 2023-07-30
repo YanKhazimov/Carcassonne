@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
-
-#include "ObjectManager.h"
+#include "Tile.h"
 
 class Player : public QObject
 {
@@ -59,7 +58,7 @@ public:
     bool isActive() const;
     void setActive(bool value);
 
-    void createAbbeyTile(ObjectManager& objectManager);
+    void createAbbeyTile();
     Tile* getAbbeyTile();
 
     Q_INVOKABLE void scorePoints(int points);

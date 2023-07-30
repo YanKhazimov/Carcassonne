@@ -36,11 +36,9 @@ int main(int argc, char *argv[])
                                                        "QmlPresenter class defines the game engine");
     qmlRegisterUncreatableMetaObject(QmlEnums::staticMetaObject, "EngineEnums", 1, 0, "EngineEnums", "Error: only enums");
 
-    ObjectManager objectManager;
+    std::list<Tile> tiles = DeckBuilder::BuildDeck("img/pnp/tiles", "png");
 
-    std::list<Tile> tiles = DeckBuilder::BuildDeck(objectManager, "img/pnp/tiles", "png");
-
-    QmlPresenter presenter(objectManager);
+    QmlPresenter presenter;
 
     presenter.AddTiles(tiles);
 

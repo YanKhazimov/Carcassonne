@@ -2,7 +2,7 @@
 #include "DataRoles.h"
 #include <QDebug>
 
-Logger* Logger::m_instance = 0;
+Logger* Logger::m_instance = nullptr;
 int Logger::m_turn = 0;
 
 Logger::Logger(QObject *parent) : QAbstractListModel(parent)
