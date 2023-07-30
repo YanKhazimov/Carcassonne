@@ -22,6 +22,8 @@ class Player : public QObject
     Q_PROPERTY(bool WheatLead READ getWheatLead WRITE setWheatLead NOTIFY wheatLeadChanged)
     Q_PROPERTY(bool BarrelsLead READ getBarrelsLead WRITE setBarrelsLead NOTIFY barrelsLeadChanged)
     Q_PROPERTY(bool ClothLead READ getClothLead WRITE setClothLead NOTIFY clothLeadChanged)
+    Q_PROPERTY(int BiggestTown READ getBiggestTown WRITE setBiggestTown NOTIFY biggestTownChanged)
+    Q_PROPERTY(int BiggestRoad READ getBiggestRoad WRITE setBiggestRoad NOTIFY biggestRoadChanged)
     Q_PROPERTY(bool TownLead READ getTownLead WRITE setTownLead NOTIFY townLeadChanged)
     Q_PROPERTY(bool RoadLead READ getRoadLead WRITE setRoadLead NOTIFY roadLeadChanged)
     Q_PROPERTY(int PreviousTime MEMBER prevTurnsSeconds NOTIFY prevTurnsSecondsChanged)
@@ -35,6 +37,7 @@ class Player : public QObject
     int place = 0;
     int wheat = 0, barrels = 0, cloth = 0;
     bool wheatLead = false, barrelsLead = false, clothLead = false;
+    int biggestTown = 0, biggestRoad = 0;
     bool townLead = false, roadLead = false;
     int prevTurnsSeconds = 0;
     int currentTurnSeconds = 0;
@@ -67,6 +70,8 @@ public:
     Q_INVOKABLE void setWheatLead(bool value);
     Q_INVOKABLE void setBarrelsLead(bool value);
     Q_INVOKABLE void setClothLead(bool value);
+    int getBiggestTown() const;
+    int getBiggestRoad() const;
     bool getWheatLead() const;
     bool getBarrelsLead() const;
     bool getClothLead() const;
@@ -77,6 +82,8 @@ public:
     bool getTownLead() const;
     Q_INVOKABLE void setRoadLead(bool value);
     bool getRoadLead() const;
+    void setBiggestTown(int value);
+    void setBiggestRoad(int value);
 
     QString getName() const;
 
@@ -94,6 +101,8 @@ signals:
     void wheatLeadChanged();
     void barrelsLeadChanged();
     void clothLeadChanged();
+    void biggestTownChanged();
+    void biggestRoadChanged();
     void townLeadChanged();
     void roadLeadChanged();
     void prevTurnsSecondsChanged();

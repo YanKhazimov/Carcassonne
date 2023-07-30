@@ -15,6 +15,8 @@ enum DataRoles {
     ClothLead,
     TownLead,
     RoadLead,
+    BiggestTown,
+    BiggestRoad,
     IsTileFixed,
     TileCopies,
     TileImagePath,

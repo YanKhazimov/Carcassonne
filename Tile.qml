@@ -240,8 +240,8 @@ AnimatedItem {
         }
     }
 
-    Behavior on x { NumberAnimation { duration: engine.GameState === GameEngine.Initialization ? 0 : 200 } }
-    Behavior on y { NumberAnimation { duration: engine.GameState === GameEngine.Initialization ? 0 : 200 } }
+    Behavior on x { NumberAnimation { duration: !engine || engine.GameState === GameEngine.Initialization ? 0 : 200 } }
+    Behavior on y { NumberAnimation { duration: !engine || engine.GameState === GameEngine.Initialization ? 0 : 200 } }
 
     ElementActionIndicator {
         target: parent

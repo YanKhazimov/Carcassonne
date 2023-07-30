@@ -24,8 +24,6 @@ class QmlPresenter : public QObject
     Q_PROPERTY(int UnassignedWheat MEMBER unassignedWheat NOTIFY unassignedWheatChanged)
     Q_PROPERTY(int UnassignedBarrels MEMBER unassignedBarrels NOTIFY unassignedBarrelsChanged)
     Q_PROPERTY(int UnassignedCloth MEMBER unassignedCloth NOTIFY unassignedClothChanged)
-    Q_PROPERTY(int MaxTown MEMBER maxTown NOTIFY maxTownChanged)
-    Q_PROPERTY(int MaxRoad MEMBER maxRoad NOTIFY maxRoadChanged)
     Q_PROPERTY(qreal TilePictureOpacity MEMBER tilePictureOpacity NOTIFY tilePictureOpacityChanged)
     Q_PROPERTY(QVariantList PossibleColors READ getPossibleColors CONSTANT)
     Q_PROPERTY(RemainingTilesModel* remainingTilesModel READ getRemainingTiles NOTIFY remainingTilesChanged)
@@ -148,8 +146,6 @@ signals:
     void unassignedWheatChanged();
     void unassignedBarrelsChanged();
     void unassignedClothChanged();
-    void maxTownChanged();
-    void maxRoadChanged();
     void tilePictureOpacityChanged();
     void remainingTilesChanged();
     void allFttingTilesPlayedChanged();

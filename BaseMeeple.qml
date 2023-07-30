@@ -41,7 +41,6 @@ AnimatedItem {
 
     Component.onCompleted: {
         draggable = true
-        opacity = 0
     }
 
     MouseArea {

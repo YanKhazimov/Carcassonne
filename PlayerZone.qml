@@ -139,87 +139,119 @@ Rectangle {
         }
     }
 
-    Row {
-        anchors.top: timerRow.bottom; anchors.topMargin: 5
+    ItemGroup {
         anchors.left: parent.left; anchors.leftMargin: 10
-        spacing: 15
+        anchors.bottom: parent.bottom; anchors.bottomMargin: 10
+        title.text: "БОНУСЫ"
+        title.font: Fonts.bonuses
+        color: activeColor
 
-        Row {
-            TileBonusIndicator {
-                source: "qrc:/img/barrel.png"
-                width: 32
-                height: 32
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Text {
-                text: playerData ? " x" + playerData.Barrels : ""
-                color: playerData && playerData.BarrelsLead ? "black" : "grey"
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
+        myContent: ColumnLayout {
+            spacing: 10
 
-        Row {
-            TileBonusIndicator {
-                source: "qrc:/img/wheat.png"
-                width: 32
-                height: 32
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Text {
-                text: playerData ? " x" + playerData.Wheat : ""
-                color: playerData && playerData.WheatLead ? "black" : "grey"
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
+            Row {
+                id: resourcesRow
 
-        Row {
-            TileBonusIndicator {
-                source: "qrc:/img/cloth.png"
-                width: 32
-                height: 32
-                anchors.verticalCenter: parent.verticalCenter
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 15
+
+                Row {
+                    GreyedOutImage {
+                        anchors.verticalCenter: parent.verticalCenter
+                        active: !(playerData && playerData.BarrelsLead)
+                        imageSource: TileBonusIndicator {
+                            source: "qrc:/img/barrel.png"
+                            width: 32
+                            height: 32
+                        }
+                    }
+                    MyText {
+                        text: playerData ? " x" + playerData.Barrels : ""
+                        color: playerData && playerData.BarrelsLead ? "black" : "grey"
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    GreyedOutImage {
+                        anchors.verticalCenter: parent.verticalCenter
+                        active: !(playerData && playerData.WheatLead)
+                        imageSource: TileBonusIndicator {
+                            source: "qrc:/img/wheat.png"
+                            width: 32
+                            height: 32
+                        }
+                    }
+                    MyText {
+                        text: playerData ? " x" + playerData.Wheat : ""
+                        color: playerData && playerData.WheatLead ? "black" : "grey"
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    GreyedOutImage {
+                        anchors.verticalCenter: parent.verticalCenter
+                        active: !(playerData && playerData.ClothLead)
+                        imageSource: TileBonusIndicator {
+                            source: "qrc:/img/cloth.png"
+                            width: 32
+                            height: 32
+                        }
+                    }
+                    MyText {
+                        text: playerData ? " x" + playerData.Cloth : ""
+                        color: playerData && playerData.ClothLead ? "black" : "grey"
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
             }
-            Text {
-                text: playerData ? " x" + playerData.Cloth : ""
-                color: playerData && playerData.ClothLead ? "black" : "grey"
-                anchors.verticalCenter: parent.verticalCenter
+
+            Row {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 15
+
+                Row {
+                    spacing: 5
+
+                    GreyedOutImage {
+                        active: !(playerData && playerData.TownLead)
+                        imageSource: TileBonusIndicator {
+                            source: "qrc:/img/king.png"
+                            width: 64
+                            height: 64
+                        }
+                    }
+                    MyText {
+                        text: playerData ? playerData.BiggestTown  : ""
+                        font.pixelSize: 20
+                        color: playerData && playerData.TownLead ? "black" : "grey"
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    spacing: 5
+                    GreyedOutImage {
+                        active: !(playerData && playerData.RoadLead)
+                        imageSource: TileBonusIndicator {
+                            source: "qrc:/img/chieftain.png"
+                            width: 64
+                            height: 64
+                        }
+                    }
+
+                    MyText {
+                        text: playerData ? playerData.BiggestRoad : ""
+                        font.pixelSize: 20
+                        color: playerData && playerData.RoadLead ? "black" : "grey"
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
             }
+
         }
     }
-
-    Row {
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.margins: 10
-        spacing: 5
-
-        Row {
-            visible: playerData && playerData.TownLead
-
-            Text {
-                text: engine ? ("город: " + engine.MaxTown) : ""
-                font.pixelSize: 20
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            LeadIndicator {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-
-        Row {
-            visible: playerData && playerData.RoadLead
-
-            Text {
-                text: engine ? ("дорога: " + engine.MaxRoad) : ""
-                font.pixelSize: 20
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            LeadIndicator {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-    }
-
 
     Rectangle {
         id: regularTilePlaceholder
@@ -294,11 +326,11 @@ Rectangle {
         anchors.bottom: regularTilePlaceholder.bottom
         anchors.margins: 10
         spacing: 10
-        opacity: 0.2
 
         MeepleSmall {
             id: smallMeeplePlaceholder
             draggable: false
+            opacity: 0.2
             playerIndex: root.playerIndex
             Layout.alignment: Qt.AlignHCenter
         }
@@ -306,6 +338,7 @@ Rectangle {
         MeepleBig {
             id: bigMeeplePlaceholder
             draggable: false
+            opacity: 0.2
             playerIndex: root.playerIndex
             Layout.alignment: Qt.AlignHCenter
         }
@@ -313,6 +346,7 @@ Rectangle {
         MeepleBarn {
             id: barnPlaceholder
             draggable: false
+            opacity: 0.2
             playerIndex: root.playerIndex
             Layout.alignment: Qt.AlignHCenter
         }
@@ -320,6 +354,7 @@ Rectangle {
         MeepleBuilder {
             id: builderPlaceholder
             draggable: false
+            opacity: 0.2
             playerIndex: root.playerIndex
             Layout.alignment: Qt.AlignHCenter
         }
@@ -327,6 +362,7 @@ Rectangle {
         MeeplePig {
             id: pigPlaceholder
             draggable: false
+            opacity: 0.2
             playerIndex: root.playerIndex
             Layout.alignment: Qt.AlignHCenter
         }

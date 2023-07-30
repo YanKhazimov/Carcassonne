@@ -116,6 +116,16 @@ void Player::setClothLead(bool value)
     }
 }
 
+int Player::getBiggestTown() const
+{
+    return biggestTown;
+}
+
+int Player::getBiggestRoad() const
+{
+    return biggestRoad;
+}
+
 bool Player::getWheatLead() const
 {
     return wheatLead;
@@ -235,5 +245,23 @@ void Player::setCloth(int value)
     {
         cloth = value;
         emit clothChanged();
+    }
+}
+
+void Player::setBiggestTown(int value)
+{
+    if (biggestTown != value)
+    {
+        biggestTown = value;
+        emit biggestTownChanged();
+    }
+}
+
+void Player::setBiggestRoad(int value)
+{
+    if (biggestRoad != value)
+    {
+        biggestRoad = value;
+        emit biggestRoadChanged();
     }
 }

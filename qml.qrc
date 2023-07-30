@@ -110,7 +110,6 @@
         <file>PlayerZone.qml</file>
         <file>schematic/Abbey.qml</file>
         <file>Scoreboard.qml</file>
-        <file>LeadIndicator.qml</file>
         <file>schematic/Monastery.qml</file>
         <file>TileBonusIndicator.qml</file>
         <file>TileBonuses.qml</file>
@@ -152,6 +151,10 @@
         <file>schematic/Field_JTriangle_SouthWest.qml</file>
         <file>LogPopup.qml</file>
         <file>AnimatedItem.qml</file>
+        <file>GreyedOutImage.qml</file>
+        <file>Fonts.qml</file>
+        <file>ItemGroup.qml</file>
+        <file>MyText.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>
@@ -168,7 +171,17 @@
         <file alias="barrel.png">img/barrel.png</file>
         <file alias="cloth.png">img/cloth.png</file>
         <file alias="wheat.png">img/wheat.png</file>
-        <file alias="star.png">img/star.png</file>
         <file alias="startBackgroundGPT.jpg">img/startBackgroundGPT.jpg</file>
+        <file alias="king.png">img/king.png</file>
+        <file alias="chieftain.png">img/chieftain.png</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file alias="gravtrac_compressed_bd.otf">fonts/gravtrac_compressed_bd.otf</file>
+        <file alias="engry.otf">fonts/engry.otf</file>
+        <file alias="zekton_rg.otf">fonts/zekton_rg.otf</file>
+        <file alias="inglobal.ttf">fonts/inglobal.ttf</file>
+        <file alias="Minaeff_Ect-Bold.ttf">fonts/Minaeff_Ect-Bold.ttf</file>
+        <file alias="remissis_sb.otf">fonts/remissis_sb.otf</file>
+        <file alias="ZeroCool.otf">fonts/ZeroCool.otf</file>
     </qresource>
 </RCC>

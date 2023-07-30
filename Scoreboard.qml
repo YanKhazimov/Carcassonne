@@ -129,7 +129,7 @@ Item {
                 border.color: "#DDDDDD"
 
                 Text {
-                    property int animatedScore: TOWN_LEAD ? engine.MaxTown : 0
+                    property int animatedScore: TOWN_LEAD ? BIGGEST_TOWN : 0
                     Behavior on animatedScore { NumberAnimation { duration: 1000 } }
                     text: "+" + animatedScore
                     visible: animatedScore > 0
@@ -144,7 +144,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     visible: TOWN_LEAD && engine.GameState === GameEngine.GameEnd
                     onClicked: {
-                        engine.getPlayer(index).scorePoints(engine.MaxTown)
+                        engine.getPlayer(index).scorePoints(BIGGEST_TOWN)
                         engine.getPlayer(index).setTownLead(false)
                     }
 
@@ -164,7 +164,7 @@ Item {
                 border.color: "#DDDDDD"
 
                 Text {
-                    property int animatedScore: ROAD_LEAD ? engine.MaxRoad : 0
+                    property int animatedScore: ROAD_LEAD ? BIGGEST_ROAD : 0
                     Behavior on animatedScore { NumberAnimation { duration: 1000 } }
                     text: "+" + animatedScore
                     visible: animatedScore > 0
@@ -177,7 +177,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     visible: ROAD_LEAD && engine.GameState === GameEngine.GameEnd
                     onClicked: {
-                        engine.getPlayer(index).scorePoints(engine.MaxRoad)
+                        engine.getPlayer(index).scorePoints(BIGGEST_ROAD)
                         engine.getPlayer(index).setRoadLead(false)
                     }
 

@@ -107,6 +107,9 @@ Item {
                 tilesInDeck++
                 engine.GameState = GameEngine.TileDrawn
             })
+            obj.dragFinished.connect(function() {
+                obj.z = 0
+            })
 
             return obj
         }
@@ -179,7 +182,8 @@ Item {
                                         {
                                             "x": x,
                                             "y": y,
-                                            "playerIndex": playerIndex
+                                            "playerIndex": playerIndex,
+                                            "opacity": 0
                                         })
             obj.dragStarted.connect(function() {
                 if (root.activeMeeple !== obj)
@@ -533,7 +537,7 @@ Item {
         Column {
             id: buttonPanel
 
-            visible: engine.ActivePlayer !== -1
+            visible: engine && engine.ActivePlayer !== -1
             y: engine && (engine.ActivePlayer !== -1) ?
                    playersColumn.y + zones[engine.ActivePlayer].y + zones[engine.ActivePlayer].height - 10 - height :
                    0

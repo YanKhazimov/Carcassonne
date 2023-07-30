@@ -44,6 +44,12 @@ QVariant PlayersModel::data(const QModelIndex &index, int role) const
     if (role == DataRoles::RoadLead)
         return players.at(index.row())->getRoadLead();
 
+    if (role == DataRoles::BiggestTown)
+        return players.at(index.row())->getBiggestTown();
+
+    if (role == DataRoles::BiggestRoad)
+        return players.at(index.row())->getBiggestRoad();
+
     return QVariant();
 }
 
@@ -78,6 +84,12 @@ void PlayersModel::AddPlayer(QColor color, QString name)
     });
     connect(players[i].get(), &Player::roadLeadChanged, this, [this, i](){
         emit dataChanged(index(i, 0), index(i, 0), {DataRoles::RoadLead});
+    });
+    connect(players[i].get(), &Player::biggestTownChanged, this, [this, i](){
+        emit dataChanged(index(i, 0), index(i, 0), {DataRoles::BiggestTown});
+    });
+    connect(players[i].get(), &Player::biggestRoadChanged, this, [this, i](){
+        emit dataChanged(index(i, 0), index(i, 0), {DataRoles::BiggestRoad});
     });
 
     endInsertRows();
@@ -127,6 +139,8 @@ QHash<int, QByteArray> PlayersModel::roleNames() const
         { DataRoles::BarrelsLead, "BARRELS_LEAD" },
         { DataRoles::ClothLead, "CLOTH_LEAD" },
         { DataRoles::TownLead, "TOWN_LEAD" },
-        { DataRoles::RoadLead, "ROAD_LEAD" }
+        { DataRoles::RoadLead, "ROAD_LEAD" },
+        { DataRoles::BiggestTown, "BIGGEST_TOWN" },
+        { DataRoles::BiggestRoad, "BIGGEST_ROAD" }
     };
 }

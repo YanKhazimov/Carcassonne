@@ -1,2 +1,3 @@
 singleton Constants Constants.qml
 singleton Preferences Preferences.qml
+singleton Fonts Fonts.qml

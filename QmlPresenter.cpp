@@ -263,13 +263,17 @@ void QmlPresenter::scoreTownResorces(unsigned townId)
 void QmlPresenter::scoreLargestTown(unsigned townId)
 {
     int townSize = objectManager.countObjectTiles(townId);
+    int currentActivePlayer = activePlayer();
+    Player* activePlayer = getPlayer(currentActivePlayer);
+
+    if (townSize > activePlayer->getBiggestTown())
+    {
+        activePlayer->setBiggestTown(townSize);
+    }
 
     if (townSize > maxTown)
     {
         maxTown = townSize;
-        emit maxTownChanged();
-
-        int currentActivePlayer = activePlayer();
 
         for (int i = 0; i < players.rowCount(); ++i)
         {
@@ -287,13 +291,17 @@ void QmlPresenter::scoreLargestTown(unsigned townId)
 void QmlPresenter::scoreLongestRoad(unsigned roadId)
 {
     int roadSize = objectManager.countObjectTiles(roadId);
+    int currentActivePlayer = activePlayer();
+    Player* activePlayer = getPlayer(currentActivePlayer);
+
+    if (roadSize > activePlayer->getBiggestRoad())
+    {
+        activePlayer->setBiggestRoad(roadSize);
+    }
 
     if (roadSize > maxRoad)
     {
         maxRoad = roadSize;
-        emit maxRoadChanged();
-
-        int currentActivePlayer = activePlayer();
 
         for (int i = 0; i < players.rowCount(); ++i)
         {
