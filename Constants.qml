@@ -3,7 +3,7 @@ import QtQuick 2.15
 
 QtObject {
     readonly property real defaultTileSize: 192
-    property int tilePreviewSize: 120
+    property int tilePreviewSize: 96
     property int tileSize: 192
     readonly property int smallMeepleSize: 20
 

@@ -12,24 +12,28 @@ Rectangle {
     readonly property Player playerData: engine ? engine.getPlayer(playerIndex) : null
     readonly property color activeColor: playerData ? playerData.Color : "transparent"
 
-    readonly property real smallMeeplePositionX: meeplePositioner.x + smallMeeplePlaceholder.x
-    readonly property real smallMeeplePositionY: meeplePositioner.y + smallMeeplePlaceholder.y
+    function getMeeplePosition(meepleType) {
+        let positionInsideComponent = handGroup.item.getMeeplePosition(meepleType)
+        let itemPosition = handGroup.getItemPosition()
+        let x = handGroup.x + itemPosition.x + positionInsideComponent.x
+        let y = handGroup.y + itemPosition.y + positionInsideComponent.y
+        return Qt.point(x, y)
+    }
+
+    function getAbbeyTilePosition() {
+        let positionInsideComponent = handGroup.item.getAbbeyTilePosition()
+        let itemPosition = handGroup.getItemPosition()
+        let x = handGroup.x + itemPosition.x + positionInsideComponent.x
+        let y = handGroup.y + itemPosition.y + positionInsideComponent.y
+        return Qt.point(x, y)
+    }
+
     property int smallMeepleCount: 0
-    readonly property real bigMeeplePositionX: meeplePositioner.x + bigMeeplePlaceholder.x
-    readonly property real bigMeeplePositionY: meeplePositioner.y + bigMeeplePlaceholder.y
     property int bigMeepleCount: 0
-    readonly property real barnPositionX: meeplePositioner.x + barnPlaceholder.x
-    readonly property real barnPositionY: meeplePositioner.y + barnPlaceholder.y
     property int barnCount: 0
-    readonly property real builderPositionX: meeplePositioner.x + builderPlaceholder.x
-    readonly property real builderPositionY: meeplePositioner.y + builderPlaceholder.y
     property int builderCount: 0
-    readonly property real pigPositionX: meeplePositioner.x + pigPlaceholder.x
-    readonly property real pigPositionY: meeplePositioner.y + pigPlaceholder.y
     property int pigCount: 0
 
-    readonly property real abbeyPositionX: abbeyPlaceholder.x
-    readonly property real abbeyPositionY: abbeyPlaceholder.y
     readonly property real regularTilePositionX: regularTilePlaceholder.x
     readonly property real regularTilePositionY: regularTilePlaceholder.y
 
@@ -140,6 +144,8 @@ Rectangle {
     }
 
     ItemGroup {
+        id: bonusesGroup
+
         anchors.left: parent.left; anchors.leftMargin: 10
         anchors.bottom: parent.bottom; anchors.bottomMargin: 10
         title.text: "БОНУСЫ"
@@ -153,7 +159,7 @@ Rectangle {
                 id: resourcesRow
 
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 15
+                spacing: 20
 
                 Row {
                     GreyedOutImage {
@@ -209,7 +215,7 @@ Rectangle {
 
             Row {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 15
+                spacing: 20
 
                 Row {
                     spacing: 5
@@ -232,6 +238,7 @@ Rectangle {
 
                 Row {
                     spacing: 5
+
                     GreyedOutImage {
                         active: !(playerData && playerData.RoadLead)
                         imageSource: TileBonusIndicator {
@@ -256,8 +263,8 @@ Rectangle {
     Rectangle {
         id: regularTilePlaceholder
 
-        anchors.bottom: parent.bottom; anchors.bottomMargin: 10
-        anchors.right: abbeyPlaceholder.left; anchors.rightMargin: 10
+        anchors.verticalCenter: parent.verticalCenter; anchors.verticalCenterOffset: separator.y/2
+        anchors.right: tilesLeft.left; anchors.rightMargin: 10
         width: Constants.tilePreviewSize
         height: Constants.tilePreviewSize
         color: "transparent"
@@ -295,107 +302,171 @@ Rectangle {
         }
     }
 
-    Text {
-        anchors.bottom: regularTilePlaceholder.top; anchors.bottomMargin: 5
-        anchors.horizontalCenter: regularTilePlaceholder.horizontalCenter
+    MyText {
+        id: tilesLeft
+
+        anchors.right: parent.right; anchors.rightMargin: 10 + buttonsOffset
+        anchors.verticalCenter: parent.verticalCenter
         text: "x" + tilesInDeck
         font.pixelSize: 20
     }
 
-    Rectangle {
-        id: abbeyPlaceholder
+    ItemGroup {
+        id: handGroup
 
+        anchors.left: bonusesGroup.right; anchors.leftMargin: 10
         anchors.bottom: parent.bottom; anchors.bottomMargin: 10
-        anchors.right: parent.right; anchors.rightMargin: root.buttonsOffset + 10
-        width: Constants.tilePreviewSize
-        height: Constants.tilePreviewSize
-        color: "transparent"
-        border.width: 2
-        border.color: "grey"
+        title.text: "ФИШКИ"
+        title.font: Fonts.bonuses
+        color: activeColor
 
-        Image {
-            anchors.centerIn: parent
-            source: "qrc:/img/x_icon.png"
+        myContent: RowLayout {
+            id: handGroupComponent
+
+            spacing: 20
+
+            function getMeeplePosition(meepleType) {
+                let meepleItems = [null, smallMeeplePlaceholder, bigMeeplePlaceholder, barnPlaceholder, builderPlaceholder, pigPlaceholder]
+                return meepleItems[meepleType].mapToItem(handGroupComponent, 0, 0)
+            }
+
+            function getAbbeyTilePosition() {
+                return abbeyPlaceholder.mapToItem(handGroupComponent, 0, 0)
+            }
+
+            MyText {
+                id: widthReference
+
+                text: "x8"
+                font.pixelSize: 20
+                visible: false
+            }
+
+            ColumnLayout {
+                Row {
+                    spacing: 20
+                    Layout.alignment: Qt.AlignHCenter
+
+                    Row {
+                        spacing: 5
+                        Layout.alignment: Qt.AlignVCenter
+
+                        MeepleSmall {
+                            id: smallMeeplePlaceholder
+                            draggable: false
+                            opacity: 0.2
+                            playerIndex: root.playerIndex
+                        }
+
+                        MyText {
+                            text: "x" + smallMeepleCount
+                            font.pixelSize: 20
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: widthReference.width
+                            horizontalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+                    Row {
+                        spacing: 5
+                        Layout.alignment: Qt.AlignVCenter
+
+                        MeeplePig {
+                            id: pigPlaceholder
+                            draggable: false
+                            opacity: 0.2
+                            playerIndex: root.playerIndex
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+                        MyText {
+                            text: "x" + pigCount
+                            font.pixelSize: 20
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: widthReference.width
+                            horizontalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+
+                Row {
+                    spacing: 20
+
+                    Row {
+                        spacing: 5
+
+                        MeepleBuilder {
+                            id: builderPlaceholder
+                            draggable: false
+                            opacity: 0.2
+                            playerIndex: root.playerIndex
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+                        MyText {
+                            text: "x" + builderCount
+                            font.pixelSize: 20
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: widthReference.width
+                            horizontalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+                    Row {
+                        spacing: 5
+                        Layout.alignment: Qt.AlignVCenter
+
+                        MeepleBig {
+                            id: bigMeeplePlaceholder
+                            draggable: false
+                            opacity: 0.2
+                            playerIndex: root.playerIndex
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+                        MyText {
+                            text: "x" + bigMeepleCount
+                            font.pixelSize: 20
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: widthReference.width
+                            horizontalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+                    Row {
+                        spacing: 5
+                        Layout.alignment: Qt.AlignVCenter
+
+                        MeepleBarn {
+                            id: barnPlaceholder
+                            draggable: false
+                            opacity: 0.2
+                            playerIndex: root.playerIndex
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+                        MyText {
+                            text: "x" + barnCount
+                            font.pixelSize: 20
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: widthReference.width
+                            horizontalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: abbeyPlaceholder
+
+                width: Constants.tilePreviewSize
+                height: Constants.tilePreviewSize
+                color: "transparent"
+                border.width: 2
+                border.color: "grey"
+
+                ColoredImage {
+                    anchors.centerIn: parent
+                    source: "qrc:/img/x_icon.png"
+                    color: "grey"
+                }
+            }
         }
-    }
-
-    RowLayout {
-        id: meeplePositioner
-
-        anchors.right: regularTilePlaceholder.left
-        anchors.bottom: regularTilePlaceholder.bottom
-        anchors.margins: 10
-        spacing: 10
-
-        MeepleSmall {
-            id: smallMeeplePlaceholder
-            draggable: false
-            opacity: 0.2
-            playerIndex: root.playerIndex
-            Layout.alignment: Qt.AlignHCenter
-        }
-
-        MeepleBig {
-            id: bigMeeplePlaceholder
-            draggable: false
-            opacity: 0.2
-            playerIndex: root.playerIndex
-            Layout.alignment: Qt.AlignHCenter
-        }
-
-        MeepleBarn {
-            id: barnPlaceholder
-            draggable: false
-            opacity: 0.2
-            playerIndex: root.playerIndex
-            Layout.alignment: Qt.AlignHCenter
-        }
-
-        MeepleBuilder {
-            id: builderPlaceholder
-            draggable: false
-            opacity: 0.2
-            playerIndex: root.playerIndex
-            Layout.alignment: Qt.AlignHCenter
-        }
-
-        MeeplePig {
-            id: pigPlaceholder
-            draggable: false
-            opacity: 0.2
-            playerIndex: root.playerIndex
-            Layout.alignment: Qt.AlignHCenter
-        }
-    }
-
-    Text {
-        text: "x" + smallMeepleCount
-        x: smallMeeplePositionX + Constants.smallMeepleSize/2 - width/2
-        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
-        font.pixelSize: 20
-    }
-    Text {
-        text: "x" + bigMeepleCount
-        x: bigMeeplePositionX + 2 * Constants.smallMeepleSize/2 - width/2
-        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
-        font.pixelSize: 20
-    }
-    Text {
-        text: "x" + barnCount
-        x: barnPositionX + 2 * Constants.smallMeepleSize/2 - width/2
-        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
-        font.pixelSize: 20
-    }
-    Text {
-        text: "x" + builderCount
-        x: builderPositionX + Constants.smallMeepleSize/2 - width/2
-        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
-        font.pixelSize: 20
-    }
-    Text {
-        text: "x" + pigCount
-        x: pigPositionX + 2 * Constants.smallMeepleSize/2 - width/2
-        anchors.bottom: meeplePositioner.top; anchors.bottomMargin: 10/2
-        font.pixelSize: 20
     }
 }
