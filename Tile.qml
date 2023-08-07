@@ -23,7 +23,7 @@ AnimatedItem {
     width: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
     height: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
     animationDuration: 500
-    pauseDuration: 500
+    pauseDuration: 100
 
     QtObject {
         id: internal

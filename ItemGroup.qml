@@ -14,19 +14,23 @@ Item {
     }
 
     width: loader.width + 2 * 10
-    height: titleText.height + loader.height + 10
+    height: titleText.height + loader.height + 2 * 10
 
     Loader {
         id: loader
+        y: 10
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom; anchors.bottomMargin: 10
         sourceComponent: myContent
     }
 
-    Text {
+    MyText {
         id: titleText
         anchors.horizontalCenter: parent.horizontalCenter
-        font.pixelSize: 20
+        font {
+            family: Fonts.bonuses
+            pixelSize: 20
+        }
     }
 
     Rectangle {

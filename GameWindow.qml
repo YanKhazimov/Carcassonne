@@ -239,16 +239,17 @@ Item {
         {
             if (zones[zone].playerData)
             {
+                // in the order of the layout
                 for (let i = 0; i < smallMeepleTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleSmall)
                     let globalPosition = zones[zone].mapToItem(root, positionInZone)
                     meeples.push(createMeepleItem("MeepleSmall.qml", globalPosition, zone))
                 }
 
-                for (let i = 0; i < pigTotal; ++i) { // false positive warnings
-                    let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeeplePig)
+                for (let i = 0; i < bigMeepleTotal; ++i) { // false positive warnings
+                    let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleBig)
                     let globalPosition = zones[zone].mapToItem(root, positionInZone)
-                    meeples.push(createMeepleItem("MeeplePig.qml", globalPosition, zone))
+                    meeples.push(createMeepleItem("MeepleBig.qml", globalPosition, zone))
                 }
 
                 for (let i = 0; i < builderTotal; ++i) {
@@ -257,10 +258,10 @@ Item {
                     meeples.push(createMeepleItem("MeepleBuilder.qml", globalPosition, zone))
                 }
 
-                for (let i = 0; i < bigMeepleTotal; ++i) {
-                    let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleBig)
+                for (let i = 0; i < pigTotal; ++i) {
+                    let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeeplePig)
                     let globalPosition = zones[zone].mapToItem(root, positionInZone)
-                    meeples.push(createMeepleItem("MeepleBig.qml", globalPosition, zone))
+                    meeples.push(createMeepleItem("MeeplePig.qml", globalPosition, zone))
                 }
 
                 for (let i = 0; i < barnTotal; ++i) {
@@ -280,21 +281,21 @@ Item {
                 }
                 else {
                     meepleIndex -= smallMeepleTotal
-                    if (meepleIndex < pigTotal) {
-                        zones[playerIndex].pigCount++
+                    if (meepleIndex < bigMeepleTotal) {
+                        zones[playerIndex].bigMeepleCount++
                     }
                     else {
-                        meepleIndex -= pigTotal
+                        meepleIndex -= bigMeepleTotal
                         if (meepleIndex < builderTotal) {
                             zones[playerIndex].builderCount++
                         }
                         else {
                             meepleIndex -= builderTotal
-                            if (meepleIndex < bigMeepleTotal) {
-                                zones[playerIndex].bigMeepleCount++
+                            if (meepleIndex < pigTotal) {
+                                zones[playerIndex].pigCount++
                             }
                             else {
-                                meepleIndex -= bigMeepleTotal
+                                meepleIndex -= pigTotal
                                 if (meepleIndex < barnTotal) {
                                     zones[playerIndex].barnCount++
                                 }
@@ -325,20 +326,26 @@ Item {
         tilesInDeck = engine.deck.rowCount() - 1
     }
 
-    Image {
+    Rectangle {
         id: background
 
-        source: "qrc:/img/background.png"
+        color: "white"
         width: boardFinalPosition.x
         height: parent.height
         x: width * (-1 + slideInAnimation.progressPercentage)
-        sourceSize.width: 144
-        sourceSize.height: 144
-        fillMode: Image.Tile
-        Keys.onTabPressed: {
-            engine.passTurn(regularTiles.length)
+
+        Image {
+            opacity: 0.3
+            source: "qrc:/img/background.png"
+            sourceSize.width: 144
+            sourceSize.height: 144
+            anchors.fill: parent
+            fillMode: Image.Tile
+            Keys.onTabPressed: {
+                engine.passTurn(regularTiles.length)
+            }
+            Component.onCompleted: forceActiveFocus()
         }
-        Component.onCompleted: forceActiveFocus()
     }
 
     Item {
@@ -449,11 +456,10 @@ Item {
         }
     }
 
-    function drawTile(zoneColumn, playerZone, playerIndex) {
-        var tile = createTileItem(playersSpace.x + zoneColumn.x + playerZone.x + playerZone.regularTilePositionX,
-                                  playersSpace.y + zoneColumn.y + playerZone.y + playerZone.regularTilePositionY,
-                                  null)
-        tile.playerIndex = playerIndex
+    function drawTile() {
+        let globalPosition = common.mapToItem(root, regularTilePlaceholder.x, regularTilePlaceholder.y)
+        var tile = createTileItem(globalPosition.x, globalPosition.y, null)
+        tile.playerIndex = engine.ActivePlayer
         board.activeTile = tile
         regularTiles.push(tile)
         engine.GameState = GameEngine.TileDrawn
@@ -468,133 +474,193 @@ Item {
         width: boardFinalPosition.x - 2 * anchors.margins
         anchors.right: background.right
 
-        Column {
-            id: playersColumn
+        Row {
+            width: parent.width + 2 * 10
+            anchors.horizontalCenter: parent.horizontalCenter
+            clip: true
 
-            readonly property int availableHeight: root.height - generalInfo.y - generalInfo.height - 2 * 10
-            anchors.verticalCenter: parent.verticalCenter
-            height: childrenRect.height
-            width: parent.width
+            Repeater {
+                model: 25
+                delegate: Image {
+                    source: "qrc:/img/pattern.png"
+                    fillMode: Image.PreserveAspectFit
+                }
+            }
+        }
+
+        Row {
+            id: playersRow
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: parent.height
+            width: childrenRect.width
             spacing: 10
 
             PlayerZone {
                 id: playerZone0
 
-                width: parent.width
-                height: (playersSpace.height - parent.spacing * 3) / 4
-                buttonsOffset: buttonsSpace.width + buttonsSpace.anchors.rightMargin
+                width: (playersSpace.width - parent.spacing * 3) / 4
+                height: parent.height
                 playerIndex: 0
                 visible: engine && engine.PlayerCount > playerIndex
-                tilesInDeck: playerData && playerData.IsActive ? root.tilesInDeck : Math.max(0, root.tilesInDeck - 1)
-                onTileClicked: drawTile(playersColumn, playerZone0, playerIndex)
             }
 
             PlayerZone {
                 id: playerZone1
 
-                width: parent.width
-                height: (playersSpace.height - parent.spacing * 3) / 4
-                buttonsOffset: buttonsSpace.width + buttonsSpace.anchors.rightMargin
+                width: (playersSpace.width - parent.spacing * 3) / 4
+                height: parent.height
                 playerIndex: 1
                 visible: engine && engine.PlayerCount > playerIndex
-                tilesInDeck: playerData && playerData.IsActive ? root.tilesInDeck : Math.max(0, root.tilesInDeck - 1)
-                onTileClicked: drawTile(playersColumn, playerZone1, playerIndex)
             }
 
             PlayerZone {
                 id: playerZone2
 
-                width: parent.width
-                height: (playersSpace.height - parent.spacing * 3) / 4
-                buttonsOffset: buttonsSpace.width + buttonsSpace.anchors.rightMargin
+                width: (playersSpace.width - parent.spacing * 3) / 4
+                height: parent.height
                 playerIndex: 2
                 visible: engine && engine.PlayerCount > playerIndex
-                tilesInDeck: playerData && playerData.IsActive ? root.tilesInDeck : Math.max(0, root.tilesInDeck - 1)
-                onTileClicked: drawTile(playersColumn, playerZone2, playerIndex)
             }
 
             PlayerZone {
                 id: playerZone3
 
-                width: parent.width
-                height: (playersSpace.height - parent.spacing * 3) / 4
-                buttonsOffset: buttonsSpace.width + buttonsSpace.anchors.rightMargin
+                width: (playersSpace.width - parent.spacing * 3) / 4
+                height: parent.height
                 playerIndex: 3
                 visible: engine && engine.PlayerCount > playerIndex
-                tilesInDeck: playerData && playerData.IsActive ? root.tilesInDeck : Math.max(0, root.tilesInDeck - 1)
-                onTileClicked: drawTile(playersColumn, playerZone3, playerIndex)
             }
         }
     }
 
-    Item {
-        id: buttonsSpace
+    Column {
+        id: common
 
-        anchors.top: generalInfo.bottom
-        anchors.bottom: parent.bottom
-        width: childrenRect.width
-        anchors.right: playersSpace.right
-        anchors.margins: 10
+        readonly property point position: engine && (engine.ActivePlayer !== -1) ?
+                                              zones[engine.ActivePlayer].mapToItem(root,
+                                                                                   zones[engine.ActivePlayer].width/2 - width/2,
+                                                                                   zones[engine.ActivePlayer].bannerEnd) :
+                                              Qt.point(0, 0)
 
-        Column {
-            id: buttonPanel
+        spacing: 10
+        visible: engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready
+        x: position.x
+        y: position.y
 
-            visible: engine && engine.ActivePlayer !== -1
-            y: engine && (engine.ActivePlayer !== -1) ?
-                   playersColumn.y + zones[engine.ActivePlayer].y + zones[engine.ActivePlayer].height - 10 - height :
-                   0
-            Behavior on y { NumberAnimation { duration: 300 } }
+        Row {
+            id: regularTilePlaceholder
 
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: 5
 
-            MenuButton {
-                id: rotateTileButton
-                text: "Повернуть"
+            Rectangle {
+                width: Constants.tilePreviewSize
+                height: Constants.tilePreviewSize
                 color: "transparent"
-                onClicked: regularTiles[regularTiles.length - 1].tileData.rotateClockwise()
-            }
+                border.width: 2
+                border.color: "grey"
 
-            MenuButton {
-                id: fixTileButton
-                text: "Поставить"
-                color: "transparent"
-                onClicked: {
-                    engine.fixTile(board.activeTile.tileData)
-                    lastPlacedTile = board.activeTile
-                    if (board.activeTile.tileData.Abbey) {
-                        board.activeTile.z = 0
+                Image {
+                    anchors.centerIn: parent
+                    source: "qrc:/img/x_icon.png"
+                }
+
+                Image {
+                    id: tileBack
+
+                    source: "qrc:/img/tileBack.png"
+                    anchors.fill: parent
+                    visible: tilesInDeck > 0
+
+                    Rectangle {
+                        id: border
+
+                        anchors.fill: parent
+                        color: "transparent"
+                        border.width: 2
+                        border.color: "black"
                     }
-                    engine.updateHighlight()
-                    board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
-                    board.activeTile = null
-                    engine.GameState = GameEngine.TileFixed
+                }
+
+                MouseArea {
+                    id: deckBackMouseArea
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    visible: engine && tilesInDeck > 0 && !engine.AllFttingTilesPlayed &&
+                             (engine.GameState === GameEngine.NewTurn ||
+                              engine.GameState === GameEngine.TilePlaced &&
+                              engine.getAbbeyTile(engine.ActivePlayer).IsPlaced &&
+                              !engine.getAbbeyTile(engine.ActivePlayer).IsFixed)
+                    onClicked: drawTile()
+                }
+
+                ElementActionIndicator {
+                    target: parent
+                    visible: deckBackMouseArea.visible
                 }
             }
 
-            MenuButton {
-                id: fixMeepleButton
-                text: "Занять"
-                color: "transparent"
-                onClicked: {
-                    lastPlacedTile.fixMeeple()
+            MyText {
+                id: tilesLeft
+
+                anchors.verticalCenter: regularTilePlaceholder.verticalCenter
+                text: "x" + tilesInDeck
+                font.pixelSize: 20
+            }
+        }
+
+        MenuButton {
+            id: rotateTileButton
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Повернуть"
+            font.family: Fonts.font4
+            onClicked: regularTiles[regularTiles.length - 1].tileData.rotateClockwise()
+        }
+
+        MenuButton {
+            id: fixTileButton
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Поставить"
+            font.family: Fonts.font4
+            onClicked: {
+                engine.fixTile(board.activeTile.tileData)
+                lastPlacedTile = board.activeTile
+                if (board.activeTile.tileData.Abbey) {
+                    board.activeTile.z = 0
+                }
+                engine.updateHighlight()
+                board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
+                board.activeTile = null
+                engine.GameState = GameEngine.TileFixed
+            }
+        }
+
+        MenuButton {
+            id: fixMeepleButton
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Занять"
+            font.family: Fonts.font4
+            onClicked: {
+                lastPlacedTile.fixMeeple()
+                root.activeMeeple = null
+                endTurn()
+            }
+        }
+
+        MenuButton {
+            id: skipMeepleButton
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Передать ход"
+            font.family: Fonts.font4
+            onClicked: {
+                if (root.activeMeeple) {
+                    root.activeMeeple.resetPosition()
+                    if (engine.GameState === GameEngine.MeeplePlaced)
+                        zones[engine.ActivePlayer].addMeeple(root.activeMeeple.type, 1)
                     root.activeMeeple = null
-                    endTurn()
                 }
-            }
-
-            MenuButton {
-                id: skipMeepleButton
-                text: "Передать ход"
-                color: "transparent"
-                onClicked: {
-                    if (root.activeMeeple) {
-                        root.activeMeeple.resetPosition()
-                        if (engine.GameState === GameEngine.MeeplePlaced)
-                            zones[engine.ActivePlayer].addMeeple(root.activeMeeple.type, 1)
-                        root.activeMeeple = null
-                    }
-                    endTurn()
-                }
+                endTurn()
             }
         }
     }

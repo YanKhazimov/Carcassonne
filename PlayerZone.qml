@@ -1,16 +1,34 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
-import QtGraphicalEffects 1.15
+import QtGraphicalEffects 1.15 as QGE
+import QtQuick.Shapes 1.15
 import com.carcassonne.cppTypes 1.0
 import QmlPresenter 1.0
 import EngineEnums 1.0
 
-Rectangle {
+Item {
     id: root
 
     required property int playerIndex
     readonly property Player playerData: engine ? engine.getPlayer(playerIndex) : null
     readonly property color activeColor: playerData ? playerData.Color : "transparent"
+    readonly property real bannerEnd: bannerImage.y + bannerImage.height
+    readonly property bool ready: !activationAnimation.running
+    property int smallMeepleCount: 0
+    property int bigMeepleCount: 0
+    property int barnCount: 0
+    property int builderCount: 0
+    property int pigCount: 0
+
+    function addMeeple(meepleType, diff) {
+        switch (meepleType) {
+        case EngineEnums.MeepleSmall: smallMeepleCount += diff; break;
+        case EngineEnums.MeepleBig: bigMeepleCount += diff; break;
+        case EngineEnums.MeepleBarn: barnCount += diff; break;
+        case EngineEnums.MeeplePig: pigCount += diff; break;
+        case EngineEnums.MeepleBuilder: builderCount += diff; break;
+        }
+    }
 
     function getMeeplePosition(meepleType) {
         let positionInsideComponent = handGroup.item.getMeeplePosition(meepleType)
@@ -28,54 +46,104 @@ Rectangle {
         return Qt.point(x, y)
     }
 
-    property int smallMeepleCount: 0
-    property int bigMeepleCount: 0
-    property int barnCount: 0
-    property int builderCount: 0
-    property int pigCount: 0
+    implicitWidth: 100
+    implicitHeight: 200
 
-    readonly property real regularTilePositionX: regularTilePlaceholder.x
-    readonly property real regularTilePositionY: regularTilePlaceholder.y
+    Item {
+        id: fade
 
-    property int buttonsOffset: 0
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - 40
+        anchors.top: parent.top; anchors.topMargin: playerData && playerData.IsActive ? 440 : 40 // behind banner
+        height: parent.height - 440
 
-    required property int tilesInDeck
+        Behavior on anchors.topMargin {
+            NumberAnimation {
+                id: activationAnimation
 
-    signal tileClicked()
+                duration: 300
+            }
+        }
 
-    function addMeeple(meepleType, diff) {
-        switch (meepleType) {
-        case EngineEnums.MeepleSmall: smallMeepleCount += diff; break;
-        case EngineEnums.MeepleBig: bigMeepleCount += diff; break;
-        case EngineEnums.MeepleBarn: barnCount += diff; break;
-        case EngineEnums.MeeplePig: pigCount += diff; break;
-        case EngineEnums.MeepleBuilder: builderCount += diff; break;
+        QGE.LinearGradient {
+            anchors.fill: parent
+            start: Qt.point(0, 0)
+            end: Qt.point(0, parent.height)
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(activeColor.r, activeColor.g, activeColor.b, 0.7) }
+                GradientStop { position: 1.0; color: "transparent" }
+            }
         }
     }
 
-    implicitWidth: 100
-    implicitHeight: 200
-    color: "white"
-    border.width: 2
-    border.color: activeColor
-    radius: 10
+    Image {
+        id: bannerImage
 
-    Rectangle {
-        anchors.fill: parent
-        color: activeColor
-        opacity: 0.3
-        radius: root.radius
+        source: "qrc:/img/banner.png"
+
+        ColoredImage {
+            source: "qrc:/img/banner.png"
+            color: activeColor
+            opacity: 0.4
+        }
+    }
+
+    Shape {
+        id: playerNameShape
+        anchors.top: parent.top; anchors.topMargin: 35
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - 20
+        height: playerName.height
+
+        ShapePath {
+            startX: 0
+            startY: 0
+            fillColor: "white"
+            strokeColor: "black"
+            strokeWidth: 1
+
+            PathLine {
+                x: playerNameShape.width
+                y: 0
+            }
+
+            PathLine {
+                x: playerNameShape.width - 20
+                y: playerNameShape.height/2
+            }
+
+            PathLine {
+                x: playerNameShape.width
+                y: playerNameShape.height
+            }
+
+            PathLine {
+                x: 0
+                y: playerNameShape.height
+            }
+
+            PathLine {
+                x: 20
+                y: playerNameShape.height/2
+            }
+
+            PathLine {
+                x: 0
+                y: 0
+            }
+        }
     }
 
     TextEdit {
         id: playerName
 
-        anchors.top: parent.top; anchors.topMargin: 5
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.centerIn: playerNameShape
         font.pixelSize: 20
+        font.family: Fonts.font6
         text: playerData ? playerData.Name : ""
         selectByMouse: true
         Keys.onEscapePressed: focus = false
+        color: activeColor
     }
 
     Binding {
@@ -85,30 +153,10 @@ Rectangle {
         when: playerData
     }
 
-    Rectangle {
-        id: separator
-
-        height: 2
-        anchors.top: playerName.bottom; anchors.topMargin: 5
-        anchors.left: parent.left; anchors.leftMargin: 10
-        anchors.right: parent.right; anchors.rightMargin: 10
-
-        LinearGradient {
-            anchors.fill: parent
-            start: Qt.point(0, 0)
-            end: Qt.point(parent.width, 0)
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.rgba(activeColor.r, activeColor.g, activeColor.b, 0.3) }
-                GradientStop { position: 0.5; color: root.activeColor }
-                GradientStop { position: 1.0; color: Qt.rgba(activeColor.r, activeColor.g, activeColor.b, 0.3) }
-            }
-        }
-    }
-
     Row {
         id: timerRow
 
-        anchors.top: separator.bottom; anchors.topMargin: 5
+        anchors.top: playerNameShape.bottom; anchors.topMargin: 5
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 0
 
@@ -116,12 +164,14 @@ Rectangle {
             id: prevTurnsTime
             text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData ? playerData.PreviousTime : 0), "mm:ss")
             font.pixelSize: 15
+            font.family: Fonts.font4
             visible: playerData && playerData.PreviousTime !== 0 || !currentTurnTime.visible
         }
 
         Text {
             text: " + "
             font.pixelSize: 15
+            font.family: Fonts.font4
             visible: prevTurnsTime.visible && currentTurnTime.visible
         }
 
@@ -129,6 +179,7 @@ Rectangle {
             id: currentTurnTime
             text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData ? playerData.CurrentTime : 0), "mm:ss")
             font.pixelSize: 15
+            font.family: Fonts.font4
             visible: playerData && playerData.CurrentTime !== 0
             color: playerData && playerData.CurrentTime > 30 ? "white" : "black"
 
@@ -146,20 +197,19 @@ Rectangle {
     ItemGroup {
         id: bonusesGroup
 
-        anchors.left: parent.left; anchors.leftMargin: 10
-        anchors.bottom: parent.bottom; anchors.bottomMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: timerRow.bottom; anchors.topMargin: 5
         title.text: "БОНУСЫ"
-        title.font: Fonts.bonuses
         color: activeColor
 
         myContent: ColumnLayout {
             spacing: 10
 
             Row {
-                id: resourcesRow
+                id: resourcesColumn
 
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 20
+                spacing: 10
 
                 Row {
                     GreyedOutImage {
@@ -173,7 +223,6 @@ Rectangle {
                     }
                     MyText {
                         text: playerData ? " x" + playerData.Barrels : ""
-                        color: playerData && playerData.BarrelsLead ? "black" : "grey"
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -190,7 +239,6 @@ Rectangle {
                     }
                     MyText {
                         text: playerData ? " x" + playerData.Wheat : ""
-                        color: playerData && playerData.WheatLead ? "black" : "grey"
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -207,7 +255,6 @@ Rectangle {
                     }
                     MyText {
                         text: playerData ? " x" + playerData.Cloth : ""
-                        color: playerData && playerData.ClothLead ? "black" : "grey"
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -215,7 +262,7 @@ Rectangle {
 
             Row {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 20
+                spacing: 10
 
                 Row {
                     spacing: 5
@@ -231,7 +278,6 @@ Rectangle {
                     MyText {
                         text: playerData ? playerData.BiggestTown  : ""
                         font.pixelSize: 20
-                        color: playerData && playerData.TownLead ? "black" : "grey"
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -251,7 +297,6 @@ Rectangle {
                     MyText {
                         text: playerData ? playerData.BiggestRoad : ""
                         font.pixelSize: 20
-                        color: playerData && playerData.RoadLead ? "black" : "grey"
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -260,70 +305,26 @@ Rectangle {
         }
     }
 
-    Rectangle {
-        id: regularTilePlaceholder
-
-        anchors.verticalCenter: parent.verticalCenter; anchors.verticalCenterOffset: separator.y/2
-        anchors.right: tilesLeft.left; anchors.rightMargin: 10
-        width: Constants.tilePreviewSize
-        height: Constants.tilePreviewSize
-        color: "transparent"
-        border.width: 2
-        border.color: "grey"
-
-        Image {
-            anchors.centerIn: parent
-            source: "qrc:/img/x_icon.png"
-        }
-
-        Image {
-            id: tileBack
-
-            source: "qrc:/img/tileBack.png"
-            anchors.fill: parent
-            visible: tilesInDeck > 0
-        }
-
-        MouseArea {
-            id: deckBackMouseArea
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            visible: engine && tilesInDeck > 0 && !engine.AllFttingTilesPlayed && playerData && playerData.IsActive &&
-                     (engine.GameState === GameEngine.NewTurn ||
-                      engine.GameState === GameEngine.TilePlaced &&
-                      engine.getAbbeyTile(engine.ActivePlayer).IsPlaced &&
-                      !engine.getAbbeyTile(engine.ActivePlayer).IsFixed)
-            onClicked: tileClicked()
-        }
-
-        ElementActionIndicator {
-            target: parent
-            visible: deckBackMouseArea.visible
-        }
-    }
-
     MyText {
-        id: tilesLeft
+        id: widthReference
 
-        anchors.right: parent.right; anchors.rightMargin: 10 + buttonsOffset
-        anchors.verticalCenter: parent.verticalCenter
-        text: "x" + tilesInDeck
+        text: "x8"
         font.pixelSize: 20
+        visible: false
     }
 
     ItemGroup {
         id: handGroup
 
-        anchors.left: bonusesGroup.right; anchors.leftMargin: 10
-        anchors.bottom: parent.bottom; anchors.bottomMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: bonusesGroup.bottom
         title.text: "ФИШКИ"
-        title.font: Fonts.bonuses
         color: activeColor
 
-        myContent: RowLayout {
+        myContent: ColumnLayout {
             id: handGroupComponent
 
-            spacing: 20
+            spacing: 10
 
             function getMeeplePosition(meepleType) {
                 let meepleItems = [null, smallMeeplePlaceholder, bigMeeplePlaceholder, barnPlaceholder, builderPlaceholder, pigPlaceholder]
@@ -334,120 +335,103 @@ Rectangle {
                 return abbeyPlaceholder.mapToItem(handGroupComponent, 0, 0)
             }
 
-            MyText {
-                id: widthReference
+            RowLayout {
+                spacing: 10
+                Layout.alignment: Qt.AlignHCenter
 
-                text: "x8"
-                font.pixelSize: 20
-                visible: false
-            }
-
-            ColumnLayout {
                 Row {
-                    spacing: 20
-                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 5
+                    Layout.alignment: Qt.AlignVCenter
 
-                    Row {
-                        spacing: 5
-                        Layout.alignment: Qt.AlignVCenter
-
-                        MeepleSmall {
-                            id: smallMeeplePlaceholder
-                            draggable: false
-                            opacity: 0.2
-                            playerIndex: root.playerIndex
-                        }
-
-                        MyText {
-                            text: "x" + smallMeepleCount
-                            font.pixelSize: 20
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: widthReference.width
-                            horizontalAlignment: Text.AlignVCenter
-                        }
+                    MeepleSmall {
+                        id: smallMeeplePlaceholder
+                        draggable: false
+                        opacity: 0.2
+                        playerIndex: root.playerIndex
                     }
 
-                    Row {
-                        spacing: 5
-                        Layout.alignment: Qt.AlignVCenter
-
-                        MeeplePig {
-                            id: pigPlaceholder
-                            draggable: false
-                            opacity: 0.2
-                            playerIndex: root.playerIndex
-                            Layout.alignment: Qt.AlignHCenter
-                        }
-                        MyText {
-                            text: "x" + pigCount
-                            font.pixelSize: 20
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: widthReference.width
-                            horizontalAlignment: Text.AlignVCenter
-                        }
+                    MyText {
+                        text: "x" + smallMeepleCount
+                        font.pixelSize: 20
+                        anchors.verticalCenter: smallMeeplePlaceholder.verticalCenter
+                        width: widthReference.width
                     }
                 }
 
                 Row {
-                    spacing: 20
+                    spacing: 5
+                    Layout.alignment: Qt.AlignVCenter
 
-                    Row {
-                        spacing: 5
-
-                        MeepleBuilder {
-                            id: builderPlaceholder
-                            draggable: false
-                            opacity: 0.2
-                            playerIndex: root.playerIndex
-                            Layout.alignment: Qt.AlignHCenter
-                        }
-                        MyText {
-                            text: "x" + builderCount
-                            font.pixelSize: 20
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: widthReference.width
-                            horizontalAlignment: Text.AlignVCenter
-                        }
+                    MeepleBig {
+                        id: bigMeeplePlaceholder
+                        draggable: false
+                        opacity: 0.2
+                        playerIndex: root.playerIndex
                     }
-
-                    Row {
-                        spacing: 5
-                        Layout.alignment: Qt.AlignVCenter
-
-                        MeepleBig {
-                            id: bigMeeplePlaceholder
-                            draggable: false
-                            opacity: 0.2
-                            playerIndex: root.playerIndex
-                            Layout.alignment: Qt.AlignHCenter
-                        }
-                        MyText {
-                            text: "x" + bigMeepleCount
-                            font.pixelSize: 20
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: widthReference.width
-                            horizontalAlignment: Text.AlignVCenter
-                        }
+                    MyText {
+                        text: "x" + bigMeepleCount
+                        font.pixelSize: 20
+                        anchors.verticalCenter: bigMeeplePlaceholder.verticalCenter
+                        width: widthReference.width
                     }
+                }
 
-                    Row {
-                        spacing: 5
-                        Layout.alignment: Qt.AlignVCenter
+                Row {
+                    spacing: 5
+                    Layout.alignment: Qt.AlignVCenter
 
-                        MeepleBarn {
-                            id: barnPlaceholder
-                            draggable: false
-                            opacity: 0.2
-                            playerIndex: root.playerIndex
-                            Layout.alignment: Qt.AlignHCenter
-                        }
-                        MyText {
-                            text: "x" + barnCount
-                            font.pixelSize: 20
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: widthReference.width
-                            horizontalAlignment: Text.AlignVCenter
-                        }
+                    MeepleBuilder {
+                        id: builderPlaceholder
+                        draggable: false
+                        opacity: 0.2
+                        playerIndex: root.playerIndex
+                    }
+                    MyText {
+                        text: "x" + builderCount
+                        font.pixelSize: 20
+                        anchors.verticalCenter: builderPlaceholder.verticalCenter
+                        width: widthReference.width
+                    }
+                }
+            }
+
+            RowLayout {
+                spacing: 10
+                Layout.alignment: Qt.AlignHCenter
+
+                Row {
+                    spacing: 5
+                    Layout.alignment: Qt.AlignVCenter
+
+                    MeeplePig {
+                        id: pigPlaceholder
+                        draggable: false
+                        opacity: 0.2
+                        playerIndex: root.playerIndex
+                    }
+                    MyText {
+                        text: "x" + pigCount
+                        font.pixelSize: 20
+                        anchors.verticalCenter: pigPlaceholder.verticalCenter
+                        width: widthReference.width
+                    }
+                }
+
+                Row {
+                    spacing: 5
+                    Layout.alignment: Qt.AlignVCenter
+
+                    MeepleBarn {
+                        id: barnPlaceholder
+                        draggable: false
+                        opacity: 0.2
+                        playerIndex: root.playerIndex
+                    }
+                    MyText {
+                        text: "x" + barnCount
+                        font.pixelSize: 20
+                        anchors.verticalCenter: barnPlaceholder.verticalCenter
+                        width: widthReference.width
                     }
                 }
             }
@@ -455,6 +439,7 @@ Rectangle {
             Rectangle {
                 id: abbeyPlaceholder
 
+                Layout.alignment: Qt.AlignHCenter
                 width: Constants.tilePreviewSize
                 height: Constants.tilePreviewSize
                 color: "transparent"

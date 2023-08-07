@@ -4,18 +4,20 @@ Rectangle {
     id: root
 
     property alias text: text.text
+    property alias font: text.font
+
     signal clicked()
 
-    width: 120
+    width: 130
     height: 30
     radius: 8
-    color: "lightgrey"
+    color: "white"
     border.color: enabled ? "black" : "grey"
 
     Text {
         id: text
         anchors.centerIn: parent
-        color: enabled ? "black" : "grey"
+        color: enabled ? "black" : "lightgrey"
         font.pixelSize: 15
     }
 
