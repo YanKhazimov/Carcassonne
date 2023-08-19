@@ -35,6 +35,6 @@ QtObject {
                 }
             }
         }
-        readonly property color activeElement: "grey"
+        readonly property color activeElement: "white"
     }
 }

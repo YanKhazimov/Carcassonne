@@ -5,7 +5,7 @@ import QtGraphicalEffects 1.15
 Rectangle {
     id: root
 
-    color: "#444444"
+    color: "#aaaaaa"
 
     property int capacity
     readonly property int maxCapacity: engine ? engine.mapModel.MaxCapacity : 0
@@ -240,13 +240,31 @@ Rectangle {
                            ? "transparent" : "cyan"
                     border.color: activeTile && activeTile.dragActive ? "silver" : "transparent"
 
+                    Image {
+                        width: parent.width * 0.1
+                        height: parent.height * 0.1
+                        source: "qrc:/img/x_icon.png"
+                        anchors.centerIn: parent
+                        anchors.horizontalCenterOffset: -parent.width / 4
+                        anchors.verticalCenterOffset: -parent.height / 4
+                    }
+
+                    Image {
+                        width: parent.width * 0.1
+                        height: parent.height * 0.1
+                        source: "qrc:/img/x_icon.png"
+                        anchors.centerIn: parent
+                        anchors.horizontalCenterOffset: parent.width / 4
+                        anchors.verticalCenterOffset: parent.height / 4
+                    }
+
                     Behavior on width { NumberAnimation { duration: 200 } }
                     Behavior on height { NumberAnimation { duration: 200 } }
 
                     DropArea {
                         id: dropArea
 
-                        readonly property int xIndex: index%grid.size - Math.floor(grid.size/2)
+                        readonly property int xIndex: index % grid.size - Math.floor(grid.size/2)
                         readonly property int yIndex: Math.floor(index/grid.size) - Math.floor(grid.size/2)
                         readonly property color activeHighlightColor: redHighlight.visible ? redHighlight.color
                                                                                            : greenHighlight.visible ? greenHighlight.color

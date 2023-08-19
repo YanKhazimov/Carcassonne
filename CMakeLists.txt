@@ -44,6 +44,8 @@ set(PROJECT_SOURCES
         ShuffledDeck.cpp
         Logger.h
         Logger.cpp
+        ScoreboardModel.h
+        ScoreboardModel.cpp
         main.cpp
         qml.qrc
 )

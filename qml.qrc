@@ -131,7 +131,7 @@
         <file>schematic/Town_3e4c_EastNorthSouth.qml</file>
         <file>schematic/Town_3e4c_SouthEastWest.qml</file>
         <file>schematic/Town_3e4c_WestNorthSouth.qml</file>
-        <file>RemainingTilesPopup.qml</file>
+        <file>ReferencePopup.qml</file>
         <file>TileViewSwitch.qml</file>
         <file>schematic/Town_1e3c_NorthToSouthEast.qml</file>
         <file>schematic/Town_1e3c_EastToSouthWest.qml</file>
@@ -155,6 +155,7 @@
         <file>Fonts.qml</file>
         <file>ItemGroup.qml</file>
         <file>MyText.qml</file>
+        <file>TintColoredRectangle.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>

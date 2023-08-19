@@ -329,7 +329,7 @@ Item {
     Rectangle {
         id: background
 
-        color: "white"
+        color: "black"
         width: boardFinalPosition.x
         height: parent.height
         x: width * (-1 + slideInAnimation.progressPercentage)
@@ -387,75 +387,6 @@ Item {
         z: 1
     }
 
-    Rectangle {
-        id: generalInfo
-
-        anchors.top: parent.top
-        height: 160
-        width: boardFinalPosition.x - 2 * anchors.margins
-        anchors.right: background.right
-        anchors.margins: 10
-        color: "#DDDDDD"
-
-        Row {
-            anchors.centerIn: parent
-            spacing: 20
-
-            Column {
-                id: resourcesColumn
-
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 5
-
-                Row {
-                    spacing: 5
-                    TileBonusIndicator {
-                        source: "qrc:/img/barrel.png"
-                        width: 32
-                        height: 32
-                    }
-                    Text {
-                        text: engine ? ("x" + engine.UnassignedBarrels) : ""
-                        font.pixelSize: 20
-                    }
-                }
-
-                Row {
-                    spacing: 5
-                    TileBonusIndicator {
-                        source: "qrc:/img/wheat.png"
-                        width: 32
-                        height: 32
-                    }
-                    Text {
-                        text: engine ? ("x" + engine.UnassignedWheat) : ""
-                        font.pixelSize: 20
-                    }
-                }
-
-                Row {
-                    spacing: 5
-                    TileBonusIndicator {
-                        source: "qrc:/img/cloth.png"
-                        width: 32
-                        height: 32
-                    }
-                    Text {
-                        text: engine ? ("x" + engine.UnassignedCloth) : ""
-                        font.pixelSize: 20
-                    }
-                }
-            }
-
-            Scoreboard {
-                id: scoreboard
-            }
-
-            TileViewSwitch {
-            }
-        }
-    }
-
     function drawTile() {
         let globalPosition = common.mapToItem(root, regularTilePlaceholder.x, regularTilePlaceholder.y)
         var tile = createTileItem(globalPosition.x, globalPosition.y, null)
@@ -468,8 +399,8 @@ Item {
     Item {
         id: playersSpace
 
-        anchors.top: generalInfo.bottom
-        anchors.bottom: parent.bottom
+        anchors.top: parent.top
+        anchors.bottom: scoreboardSpace.top
         anchors.margins: 10
         width: boardFinalPosition.x - 2 * anchors.margins
         anchors.right: background.right
@@ -552,7 +483,7 @@ Item {
             id: regularTilePlaceholder
 
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 5
+            spacing: 10
 
             Rectangle {
                 width: Constants.tilePreviewSize
@@ -607,6 +538,7 @@ Item {
                 anchors.verticalCenter: regularTilePlaceholder.verticalCenter
                 text: "x" + tilesInDeck
                 font.pixelSize: 20
+                color: "white"
             }
         }
 
@@ -665,7 +597,27 @@ Item {
         }
     }
 
-    RemainingTilesPopup {
+    Item {
+        id: scoreboardSpace
+
+        anchors.bottom: parent.bottom
+        height: 160
+        width: boardFinalPosition.x - 2 * anchors.margins
+        anchors.right: background.right
+        anchors.margins: 10
+
+        Scoreboard {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        TileViewSwitch {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+        }
+    }
+
+    ReferencePopup {
         id: remainingTilesPopup
 
         anchors.centerIn: parent

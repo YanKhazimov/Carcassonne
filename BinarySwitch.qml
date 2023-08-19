@@ -14,16 +14,20 @@ Item {
     Row {
         spacing: 5
 
-        Text {
+        MyText {
             id: leftText
 
-            font.pixelSize: 15
+            font.pixelSize: 20
+            color: "white"
+            font.family: Fonts.font4
+            anchors.verticalCenter: parent.verticalCenter
         }
 
         MouseArea {
             onPressed: root.callback()
             width: switchBackground.width
             height: switchBackground.height
+            anchors.verticalCenter: parent.verticalCenter
             cursorShape: Qt.PointingHandCursor
 
             Row {
@@ -32,18 +36,18 @@ Item {
                 spacing: -10
 
                 Rectangle {
-                    color: "#444444"
+                    color: "white"
                     height: 20
                     width: 20
                     radius: 10
                 }
                 Rectangle {
-                    color: "#444444"
+                    color: "white"
                     height: 20
                     width: 20
                 }
                 Rectangle {
-                    color: "#444444"
+                    color: "white"
                     height: 20
                     width: 20
                     radius: 10
@@ -52,7 +56,7 @@ Item {
 
             Rectangle {
                 readonly property int margin: 2
-                color: "lightgrey"
+                color: "grey"
                 height: 20 - 2 * margin
                 width: 20 - 2 * margin
                 radius: width / 2
@@ -67,10 +71,13 @@ Item {
             }
         }
 
-        Text {
+        MyText {
             id: rightText
 
-            font.pixelSize: 15
+            font.pixelSize: 20
+            color: "white"
+            font.family: Fonts.font4
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 }

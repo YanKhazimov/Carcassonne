@@ -185,7 +185,7 @@ int TownLeadLogRecord::objectSize() const
 }
 
 MeeplePlaceLogRecord::MeeplePlaceLogRecord(QColor color, QString name, ObjectType objectType, QmlEnums::MeepleType meeple, QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogMeeplePlaced, parent), m_objectType(objectType), m_meeple(meeple), m_color(color), m_name(name)
+    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogMeeplePlaced, color, name, parent), m_objectType(objectType), m_meeple(meeple)
 {
 }
 

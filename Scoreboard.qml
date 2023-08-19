@@ -22,10 +22,11 @@ Item {
             color: "white"
             border.color: "#DDDDDD"
 
-            Text {
+            MyText {
                 text: "Счет"
                 anchors.centerIn: parent
                 font.pixelSize: 20
+                font.family: Fonts.bonuses
             }
         }
 
@@ -35,10 +36,11 @@ Item {
             color: "white"
             border.color: "#DDDDDD"
 
-            Text {
+            MyText {
                 text: "Король"
                 anchors.centerIn: parent
                 font.pixelSize: 15
+                font.family: Fonts.bonuses
             }
         }
 
@@ -48,10 +50,11 @@ Item {
             color: "white"
             border.color: "#DDDDDD"
 
-            Text {
+            MyText {
                 text: "Атаман"
                 anchors.centerIn: parent
                 font.pixelSize: 15
+                font.family: Fonts.bonuses
             }
         }
 
@@ -61,10 +64,11 @@ Item {
             color: "white"
             border.color: "#DDDDDD"
 
-            Text {
+            MyText {
                 text: "Ресурсы"
                 anchors.centerIn: parent
                 font.pixelSize: 15
+                font.family: Fonts.bonuses
             }
         }
     }
@@ -72,69 +76,112 @@ Item {
     Repeater {
         model: engine ? engine.Players : []
         delegate: Row {
-            y: PLACE * 30
-            z: placeAnimation.running ? 1 : 0
+            id: playerRow
+
+            readonly property int modelPlace: PLACE
+            property int visualPlace
+
+            y: visualPlace * 30
+            Component.onCompleted: visualPlace = modelPlace
+            onModelPlaceChanged: {
+                z = modelPlace < visualPlace ? 1 : 0 // scoring player's row gets in the foreground
+                visualPlace = modelPlace
+            }
 
             Behavior on y {
                 NumberAnimation {
                     id: placeAnimation
                     duration: 1000
+                    onRunningChanged: {
+                        if (!running)
+                            playerRow.z = 0
+                    }
                 }
             }
 
-            Rectangle {
+            Item {
                 width: 150
                 height: 30
-                color: "transparent"
-                LinearGradient {
+
+                TintColoredRectangle {
+                    id: rectangleSource
+
+                    visible: false
                     anchors.fill: parent
-                    anchors.margins: 1
-                    start: Qt.point(0, 0)
-                    end: Qt.point(parent.width, 0)
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: "transparent" }
-                        GradientStop { position: 1.0; color: Qt.rgba(COLOR.r, COLOR.g, COLOR.b, 0.3) }
+                    color: "white"
+                    border.color: "#DDDDDD"
+                    tintColor: COLOR
+                    tintOpacity: 0.5
+                }
+
+                Item {
+                    id: mask
+
+                    anchors.fill: parent
+                    visible: false
+
+                    LinearGradient {
+                        anchors.fill: parent
+                        start: Qt.point(0, 0)
+                        end: Qt.point(parent.width, 0)
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "transparent" }
+                            GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0) }
+                        }
                     }
                 }
 
-                Text {
+                OpacityMask {
+                    source: rectangleSource
+                    anchors.fill: parent
+                    maskSource: mask
+                }
+
+                MyText {
                     text: NAME
                     anchors.right: parent.right
                     anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     font.pixelSize: 15
+                    font.family: Fonts.font6
                 }
             }
 
-            Rectangle {
+            TintColoredRectangle {
                 width: 75
                 height: 30
-                color: Qt.rgba(COLOR.r, COLOR.g, COLOR.b, 0.3)
+                color: "white"
                 border.color: "#DDDDDD"
+                tintColor: COLOR
+                tintOpacity: 0.5
 
-                Text {
+                MyText {
                     property int animatedScore: SCORE
                     Behavior on animatedScore { NumberAnimation { id: scoreAnimation; duration: 1000 } }
                     text: animatedScore
                     anchors.centerIn: parent
                     font.pixelSize: 25
+                    font.family: Fonts.bonuses
                 }
             }
 
-            Rectangle {
+            TintColoredRectangle {
                 width: 75
                 height: 30
-                color: Qt.rgba(COLOR.r, COLOR.g, COLOR.b, 0.3)
+                color: "white"
                 border.color: "#DDDDDD"
+                tintColor: COLOR
+                tintOpacity: 0.5
 
-                Text {
+                MyText {
                     property int animatedScore: TOWN_LEAD ? BIGGEST_TOWN : 0
                     Behavior on animatedScore { NumberAnimation { duration: 1000 } }
                     text: "+" + animatedScore
                     visible: animatedScore > 0
                     anchors.centerIn: parent
                     font.pixelSize: 15
+                    font.family: Fonts.bonuses
                 }
 
                 MouseArea {
@@ -157,19 +204,22 @@ Item {
                 }
             }
 
-            Rectangle {
+            TintColoredRectangle {
                 width: 75
                 height: 30
-                color: Qt.rgba(COLOR.r, COLOR.g, COLOR.b, 0.3)
+                color: "white"
                 border.color: "#DDDDDD"
+                tintColor: COLOR
+                tintOpacity: 0.5
 
-                Text {
+                MyText {
                     property int animatedScore: ROAD_LEAD ? BIGGEST_ROAD : 0
                     Behavior on animatedScore { NumberAnimation { duration: 1000 } }
                     text: "+" + animatedScore
                     visible: animatedScore > 0
                     anchors.centerIn: parent
                     font.pixelSize: 15
+                    font.family: Fonts.bonuses
                 }
 
                 MouseArea {
@@ -190,19 +240,22 @@ Item {
                 }
             }
 
-            Rectangle {
+            TintColoredRectangle {
                 width: 75
                 height: 30
-                color: Qt.rgba(COLOR.r, COLOR.g, COLOR.b, 0.3)
+                color: "white"
                 border.color: "#DDDDDD"
+                tintColor: COLOR
+                tintOpacity: 0.5
 
-                Text {
+                MyText {
                     property int animatedScore: WHEAT_LEAD * 10 + BARRELS_LEAD * 10 + CLOTH_LEAD * 10
                     Behavior on animatedScore { NumberAnimation { duration: 1000 } }
                     text: "+" + animatedScore
                     visible: animatedScore > 0
                     anchors.centerIn: parent
                     font.pixelSize: 15
+                    font.family: Fonts.bonuses
                 }
 
                 MouseArea {

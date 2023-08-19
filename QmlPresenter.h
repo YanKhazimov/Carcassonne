@@ -8,6 +8,7 @@
 #include "PlayersModel.h"
 #include "RemainingTilesModel.h"
 #include "ShuffledDeck.h"
+#include "ScoreboardModel.h"
 
 class QmlPresenter : public QObject
 {

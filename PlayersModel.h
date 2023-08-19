@@ -2,7 +2,6 @@
 #define PLAYERSMODEL_H
 
 #include <QAbstractListModel>
-#include <QSortFilterProxyModel>
 #include "Player.h"
 #include <memory>
 
@@ -19,18 +18,6 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     void AddPlayer(QColor color, QString name);
-};
-
-class ScoreboardModel: public QSortFilterProxyModel
-{
-    Q_OBJECT
-
-private slots:
-    void onDataChanged(QModelIndex first, QModelIndex last, QVector<int> roles);
-
-public:
-    explicit ScoreboardModel(QObject *parent = nullptr);
-    void setSource(PlayersModel* source);
 };
 
 #endif // PLAYERSMODEL_H

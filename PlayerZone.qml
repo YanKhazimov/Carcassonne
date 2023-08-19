@@ -51,6 +51,7 @@ Item {
 
     Item {
         id: fade
+        visible: false
 
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 40
@@ -70,10 +71,16 @@ Item {
             start: Qt.point(0, 0)
             end: Qt.point(0, parent.height)
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.rgba(activeColor.r, activeColor.g, activeColor.b, 0.7) }
+                GradientStop { position: 0.0; color: Qt.rgba(activeColor.r, activeColor.g, activeColor.b, 0.5) }
                 GradientStop { position: 1.0; color: "transparent" }
             }
         }
+    }
+
+    QGE.OpacityMask {
+        source: bannerImage
+        anchors.fill: fade
+        maskSource: fade
     }
 
     Image {
@@ -84,7 +91,7 @@ Item {
         ColoredImage {
             source: "qrc:/img/banner.png"
             color: activeColor
-            opacity: 0.4
+            opacity: 0.5
         }
     }
 

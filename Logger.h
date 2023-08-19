@@ -94,14 +94,12 @@ public:
     explicit FreeTurnLogRecord(QColor color, QString name, QObject* parent = nullptr);
 };
 
-class MeeplePlaceLogRecord : public LogRecord
+class MeeplePlaceLogRecord : public PlayerSpecificLogRecord
 {
     Q_OBJECT
 
     ObjectType m_objectType;
     QmlEnums::MeepleType m_meeple = QmlEnums::MeepleType::MeepleNone;
-    QColor m_color;
-    QString m_name;
 
 public:
     explicit MeeplePlaceLogRecord(QColor color, QString name, ObjectType objectType, QmlEnums::MeepleType meeple, QObject* parent = nullptr);
