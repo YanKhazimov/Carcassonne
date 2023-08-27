@@ -54,12 +54,6 @@ Item {
     }
 
     Binding {
-        target: engine
-        property: "TilePictureOpacity"
-        value: activeMeeple ? 0.6 : 1
-    }
-
-    Binding {
         target: Constants.color.schematic
         property: "highlighter"
         value: (lastPlacedTile && lastPlacedTile.acceptsActiveMeeple) ? Constants.color.schematic.highlighterRight : Constants.color.schematic.highlighterWrong
@@ -73,6 +67,9 @@ Item {
         }
         if (event.key === Qt.Key_L) {
             gameLogPopup.visible = !gameLogPopup.visible
+        }
+        if (event.key === Qt.Key_G) {
+            Preferences.greyoutView = !Preferences.greyoutView
         }
     }
 

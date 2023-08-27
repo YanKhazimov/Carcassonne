@@ -764,12 +764,6 @@ bool TileData::isAbbeyTile() const
     return tileObjects.size() == 1 && tileObjects[0].objPtr->type == ObjectType::Abbey;
 }
 
-bool TileData::isPlayerBuilderPresent(TileSide side, int activePlayer) const
-{
-    std::shared_ptr<const MapObjectData> connectorObject = checkConnector(side);
-    return connectorObject && connectorObject->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer);
-}
-
 bool TileData::hasRoadNorth() const
 {
     return N() &&

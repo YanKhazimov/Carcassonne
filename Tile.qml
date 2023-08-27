@@ -215,13 +215,11 @@ AnimatedItem {
         }
     }
 
-    Image {
+    GreyedOutImage {
         id: picture
 
-        source: tileData ? tileData.Picture : ""
-        anchors.fill: parent
         rotation: tileData ? tileData.ImageRotation : 0
-        opacity: Preferences.schematicView ? 0 : 1//tileData.Abbey ? 1 : 0.8//engine.TilePictureOpacity
+        visible: !Preferences.schematicView
 
         Behavior on rotation {
             NumberAnimation {
@@ -230,14 +228,22 @@ AnimatedItem {
             }
         }
 
-        Rectangle {
-            id: border
+        active: Preferences.greyoutView && tileData && tileData.IsFixed
+        opacityValue: 1.0
+        imageSource: Image {
+            source: tileData ? tileData.Picture : ""
+            width: root.width
+            height: root.height
 
-            anchors.fill: parent
-            color: "transparent"
-            border.width: 2
-            border.color: "black"
-            visible: tileData && !tileData.IsFixed
+            Rectangle {
+                id: border
+
+                anchors.fill: parent
+                color: "transparent"
+                border.width: 2
+                border.color: "black"
+                visible: tileData && !tileData.IsFixed
+            }
         }
     }
 

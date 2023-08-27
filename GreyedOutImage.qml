@@ -5,6 +5,7 @@ ShaderEffect {
 
     required property variant imageSource
     property bool active: true
+    required property real opacityValue
 
     width: imageSource.width
     height: imageSource.height
@@ -19,7 +20,7 @@ ShaderEffect {
             gl_Position = qt_Matrix * qt_Vertex;
         }"
 
-    fragmentShader: active ? "
+    fragmentShader: active ? ("
         varying highp vec2 coord;
         uniform sampler2D imageSource;
         uniform lowp float qt_Opacity;
@@ -27,8 +28,8 @@ ShaderEffect {
             lowp vec4 tex = texture2D(imageSource, coord);
             gl_FragColor = vec4(vec3(dot(tex.rgb,
                                 vec3(0.344, 0.5, 0.156))),
-                                     tex.a) * 0.4;
-        }" : "
+                                     tex.a) * " + opacityValue + ";
+        }") : "
         varying highp vec2 coord;
         uniform sampler2D imageSource;
         uniform lowp float qt_Opacity;

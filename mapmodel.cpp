@@ -78,14 +78,34 @@ bool MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
 {
     QPoint position = tile->position();
     
-    if (Tile* nextNorth = nextTileNorth(position.x(), position.y()); nextNorth && nextNorth->isPlayerBuilderPresent(TileSide::South, activePlayer))
-        return true;
-    if (Tile* nextEast = nextTileEast(position.x(), position.y()); nextEast && nextEast->isPlayerBuilderPresent(TileSide::West, activePlayer))
-        return true;
-    if (Tile* nextSouth = nextTileSouth(position.x(), position.y()); nextSouth && nextSouth->isPlayerBuilderPresent(TileSide::North, activePlayer))
-        return true;
-    if (Tile* nextWest = nextTileWest(position.x(), position.y()); nextWest && nextWest->isPlayerBuilderPresent(TileSide::East, activePlayer))
-        return true;
+    if (Tile* nextNorth = nextTileNorth(position.x(), position.y()); nextNorth)
+    {
+        if (auto object = nextNorth->checkConnector(TileSide::South);
+            object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
+            (!tile->isAbbeyTile() || object->isCompleted()))
+            return true;
+    }
+    if (Tile* nextEast = nextTileEast(position.x(), position.y()); nextEast)
+    {
+        if (auto object = nextEast->checkConnector(TileSide::West);
+            object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
+            (!tile->isAbbeyTile() || object->isCompleted()))
+            return true;
+    }
+    if (Tile* nextSouth = nextTileSouth(position.x(), position.y()); nextSouth)
+    {
+        if (auto object = nextSouth->checkConnector(TileSide::North);
+            object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
+            (!tile->isAbbeyTile() || object->isCompleted()))
+            return true;
+    }
+    if (Tile* nextWest = nextTileWest(position.x(), position.y()); nextWest)
+    {
+        if (auto object = nextWest->checkConnector(TileSide::East);
+            object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
+            (!tile->isAbbeyTile() || object->isCompleted()))
+            return true;
+    }
 
     return false;
 }

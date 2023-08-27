@@ -169,7 +169,14 @@ Item {
 
         Text {
             id: prevTurnsTime
-            text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData ? playerData.PreviousTime : 0), "mm:ss")
+
+            readonly property int minutes: playerData ? playerData.PreviousTime / 60 : 0
+            readonly property int seconds: playerData ? playerData.PreviousTime % 60 : 0
+
+            readonly property string minutesString: minutes < 10 ? "0" + minutes : minutes
+            readonly property string secondsString: seconds < 10 ? "0" + seconds : seconds
+
+            text: minutesString + ":" + secondsString
             font.pixelSize: 15
             font.family: Fonts.font4
             visible: playerData && playerData.PreviousTime !== 0 || !currentTurnTime.visible
@@ -184,7 +191,14 @@ Item {
 
         Text {
             id: currentTurnTime
-            text: Qt.formatTime(new Date(0, 0, 0, 0, 0, playerData ? playerData.CurrentTime : 0), "mm:ss")
+
+            readonly property int minutes: playerData ? playerData.CurrentTime / 60 : 0
+            readonly property int seconds: playerData ? playerData.CurrentTime % 60 : 0
+
+            readonly property string minutesString: minutes < 10 ? "0" + minutes : minutes
+            readonly property string secondsString: seconds < 10 ? "0" + seconds : seconds
+
+            text: minutesString + ":" + secondsString
             font.pixelSize: 15
             font.family: Fonts.font4
             visible: playerData && playerData.CurrentTime !== 0
@@ -221,6 +235,7 @@ Item {
                 Row {
                     GreyedOutImage {
                         anchors.verticalCenter: parent.verticalCenter
+                        opacityValue: 0.4
                         active: !(playerData && playerData.BarrelsLead)
                         imageSource: TileBonusIndicator {
                             source: "qrc:/img/barrel.png"
@@ -237,6 +252,7 @@ Item {
                 Row {
                     GreyedOutImage {
                         anchors.verticalCenter: parent.verticalCenter
+                        opacityValue: 0.4
                         active: !(playerData && playerData.WheatLead)
                         imageSource: TileBonusIndicator {
                             source: "qrc:/img/wheat.png"
@@ -253,6 +269,7 @@ Item {
                 Row {
                     GreyedOutImage {
                         anchors.verticalCenter: parent.verticalCenter
+                        opacityValue: 0.4
                         active: !(playerData && playerData.ClothLead)
                         imageSource: TileBonusIndicator {
                             source: "qrc:/img/cloth.png"
@@ -275,6 +292,7 @@ Item {
                     spacing: 5
 
                     GreyedOutImage {
+                        opacityValue: 0.4
                         active: !(playerData && playerData.TownLead)
                         imageSource: TileBonusIndicator {
                             source: "qrc:/img/king.png"
@@ -293,6 +311,7 @@ Item {
                     spacing: 5
 
                     GreyedOutImage {
+                        opacityValue: 0.4
                         active: !(playerData && playerData.RoadLead)
                         imageSource: TileBonusIndicator {
                             source: "qrc:/img/chieftain.png"

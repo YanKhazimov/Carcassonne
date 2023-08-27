@@ -25,7 +25,6 @@ class QmlPresenter : public QObject
     Q_PROPERTY(int UnassignedWheat MEMBER unassignedWheat NOTIFY unassignedWheatChanged)
     Q_PROPERTY(int UnassignedBarrels MEMBER unassignedBarrels NOTIFY unassignedBarrelsChanged)
     Q_PROPERTY(int UnassignedCloth MEMBER unassignedCloth NOTIFY unassignedClothChanged)
-    Q_PROPERTY(qreal TilePictureOpacity MEMBER tilePictureOpacity NOTIFY tilePictureOpacityChanged)
     Q_PROPERTY(QVariantList PossibleColors READ getPossibleColors CONSTANT)
     Q_PROPERTY(RemainingTilesModel* remainingTilesModel READ getRemainingTiles NOTIFY remainingTilesChanged)
     Q_PROPERTY(bool AllFttingTilesPlayed MEMBER allFttingTilesPlayed NOTIFY allFttingTilesPlayedChanged)
@@ -64,8 +63,6 @@ private:
     int unassignedWheat = 0;
     int unassignedBarrels = 0;
     int unassignedCloth = 0;
-
-    qreal tilePictureOpacity = 0.5;
 
     void addWheatToActivePlayer(int amount);
     void addBarrelsToActivePlayer(int amount);
@@ -148,7 +145,6 @@ signals:
     void unassignedWheatChanged();
     void unassignedBarrelsChanged();
     void unassignedClothChanged();
-    void tilePictureOpacityChanged();
     void remainingTilesChanged();
     void allFttingTilesPlayedChanged();
     void showMessage(QString message, GameState stateToSet);

@@ -3,7 +3,7 @@ import EngineEnums 1.0
 
 BaseMeeple {
     type: EngineEnums.MeepleBarn
-    imageWidth: 2 * Constants.smallMeepleSize
-    imageHeight: 2 * Constants.smallMeepleSize
+    typeWidthModifier: 2
+    typeHeightModifier: 2
     imageSource: "qrc:/img/barn.png"
 }

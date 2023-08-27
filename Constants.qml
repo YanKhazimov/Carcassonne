@@ -2,10 +2,15 @@ pragma Singleton
 import QtQuick 2.15
 
 QtObject {
+    property real mapScale: 1.0
+
     readonly property real defaultTileSize: 192
-    property int tilePreviewSize: 96
-    property int tileSize: 192
-    readonly property int smallMeepleSize: 20
+    readonly property int tilePreviewSize: 96
+    readonly property int tileSize: defaultTileSize * mapScale
+
+    readonly property int defaultSmallMeepleSize: 30
+    readonly property int smallMeeplePreviewSize: 20
+    readonly property int smallMeepleSize: defaultSmallMeepleSize * mapScale
 
     property var color: QtObject {
         readonly property var schematic: QtObject {

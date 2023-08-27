@@ -3,4 +3,5 @@ import QtQuick 2.15
 
 QtObject {
     property bool schematicView: false
+    property bool greyoutView: false
 }

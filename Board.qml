@@ -155,7 +155,7 @@ Rectangle {
 
     function expandNorthWest() {
         capacity++
-        Constants.tileSize = internal.boardLength / capacity
+        Constants.mapScale = root.width / Constants.defaultTileSize / capacity
         centerTileHOffset += 0.5
         centerTileVOffset += 0.5
 
@@ -164,7 +164,7 @@ Rectangle {
 
     function expandNorthEast() {
         capacity++
-        Constants.tileSize = internal.boardLength / capacity
+        Constants.mapScale = root.width / Constants.defaultTileSize / capacity
         centerTileHOffset -= 0.5
         centerTileVOffset += 0.5
 
@@ -173,7 +173,7 @@ Rectangle {
 
     function expandSouthEast() {
         capacity++
-        Constants.tileSize = internal.boardLength / capacity
+        Constants.mapScale = root.width / Constants.defaultTileSize / capacity
         centerTileHOffset -= 0.5
         centerTileVOffset -= 0.5
 
@@ -182,7 +182,7 @@ Rectangle {
 
     function expandSouthWest() {
         capacity++
-        Constants.tileSize = internal.boardLength / capacity
+        Constants.mapScale = 1.0 * root.width / Constants.defaultTileSize / capacity
         centerTileHOffset += 0.5
         centerTileVOffset -= 0.5
 

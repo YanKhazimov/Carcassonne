@@ -74,7 +74,7 @@ Item {
 
         Text {
             anchors.centerIn: parent
-            text: "C"
+            text: "Ц"
         }
     }
 }
