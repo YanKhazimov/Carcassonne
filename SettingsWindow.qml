@@ -6,6 +6,9 @@ Item {
     id: root
 
     signal urlRequested(var urlAddress)
+    signal exitRequested()
+
+    property var currentColorOffsets: [ 0, 1, 2, 3 ]
 
     function colorIndex(index) {
         while (index < 0)
@@ -13,6 +16,15 @@ Item {
             index += engine.PossibleColors.length
         }
         return index % engine.PossibleColors.length
+    }
+
+    Image {
+        source: "qrc:/img/title.png"
+        anchors.right: parent.right
+        anchors.left: backgroundStripe.right
+        anchors.margins: 200
+        anchors.verticalCenter: parent.verticalCenter
+        fillMode: Image.PreserveAspectFit
     }
 
     Item {
@@ -39,106 +51,64 @@ Item {
         spacing: 5
 
         Item {
-            id: headerClipper
+            id: playersCountRect
 
-            clip: true
-            width: 300
-            height: 30
-            anchors.horizontalCenter: parent.horizontalCenter
+            property int playerCount: 3
 
-            Rectangle {
-                id: playersCountRect
+            width: parent.width
+            height: childrenRect.height
+
+            Row {
+                spacing: -15
                 anchors.horizontalCenter: parent.horizontalCenter
-                Behavior on anchors.horizontalCenterOffset { NumberAnimation { duration: 200 } }
 
-                property int playerCount: 3
-
-                width: 500
-                height: 30
-                color: "transparent"
-
-                LinearGradient {
-                    anchors.fill: parent
-                    start: Qt.point(0, 0)
-                    end: Qt.point(parent.width, 0)
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: "transparent" }
-                        GradientStop { position: 0.2; color: "silver" }
-                        GradientStop { position: 0.8; color: "silver" }
-                        GradientStop { position: 1.0; color: "transparent" }
-                    }
+                ColoredImage {
+                    id: meeple0
+                    source: "qrc:/img/bigMeeple.png"
+                    color: engine ? engine.PossibleColors[currentColorOffsets[0]] : "transparent"
                 }
 
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Item {
-                        width: 100
-                        height: 30
+                ColoredImage {
+                    id: meeple1
+                    source: "qrc:/img/bigMeeple.png"
+                    color: engine ? engine.PossibleColors[currentColorOffsets[1]] : "transparent"
+                }
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: "2 игрока"
-                            font.pixelSize: playersCountRect.playerCount === 2 ? 20 : 15
-                        }
-                    }
-                    Rectangle {
-                        width: 1
-                        height: 20
-                        color: "black"
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    Item {
-                        width: 100
-                        height: 30
+                ColoredImage {
+                    id: meeple2
+                    source: "qrc:/img/bigMeeple.png"
+                    color: engine ? engine.PossibleColors[currentColorOffsets[2]] : "transparent"
+                    visible: playersCountRect.playerCount > 2
+                }
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: "3 игрока"
-                            font.pixelSize: playersCountRect.playerCount === 3 ? 20 : 15
-                        }
-                    }
-                    Rectangle {
-                        width: 1
-                        height: 20
-                        color: "black"
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    Item {
-                        width: 100
-                        height: 30
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: "4 игрока"
-                            font.pixelSize: playersCountRect.playerCount === 4 ? 20 : 15
-                        }
-                    }
+                ColoredImage {
+                    id: meeple3
+                    source: "qrc:/img/bigMeeple.png"
+                    color: engine ? engine.PossibleColors[currentColorOffsets[3]] : "transparent"
+                    visible: playersCountRect.playerCount > 3
                 }
             }
 
-            MouseArea {
-                anchors.left: parent.left
-                width: 100
-                height: 30
-                cursorShape: Qt.PointingHandCursor
-                visible: playersCountRect.playerCount > 2
-                onClicked: {
+            MenuArrows {
+                leftActive: playersCountRect.playerCount > 2
+                rightActive: playersCountRect.playerCount < 4
+
+                leftColor: "white"
+                rightColor: "white"
+
+                function leftClickCallback() {
                     playersCountRect.playerCount--
-                    playersCountRect.anchors.horizontalCenterOffset += 101
                 }
-            }
-
-            MouseArea {
-                anchors.right: parent.right
-                width: 100
-                height: 30
-                cursorShape: Qt.PointingHandCursor
-                visible: playersCountRect.playerCount < 4
-                onClicked: {
+                function rightClickCallback() {
                     playersCountRect.playerCount++
-                    playersCountRect.anchors.horizontalCenterOffset -= 101
                 }
             }
+        }
+
+        MyText {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: playersCountRect.playerCount + " игрока"
+            font.pixelSize: 20
         }
 
         Item {
@@ -149,130 +119,122 @@ Item {
         Repeater {
             id: playerRepeater
 
-            model: 4
+            property var meeples: [meeple0, meeple1, meeple2, meeple3]
+            model: currentColorOffsets
             delegate: Item {
+                id: _delegate
                 property alias text: textEdit.text
-                function getColor() {
-                    return colorRepeater.itemAt(playerRow.colorOffset).color
-                }
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 300
                 height: 30
 
-                Item {
-                    id: clipper
+                property var rects: [leftRect, centralRect, rightRect]
+                property color nextColor: engine ? engine.PossibleColors[root.colorIndex(currentColorOffsets[index] + 1)] : "transparent"
+                property color prevColor: engine ? engine.PossibleColors[root.colorIndex(currentColorOffsets[index] - 1)] : "transparent"
 
-                    clip: true
-                    anchors.fill: parent
+                Rectangle {
+                    id: centralRect
 
-                    Row {
-                        id: playerRow
+                    width: 300
+                    height: 30
+                    color: engine ? engine.PossibleColors[currentColorOffsets[index]] : "transparent"
 
-                        property int colorOffset: index
-                        anchors.left: parent.left
-                        anchors.leftMargin: (-colorRepeater.model/2 - index) * 300
-                        Behavior on anchors.leftMargin {
-                            NumberAnimation {
-                                id: colorAnimation
-                                duration: 200
-                            }
-                        }
+                    Behavior on width { NumberAnimation { duration: 200 } }
+                    Behavior on x { NumberAnimation { duration: 200 } }
+                }
 
-                        Repeater {
-                            id: colorRepeater
-                            model: engine ? 10 * engine.PossibleColors.length : 0
-                            delegate: Rectangle {
-                                id: playerColorBar
+                Rectangle {
+                    id: leftRect
 
-                                width: 300
-                                height: 30
-                                color: engine ? engine.PossibleColors[root.colorIndex(index)]
-                                              : "transparent"
-                            }
-                        }
-                    }
+                    width: 0
+                    height: 30
 
-                    TextEdit {
-                        id: textEdit
-                        anchors.centerIn: parent
-                        font.pixelSize: 20
-                        selectByMouse: true
-                        color: "white"
+                    Behavior on width { NumberAnimation { duration: 200 } }
+                    Behavior on x { NumberAnimation { duration: 200 } }
+                }
 
-                        Component.onCompleted: text = "Игрок %1".arg(index + 1)
-                    }
+                Rectangle {
+                    id: rightRect
 
-                    MouseArea {
-                        id: blocker
-                        x: index >= playersCountRect.playerCount ? 0 : parent.width
-                        width: parent.width
-                        height: parent.height
-                        Behavior on x { NumberAnimation { duration: 200 } }
+                    width: 0
+                    height: 30
+                    x: 300
 
-                        Rectangle {
-                            anchors.fill: parent
-                            color: "silver"
+                    Behavior on width { NumberAnimation { duration: 200 } }
+                    Behavior on x { NumberAnimation { duration: 200 } }
+                }
 
-                            Text {
-                                anchors.centerIn: parent
-                                text: "Пусто"
-                                font.pixelSize: 20
-                            }
+                TextEdit {
+                    id: textEdit
+                    anchors.centerIn: parent
+                    font.pixelSize: 20
+                    font.family: Fonts.font6
+                    font.bold: true
+                    selectByMouse: true
+                    color: "white"
+
+                    Component.onCompleted: text = "Игрок %1".arg(index + 1)
+                }
+
+                MouseArea {
+                    id: blocker
+                    visible: index >= playersCountRect.playerCount
+                    width: parent.width
+                    height: parent.height
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "silver"
+
+                        MyText {
+                            anchors.centerIn: parent
+                            text: "Пусто"
+                            font.pixelSize: 15
                         }
                     }
                 }
 
-                MouseArea {
-                    anchors.right: parent.left
-                    width: 30
-                    height: 30
-                    cursorShape: Qt.PointingHandCursor
-                    visible: index < playersCountRect.playerCount && !colorAnimation.running
-                    onClicked: {
-                        playerRow.colorOffset = root.colorIndex(playerRow.colorOffset - 1)
-                        playerRow.anchors.leftMargin += 300
+                MenuArrows {
+                    leftActive: index < playersCountRect.playerCount
+                    rightActive: index < playersCountRect.playerCount
+
+                    leftColor: _delegate.prevColor
+                    rightColor: _delegate.nextColor
+
+                    function leftClickCallback() {
+                        let newColorIndex = root.colorIndex(currentColorOffsets[index] - 1)
+                        const LEFT = 0
+                        const CENTRAL = 1
+                        const RIGHT = 2
+                        _delegate.rects[LEFT].color = engine.PossibleColors[newColorIndex]
+                        _delegate.rects[LEFT].width = 300
+                        _delegate.rects[CENTRAL].x = 300
+                        _delegate.rects[CENTRAL].width = 0
+                        _delegate.rects[RIGHT].x = 0
+
+                        currentColorOffsets[index] = newColorIndex
+                        playerRepeater.meeples[index].color = engine.PossibleColors[newColorIndex]
+                        _delegate.nextColor = engine.PossibleColors[root.colorIndex(currentColorOffsets[index] + 1)]
+                        _delegate.prevColor = engine.PossibleColors[root.colorIndex(currentColorOffsets[index] - 1)]
+                        _delegate.rects = [_delegate.rects[RIGHT], _delegate.rects[LEFT], _delegate.rects[CENTRAL]]
                     }
+                    function rightClickCallback() {
+                        let newColorIndex = root.colorIndex(currentColorOffsets[index] + 1)
+                        const LEFT = 0
+                        const CENTRAL = 1
+                        const RIGHT = 2
+                        _delegate.rects[RIGHT].color = engine.PossibleColors[newColorIndex]
+                        _delegate.rects[RIGHT].x = 0
+                        _delegate.rects[RIGHT].width = 300
+                        _delegate.rects[CENTRAL].width = 0
+                        _delegate.rects[LEFT].x = 300
 
-                    Rectangle {
-                        anchors.fill: parent
-                        color: engine ? engine.PossibleColors[root.colorIndex(playerRow.colorOffset - 1)]
-                                      : "transparent"
-                        opacity: 0.4
-                    }
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: "<"
-                        color: "black"
-                        font.pixelSize: 20
-                    }
-                }
-
-                MouseArea {
-                    anchors.left: parent.right
-                    width: 30
-                    height: 30
-                    cursorShape: Qt.PointingHandCursor
-                    visible: index < playersCountRect.playerCount && !colorAnimation.running
-                    onClicked: {
-                        playerRow.colorOffset = root.colorIndex(playerRow.colorOffset + 1)
-                        playerRow.anchors.leftMargin -= 300
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: engine ? engine.PossibleColors[root.colorIndex(playerRow.colorOffset + 1)]
-                                      : "transparent"
-                        opacity: 0.4
-                    }
-
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: ">"
-                        color: "black"
-                        font.pixelSize: 20
+                        currentColorOffsets[index] = newColorIndex
+                        playerRepeater.meeples[index].color = engine.PossibleColors[newColorIndex]
+                        _delegate.nextColor = engine.PossibleColors[root.colorIndex(currentColorOffsets[index] + 1)]
+                        _delegate.prevColor = engine.PossibleColors[root.colorIndex(currentColorOffsets[index] - 1)]
+                        _delegate.rects = [_delegate.rects[CENTRAL], _delegate.rects[RIGHT], _delegate.rects[LEFT]]
                     }
                 }
             }
@@ -283,30 +245,30 @@ Item {
             width: 10
         }
 
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "15x15"
-            font.pixelSize: 30
-        }
-
-        Item {
-            height: 10
-            width: 10
-        }
-
         MenuButton {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Начать игру"
+            actionIndicated: false
+            font.family: Fonts.font4
             onClicked: {
                 var colors = []
                 var names = []
                 for (var i = 0; i < playersCountRect.playerCount; ++i) {
-                    colors.push(playerRepeater.itemAt(i).getColor())
+                    colors.push(engine.PossibleColors[currentColorOffsets[i]])
                     names.push(playerRepeater.itemAt(i).text)
                 }
                 engine.populatePlayers(colors, names)
                 engine.mapModel.setSize(15)
                 root.urlRequested("qrc:/GameWindow.qml")
+            }
+        }
+        MenuButton {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Выход"
+            actionIndicated: false
+            font.family: Fonts.font4
+            onClicked: {
+                root.exitRequested()
             }
         }
     }

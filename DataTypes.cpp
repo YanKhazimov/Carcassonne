@@ -9,9 +9,10 @@ QVariantList playerColors = {
     QColor(255, 0, 0),
     QColor(0, 0, 255),
     QColor(0, 0, 0),
-    QColor(150, 150, 0),
     "darkgreen",
-    "pink"
+    "#800080",
+    "#008080",
+    "#808000"
 };
 
 QMap<QString, QMap<ObjectType, QString>> objectStrings = {
