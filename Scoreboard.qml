@@ -12,7 +12,7 @@ Item {
         id: header
 
         Item {
-            width: 150
+            width: 250
             height: 30
         }
 
@@ -23,7 +23,7 @@ Item {
             border.color: "#DDDDDD"
 
             MyText {
-                text: "Счет"
+                text: "СЧЁТ"
                 anchors.centerIn: parent
                 font.pixelSize: 20
                 font.family: Fonts.bonuses
@@ -37,7 +37,7 @@ Item {
             border.color: "#DDDDDD"
 
             MyText {
-                text: "Король"
+                text: "КОРОЛЬ"
                 anchors.centerIn: parent
                 font.pixelSize: 15
                 font.family: Fonts.bonuses
@@ -51,7 +51,7 @@ Item {
             border.color: "#DDDDDD"
 
             MyText {
-                text: "Атаман"
+                text: "АТАМАН"
                 anchors.centerIn: parent
                 font.pixelSize: 15
                 font.family: Fonts.bonuses
@@ -65,7 +65,7 @@ Item {
             border.color: "#DDDDDD"
 
             MyText {
-                text: "Ресурсы"
+                text: "РЕСУРСЫ"
                 anchors.centerIn: parent
                 font.pixelSize: 15
                 font.family: Fonts.bonuses
@@ -100,11 +100,11 @@ Item {
             }
 
             Item {
-                width: 150
+                width: 250
                 height: 30
 
                 TintColoredRectangle {
-                    id: rectangleSource
+                    id: nameRectangleSource
 
                     visible: false
                     anchors.fill: parent
@@ -115,7 +115,7 @@ Item {
                 }
 
                 Item {
-                    id: mask
+                    id: nameRectangleMask
 
                     anchors.fill: parent
                     visible: false
@@ -132,9 +132,9 @@ Item {
                 }
 
                 OpacityMask {
-                    source: rectangleSource
+                    source: nameRectangleSource
                     anchors.fill: parent
-                    maskSource: mask
+                    maskSource: nameRectangleMask
                 }
 
                 MyText {
@@ -273,6 +273,89 @@ Item {
                         anchors.fill: parent
                         sourceComponent: ElementActionIndicator {
                             target: parent
+                        }
+                    }
+                }
+            }
+
+            Item {
+                width: 250
+                height: 30
+
+                TintColoredRectangle {
+                    id: timeRectangleSource
+
+                    visible: false
+                    anchors.fill: parent
+                    color: "white"
+                    border.color: "#DDDDDD"
+                    tintColor: COLOR
+                    tintOpacity: 0.5
+                }
+
+                Item {
+                    id: timeRectangleMask
+
+                    anchors.fill: parent
+                    visible: false
+
+                    LinearGradient {
+                        anchors.fill: parent
+                        start: Qt.point(parent.width, 0)
+                        end: Qt.point(0, 0)
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "transparent" }
+                            GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0) }
+                        }
+                    }
+                }
+
+                OpacityMask {
+                    source: timeRectangleSource
+                    anchors.fill: parent
+                    maskSource: timeRectangleMask
+                }
+
+                Row {
+                    id: timerRow
+
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 0
+
+                    Text {
+                        id: prevTurnsTime
+
+                        text: Qt.formatTime(new Date(0, 0, 0, 0, 0, PAST_TURNS_TIME), PAST_TURNS_TIME > 3599 ? "h:mm:ss" : "mm:ss")
+                        font.pixelSize: 15
+                        font.family: Fonts.font4
+                        visible: PAST_TURNS_TIME !== 0 || !currentTurnTime.visible
+                    }
+
+                    Text {
+                        text: " + "
+                        font.pixelSize: 15
+                        font.family: Fonts.font4
+                        visible: prevTurnsTime.visible && currentTurnTime.visible
+                    }
+
+                    Text {
+                        id: currentTurnTime
+
+                        text: Qt.formatTime(new Date(0, 0, 0, 0, 0, CURRENT_TURN_TIME), CURRENT_TURN_TIME > 3599 ? "h:mm:ss" : "mm:ss")
+                        font.pixelSize: 15
+                        font.family: Fonts.font4
+                        visible: CURRENT_TURN_TIME !== 0
+                        color: CURRENT_TURN_TIME > 30 ? "white" : "black"
+
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: -3
+                            radius: 3
+                            color: "red"
+                            visible: CURRENT_TURN_TIME > 30
+                            z: parent.z - 1
                         }
                     }
                 }

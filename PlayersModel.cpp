@@ -49,6 +49,12 @@ QVariant PlayersModel::data(const QModelIndex &index, int role) const
     if (role == DataRoles::BiggestRoad)
         return players.at(index.row())->getBiggestRoad();
 
+    if (role == DataRoles::CurrentTurnSeconds)
+        return players.at(index.row())->getCurrentTurnSeconds();
+
+    if (role == DataRoles::PastTurnsSeconds)
+        return players.at(index.row())->getPrevTurnsSeconds();
+
     return QVariant();
 }
 
@@ -90,6 +96,12 @@ void PlayersModel::AddPlayer(QColor color, QString name)
     connect(players[i].get(), &Player::biggestRoadChanged, this, [this, i](){
         emit dataChanged(index(i, 0), index(i, 0), {DataRoles::BiggestRoad});
     });
+    connect(players[i].get(), &Player::currentTurnSecondsChanged, this, [this, i](){
+        emit dataChanged(index(i, 0), index(i, 0), {DataRoles::CurrentTurnSeconds});
+    });
+    connect(players[i].get(), &Player::prevTurnsSecondsChanged, this, [this, i](){
+        emit dataChanged(index(i, 0), index(i, 0), {DataRoles::PastTurnsSeconds});
+    });
 
     endInsertRows();
 }
@@ -107,6 +119,8 @@ QHash<int, QByteArray> PlayersModel::roleNames() const
         { DataRoles::TownLead, "TOWN_LEAD" },
         { DataRoles::RoadLead, "ROAD_LEAD" },
         { DataRoles::BiggestTown, "BIGGEST_TOWN" },
-        { DataRoles::BiggestRoad, "BIGGEST_ROAD" }
+        { DataRoles::BiggestRoad, "BIGGEST_ROAD" },
+        { DataRoles::CurrentTurnSeconds, "CURRENT_TURN_TIME" },
+        { DataRoles::PastTurnsSeconds, "PAST_TURNS_TIME" }
     };
 }

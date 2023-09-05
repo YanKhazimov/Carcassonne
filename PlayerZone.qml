@@ -97,7 +97,7 @@ Item {
 
     Shape {
         id: playerNameShape
-        anchors.top: parent.top; anchors.topMargin: 35
+        anchors.top: parent.top; anchors.topMargin: 50
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 20
         height: playerName.height
@@ -160,66 +160,11 @@ Item {
         when: playerData
     }
 
-    Row {
-        id: timerRow
-
-        anchors.top: playerNameShape.bottom; anchors.topMargin: 5
-        anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 0
-
-        Text {
-            id: prevTurnsTime
-
-            readonly property int minutes: playerData ? playerData.PreviousTime / 60 : 0
-            readonly property int seconds: playerData ? playerData.PreviousTime % 60 : 0
-
-            readonly property string minutesString: minutes < 10 ? "0" + minutes : minutes
-            readonly property string secondsString: seconds < 10 ? "0" + seconds : seconds
-
-            text: minutesString + ":" + secondsString
-            font.pixelSize: 15
-            font.family: Fonts.font4
-            visible: playerData && playerData.PreviousTime !== 0 || !currentTurnTime.visible
-        }
-
-        Text {
-            text: " + "
-            font.pixelSize: 15
-            font.family: Fonts.font4
-            visible: prevTurnsTime.visible && currentTurnTime.visible
-        }
-
-        Text {
-            id: currentTurnTime
-
-            readonly property int minutes: playerData ? playerData.CurrentTime / 60 : 0
-            readonly property int seconds: playerData ? playerData.CurrentTime % 60 : 0
-
-            readonly property string minutesString: minutes < 10 ? "0" + minutes : minutes
-            readonly property string secondsString: seconds < 10 ? "0" + seconds : seconds
-
-            text: minutesString + ":" + secondsString
-            font.pixelSize: 15
-            font.family: Fonts.font4
-            visible: playerData && playerData.CurrentTime !== 0
-            color: playerData && playerData.CurrentTime > 30 ? "white" : "black"
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: -3
-                radius: 3
-                color: "red"
-                visible: playerData && playerData.CurrentTime > 30
-                z: parent.z - 1
-            }
-        }
-    }
-
     ItemGroup {
         id: bonusesGroup
 
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: timerRow.bottom; anchors.topMargin: 5
+        anchors.top: playerNameShape.bottom; anchors.topMargin: 5
         title.text: "БОНУСЫ"
         color: activeColor
 

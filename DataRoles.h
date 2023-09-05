@@ -25,7 +25,9 @@ enum DataRoles {
     EventObjectType,
     EventObjectSize,
     EventMeepleType,
-    EventMeepleTypes
+    EventMeepleTypes,
+    CurrentTurnSeconds,
+    PastTurnsSeconds
 };
 
 #endif // DATAROLES_H

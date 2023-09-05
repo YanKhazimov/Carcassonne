@@ -46,7 +46,7 @@ void Player::setActive(bool value)
         {
             turnTimer.stop();
 
-            addToPreviousTime(currentTurnSeconds);
+            addToPreviousTime(currentTurnSeconds + 1); // rounding seconds up to avoid 0s turns
             currentTurnSeconds = 0;
             emit currentTurnSecondsChanged();
         }
@@ -201,6 +201,16 @@ void Player::setPlace(int value)
 int Player::getPlace() const
 {
     return place;
+}
+
+int Player::getPrevTurnsSeconds() const
+{
+    return prevTurnsSeconds;
+}
+
+int Player::getCurrentTurnSeconds() const
+{
+    return currentTurnSeconds;
 }
 
 void Player::addToPreviousTime(int seconds)

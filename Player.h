@@ -25,8 +25,8 @@ class Player : public QObject
     Q_PROPERTY(int BiggestRoad READ getBiggestRoad WRITE setBiggestRoad NOTIFY biggestRoadChanged)
     Q_PROPERTY(bool TownLead READ getTownLead WRITE setTownLead NOTIFY townLeadChanged)
     Q_PROPERTY(bool RoadLead READ getRoadLead WRITE setRoadLead NOTIFY roadLeadChanged)
-    Q_PROPERTY(int PreviousTime MEMBER prevTurnsSeconds NOTIFY prevTurnsSecondsChanged)
-    Q_PROPERTY(int CurrentTime MEMBER currentTurnSeconds NOTIFY currentTurnSecondsChanged)
+    Q_PROPERTY(int PreviousTime READ getPrevTurnsSeconds NOTIFY prevTurnsSecondsChanged)
+    Q_PROPERTY(int CurrentTime READ getCurrentTurnSeconds NOTIFY currentTurnSecondsChanged)
 
     QColor color;
     bool active;
@@ -88,6 +88,9 @@ public:
 
     void setPlace(int value);
     int getPlace() const;
+
+    int getPrevTurnsSeconds() const;
+    int getCurrentTurnSeconds() const;
 
 signals:
     void isActiveChanged();
