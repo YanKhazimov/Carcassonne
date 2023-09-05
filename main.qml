@@ -8,16 +8,8 @@ import "schematic"
 Window {
     id: root
 
-    width: 1920
-    height: 990
-    Component.onCompleted: {
-            x = Screen.width / 2 - width / 2
-            y = Screen.height / 2 - height / 2
-        }
     visible: true
-    title: qsTr("Carcassonne")
-    flags: Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint |
-           Qt.WindowSystemMenuHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint
+    visibility: "FullScreen"
 
     Image {
         id: background
@@ -63,6 +55,10 @@ Window {
         target: loader.item
         function onUrlRequested(urlAddress) {
             loader.source = urlAddress
+        }
+        function onExitRequested() {
+            loader.source = ""
+            Qt.quit()
         }
     }
 }

@@ -12,6 +12,7 @@ AnimatedItem {
     property BaseMeeple meeple
 
     required property Board board
+    required property MenuTabs tabs
     readonly property bool isPreview: board == null
     property int playerIndex: -1
 
@@ -20,6 +21,7 @@ AnimatedItem {
 
     property bool isInHand: true
 
+    visible: !isInHand || tabs.handsTabActive
     width: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
     height: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
     animationDuration: 500
@@ -219,7 +221,7 @@ AnimatedItem {
         id: picture
 
         rotation: tileData ? tileData.ImageRotation : 0
-        visible: !Preferences.schematicView
+        visible: !Preferences.schematicView || isInHand
 
         Behavior on rotation {
             NumberAnimation {
@@ -228,7 +230,7 @@ AnimatedItem {
             }
         }
 
-        active: Preferences.greyoutView && tileData && tileData.IsFixed
+        active: Preferences.greyoutView && tileData && !isInHand
         opacityValue: 1.0
         imageSource: Image {
             source: tileData ? tileData.Picture : ""

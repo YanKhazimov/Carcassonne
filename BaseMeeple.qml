@@ -18,9 +18,11 @@ AnimatedItem {
     required property var imageSource
     required property real typeWidthModifier
     required property real typeHeightModifier
+    property MenuTabs tabs: null
 
     property bool isInHand: true
 
+    visible: !isInHand || !tabs || tabs.handsTabActive
     width: typeWidthModifier * (isInHand ? Constants.smallMeeplePreviewSize : Constants.smallMeepleSize)
     height: typeHeightModifier * (isInHand ? Constants.smallMeeplePreviewSize : Constants.smallMeepleSize)
 
@@ -134,8 +136,8 @@ AnimatedItem {
                      Qt.point(center + shineGradient.width * 0.5, center + shineGradient.height * 0.5)
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 0.5; color: "white" }
-                GradientStop { position: 1.0; color: "black" }
+                GradientStop { position: 0.5; color: "#88ffffff" }
+                GradientStop { position: 1.0; color: "transparent" }
             }
         }
         visible: false

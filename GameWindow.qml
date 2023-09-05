@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQml 2.15
 import QmlPresenter 1.0
+import QtGraphicalEffects 1.15
 import EngineEnums 1.0
 import "schematic"
 
@@ -17,6 +18,7 @@ Item {
     property Item lastPlacedTile: null
 
     signal urlRequested(var urlAddress)
+    signal exitRequested()
 
     function onLoaded() {
         initialAnimation.start()
@@ -62,26 +64,36 @@ Item {
     }
 
     Keys.onPressed: {
-        if (event.key === Qt.Key_R) {
-            remainingTilesPopup.visible = !remainingTilesPopup.visible
-        }
-        if (event.key === Qt.Key_L) {
-            gameLogPopup.visible = !gameLogPopup.visible
-        }
-        if (event.key === Qt.Key_G) {
-            Preferences.greyoutView = !Preferences.greyoutView
+        if (lastKeyPressed !== event.key) {
+            lastKeyPressed = event.key
+
+            if (event.key === Qt.Key_G) {
+                Preferences.greyoutView = !Preferences.greyoutView
+            }
+            if (event.key === Qt.Key_Tab) {
+                engine.passTurn(regularTiles.length)
+            }
+            if (event.key === Qt.Key_S) {
+                Preferences.schematicView = !Preferences.schematicView
+            }
         }
     }
+    Keys.onReleased: {
+        lastKeyPressed = undefined
+    }
+
+    property var lastKeyPressed
 
     function createTileItem(x, y, getX) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
             var obj = comp.createObject(root,
                                      {
-                                         "tileData": engine.getTile(regularTiles.length),
-                                         "x": getX ? Qt.binding(getX) : x,
-                                         "y": y,
-                                         "board": board
+                                            "tileData": engine.getTile(regularTiles.length),
+                                            "x": getX ? Qt.binding(getX) : x,
+                                            "y": y,
+                                            "board": board,
+                                            "tabs": menuTabs
                                      })
 
             if (engine.ActivePlayer !== -1 &&
@@ -126,7 +138,8 @@ Item {
                                             "y": position.y,
                                             "board": board,
                                             "playerIndex": playerIndex,
-                                            "opacity": 0
+                                            "opacity": 0,
+                                            "tabs": menuTabs
                                         })
             obj.dragStarted.connect(function() {
                 obj.z = 1
@@ -182,7 +195,8 @@ Item {
                                             "x": position.x,
                                             "y": position.y,
                                             "playerIndex": playerIndex,
-                                            "opacity": 0
+                                            "opacity": 0,
+                                            "tabs": menuTabs
                                         })
             obj.dragStarted.connect(function() {
                 if (root.activeMeeple !== obj)
@@ -314,6 +328,15 @@ Item {
         meeples[0].appear()
     }
 
+    function drawTile() {
+        let globalPosition = common.mapToItem(root, regularTilePlaceholder.x, regularTilePlaceholder.y)
+        var tile = createTileItem(globalPosition.x, globalPosition.y, null)
+        tile.playerIndex = engine.ActivePlayer
+        board.activeTile = tile
+        regularTiles.push(tile)
+        engine.GameState = GameEngine.TileDrawn
+    }
+
     function endTurn() {
         engine.highlight(-1)
         engine.passTurn(regularTiles.length)
@@ -321,10 +344,11 @@ Item {
 
     Component.onCompleted: {
         tilesInDeck = engine.deck.rowCount() - 1
+        forceActiveFocus()
     }
 
     Rectangle {
-        id: background
+        id: backgroundLeft
 
         color: "black"
         width: boardFinalPosition.x
@@ -338,10 +362,24 @@ Item {
             sourceSize.height: 144
             anchors.fill: parent
             fillMode: Image.Tile
-            Keys.onTabPressed: {
-                engine.passTurn(regularTiles.length)
-            }
-            Component.onCompleted: forceActiveFocus()
+        }
+    }
+
+    Rectangle {
+        id: backgroundRight
+
+        color: "black"
+        anchors.left: board.left
+        height: parent.height
+        width: board.width
+
+        Image {
+            opacity: 0.3
+            source: "qrc:/img/background.png"
+            sourceSize.width: 144
+            sourceSize.height: 144
+            anchors.fill: parent
+            fillMode: Image.Tile
         }
     }
 
@@ -350,7 +388,7 @@ Item {
 
         width: board.width
         height: board.height
-        anchors.bottom: parent.bottom
+        anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
     }
 
@@ -359,7 +397,7 @@ Item {
 
         height: 990
         width: height
-        anchors.bottom: boardFinalPosition.bottom
+        y: boardFinalPosition.y
         anchors.right: boardFinalPosition.right; anchors.rightMargin: width * (-1 + slideInAnimation.progressPercentage)
 
         Component.onCompleted: {
@@ -384,41 +422,96 @@ Item {
         z: 1
     }
 
-    function drawTile() {
-        let globalPosition = common.mapToItem(root, regularTilePlaceholder.x, regularTilePlaceholder.y)
-        var tile = createTileItem(globalPosition.x, globalPosition.y, null)
-        tile.playerIndex = engine.ActivePlayer
-        board.activeTile = tile
-        regularTiles.push(tile)
-        engine.GameState = GameEngine.TileDrawn
+    Row {
+        anchors.horizontalCenter: board.horizontalCenter
+        anchors.bottom: board.top
+        anchors.top: parent.top
+        spacing: 50
+
+        Repeater {
+            model: [
+                [ Qt.Key_Escape, "Esc", "Меню" ],
+                [ Qt.Key_G, "G", "Ч/б" ],
+                [ Qt.Key_S, "S", "Схемы" ]
+            ]
+            delegate: Row {
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 10
+
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: root.lastKeyPressed === modelData[0] ? "grey" : "white"
+                    border.width: 2
+                    border.color: "black"
+                    radius: 5
+                    width: Math.max(30, keyText.contentWidth + 20)
+                    height: 30
+
+                    Text {
+                        id: keyText
+                        text: modelData[1]
+                        anchors.centerIn: parent
+                    }
+                }
+
+                MyText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: modelData[2]
+                    color: "white"
+                }
+            }
+        }
+    }
+
+    MenuTabs {
+        id: menuTabs
+
+        anchors.left: backgroundLeft.left
+        anchors.right: backgroundLeft.right
+        anchors.top: scoreboardSpace.bottom; anchors.topMargin: 20
     }
 
     Item {
-        id: playersSpace
+        id: tabsSpace
 
-        anchors.top: parent.top
-        anchors.bottom: scoreboardSpace.top
-        anchors.margins: 10
-        width: boardFinalPosition.x - 2 * anchors.margins
-        anchors.right: background.right
+        width: boardFinalPosition.x
+        anchors.right: backgroundLeft.right
+        anchors.top: menuTabs.bottom
+        anchors.bottom: board.bottom
 
-        Row {
-            width: parent.width + 2 * 10
-            anchors.horizontalCenter: parent.horizontalCenter
-            clip: true
+        LinearGradient {
+            anchors.fill: parent
+            start: Qt.point(width/2, 0)
+            end: Qt.point(width/2, height)
 
-            Repeater {
-                model: 25
-                delegate: Image {
-                    source: "qrc:/img/pattern.png"
-                    fillMode: Image.PreserveAspectFit
-                }
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#bb000000" }
+                GradientStop { position: 1.0; color: "transparent" }
             }
+        }
+
+        RemainingContent {
+            anchors.fill: parent
+            visible: menuTabs.activeTab === 1
+        }
+
+        GameLog {
+            anchors.fill: parent
+            visible: menuTabs.activeTab === 2
+        }
+
+        Image {
+            visible: menuTabs.activeTab === 0
+            width: parent.width
+            height: sourceSize.height
+            source: "qrc:/img/pattern.png"
+            fillMode: Image.TileHorizontally
         }
 
         Row {
             id: playersRow
 
+            visible: menuTabs.activeTab === 0
             anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height
             width: childrenRect.width
@@ -427,7 +520,6 @@ Item {
             PlayerZone {
                 id: playerZone0
 
-                width: (playersSpace.width - parent.spacing * 3) / 4
                 height: parent.height
                 playerIndex: 0
                 visible: engine && engine.PlayerCount > playerIndex
@@ -436,7 +528,6 @@ Item {
             PlayerZone {
                 id: playerZone1
 
-                width: (playersSpace.width - parent.spacing * 3) / 4
                 height: parent.height
                 playerIndex: 1
                 visible: engine && engine.PlayerCount > playerIndex
@@ -445,7 +536,6 @@ Item {
             PlayerZone {
                 id: playerZone2
 
-                width: (playersSpace.width - parent.spacing * 3) / 4
                 height: parent.height
                 playerIndex: 2
                 visible: engine && engine.PlayerCount > playerIndex
@@ -454,7 +544,6 @@ Item {
             PlayerZone {
                 id: playerZone3
 
-                width: (playersSpace.width - parent.spacing * 3) / 4
                 height: parent.height
                 playerIndex: 3
                 visible: engine && engine.PlayerCount > playerIndex
@@ -472,7 +561,7 @@ Item {
                                               Qt.point(0, 0)
 
         spacing: 10
-        visible: engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready
+        visible: engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready && menuTabs.activeTab === 0
         x: position.x
         y: position.y
 
@@ -597,43 +686,15 @@ Item {
     Item {
         id: scoreboardSpace
 
-        anchors.bottom: parent.bottom
+        anchors.top: parent.top
         height: 160
         width: boardFinalPosition.x - 2 * anchors.margins
-        anchors.right: background.right
+        anchors.right: backgroundLeft.right
         anchors.margins: 10
 
         Scoreboard {
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.centerIn: parent
         }
-
-        TileViewSwitch {
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-        }
-    }
-
-    ReferencePopup {
-        id: remainingTilesPopup
-
-        anchors.centerIn: parent
-        width: parent.width - 200
-        height: parent.height - 200
-        visible: false
-        modal: true
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-    }
-
-    LogPopup {
-        id: gameLogPopup
-
-        anchors.centerIn: parent
-        width: parent.width - 200
-        height: parent.height - 200
-        visible: false
-        modal: true
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
     }
 
     Popup {

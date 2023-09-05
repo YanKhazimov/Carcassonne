@@ -46,7 +46,7 @@ Item {
         return Qt.point(x, y)
     }
 
-    implicitWidth: 100
+    implicitWidth: bannerImage.width
     implicitHeight: 200
 
     Item {
