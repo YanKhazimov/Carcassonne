@@ -322,6 +322,7 @@ void QmlPresenter::scoreCompletedObject(unsigned objectId)
         for (auto playerIndex: mostPresentPlayers)
         {
             getPlayer(playerIndex)->scorePoints(points);
+            emit pointsScored(points, getPlayer(playerIndex)->getColor(), object->tile);
         }
 
         removeMeepleFromObject(object, { QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeepleBuilder });
@@ -350,7 +351,9 @@ void QmlPresenter::scoreFieldMeeples(unsigned objectId, int meepleScore)
             for (auto playerIndex: mostPresentPlayers)
             {
                 bool pig = pigs.find(playerIndex) != pigs.end();
-                getPlayer(playerIndex)->scorePoints(fieldTowns * (pig ? (meepleScore + 1) : meepleScore));
+                int points = fieldTowns * (pig ? (meepleScore + 1) : meepleScore);
+                getPlayer(playerIndex)->scorePoints(points);
+                emit pointsScored(points, getPlayer(playerIndex)->getColor(), object->tile);
             }
         }
     }

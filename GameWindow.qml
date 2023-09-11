@@ -16,6 +16,7 @@ Item {
     readonly property var zones: [playerZone0, playerZone1, playerZone2, playerZone3]
     property int tilesInDeck
     property Item lastPlacedTile: null
+    property var scoresByTile: ({})
 
     signal urlRequested(var urlAddress)
     signal exitRequested()
@@ -412,6 +413,41 @@ Item {
                                       })
             tile.isInHand = false
             regularTiles.push(tile)
+        }
+
+        Connections {
+            target: engine
+            function onPointsScored(points, playerColor, tile) {
+                let scoreComponent = Qt.createComponent("HFadeawayText.qml")
+                if (scoreComponent.status === Component.Ready) {
+                    if (tile in scoresByTile) {
+                        scoresByTile[tile]++
+                    }
+                    else {
+                        scoresByTile[tile] = 0
+                    }
+
+                    let coeff = tile.Y > 0 ? -100 : 100
+                    let startPos = board.mapToItem(root,
+                                                   board.getX(tile.X),
+                                                   board.getY(tile.Y) + coeff * scoresByTile[tile])
+                    var obj = scoreComponent.createObject(root,
+                                                          {
+                                                              "startPos": startPos,
+                                                              "hDelta": -500,
+                                                              "opacity": 1.0,
+                                                              "color": playerColor,
+                                                              "text": "+" + points,
+                                                              "z": 1,
+                                                              "font.pixelSize": 100,
+                                                              "font.family": Fonts.funny
+                                                          })
+                    obj.run()
+                }
+                else {
+                    console.error("AnimatedScore component status:", scoreComponent.status, scoreComponent.errorString())
+                }
+            }
         }
     }
 

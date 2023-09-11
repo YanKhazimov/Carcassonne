@@ -150,6 +150,7 @@ signals:
     void showMessage(QString message, GameState stateToSet);
     void scorableFieldsChanged();
     void gameLogChanged();
+    void pointsScored(int points, QColor playerColor, Tile* tile);
 };
 
 #endif // QMLPRESENTER_H

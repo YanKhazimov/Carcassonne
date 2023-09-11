@@ -30,6 +30,10 @@ Item {
         id: zeroCool
         source: "qrc:/fonts/ZeroCool.otf"
     }
+    FontLoader {
+        id: cardigan_titling_bd
+        source: "qrc:/fonts/cardigan_titling_bd.otf"
+    }
 
     readonly property string font1: zekton.name
     readonly property string font2: engry.name
@@ -38,4 +42,5 @@ Item {
     readonly property string font5: gravtrac_compressed_bd.name
     readonly property string font6: minaeff_Ect_bold.name
     readonly property string font7: zeroCool.name
+    readonly property string funny: cardigan_titling_bd.name
 }

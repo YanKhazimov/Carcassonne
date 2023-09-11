@@ -158,6 +158,7 @@
         <file>MenuTabs.qml</file>
         <file>RemainingContent.qml</file>
         <file>GameLog.qml</file>
+        <file>HFadeawayText.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>
@@ -181,6 +182,7 @@
         <file alias="pattern.png">img/pattern.png</file>
         <file alias="right.png">img/right.png</file>
         <file alias="title.png">img/title.png</file>
+<!--        <file alias="wood.jpg">img/wood4.jpg</file>-->
     </qresource>
     <qresource prefix="/fonts">
         <file alias="gravtrac_compressed_bd.otf">fonts/gravtrac_compressed_bd.otf</file>
@@ -190,5 +192,6 @@
         <file alias="Minaeff_Ect-Bold.ttf">fonts/Minaeff_Ect-Bold.ttf</file>
         <file alias="remissis_sb.otf">fonts/remissis_sb.otf</file>
         <file alias="ZeroCool.otf">fonts/ZeroCool.otf</file>
+        <file alias="cardigan_titling_bd.otf">fonts/cardigan_titling_bd.otf</file>
     </qresource>
 </RCC>
