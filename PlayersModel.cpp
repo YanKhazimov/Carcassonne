@@ -106,6 +106,11 @@ void PlayersModel::AddPlayer(QColor color, QString name)
     endInsertRows();
 }
 
+QColor PlayersModel::getPlayerColor(int _index) const
+{
+    return players.at(_index)->getColor();
+}
+
 QHash<int, QByteArray> PlayersModel::roleNames() const
 {
     return {

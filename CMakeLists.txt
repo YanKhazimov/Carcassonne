@@ -48,6 +48,8 @@ set(PROJECT_SOURCES
         ScoreboardModel.cpp
         main.cpp
         qml.qrc
+        LogRecords.h
+        LogRecords.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

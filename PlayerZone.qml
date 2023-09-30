@@ -55,10 +55,10 @@ Item {
 
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 40
-        anchors.top: parent.top; anchors.topMargin: playerData && playerData.IsActive ? 440 : 40 // behind banner
-        height: parent.height - 440
+        anchors.top: bannerImage.verticalCenter
+        height: playerData && playerData.IsActive ? parent.height - bannerImage.height/2 : 0
 
-        Behavior on anchors.topMargin {
+        Behavior on height {
             NumberAnimation {
                 id: activationAnimation
 

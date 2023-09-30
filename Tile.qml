@@ -221,7 +221,7 @@ AnimatedItem {
         id: picture
 
         rotation: tileData ? tileData.ImageRotation : 0
-        visible: !Preferences.schematicView || isInHand
+        visible: !Preferences.schematicView
 
         Behavior on rotation {
             NumberAnimation {

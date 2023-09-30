@@ -29,8 +29,7 @@ class QmlPresenter : public QObject
     Q_PROPERTY(RemainingTilesModel* remainingTilesModel READ getRemainingTiles NOTIFY remainingTilesChanged)
     Q_PROPERTY(bool AllFttingTilesPlayed MEMBER allFttingTilesPlayed NOTIFY allFttingTilesPlayedChanged)
     Q_PROPERTY(QVariantList ScorableFields READ getScorableFields NOTIFY scorableFieldsChanged)
-    Q_PROPERTY(bool BuilderBonus MEMBER builderBonus CONSTANT)
-    Q_PROPERTY(QAbstractListModel* GameLog READ getLogMessages NOTIFY gameLogChanged)
+    Q_PROPERTY(QAbstractListModel* TurnLog READ getTurnLogRecords NOTIFY gameLogChanged)
 
 public:
     enum class GameState {
@@ -57,16 +56,14 @@ private:
     MapModel* getMapModel();
 
     unsigned highlightedObjId = -1;
-    int maxWheat = 0, maxBarrels = 0, maxCloth = 0;
+    int maxResources[QmlEnums::BonusType::MaxResourceType];
     int maxTown = 0, maxRoad = 0;
 
     int unassignedWheat = 0;
     int unassignedBarrels = 0;
     int unassignedCloth = 0;
 
-    void addWheatToActivePlayer(int amount);
-    void addBarrelsToActivePlayer(int amount);
-    void addClothToActivePlayer(int amount);
+    void addResourceToActivePlayer(int amount, QmlEnums::BonusType resourceType);
 
     GameState gameState;
 
@@ -105,15 +102,19 @@ private:
     std::set<unsigned> scorableFields;
     QVariantList getScorableFields() const;
     void addMeepleToObject(std::shared_ptr<MapObjectData>& object, QmlEnums::MeepleType meepleType, int playerIndex, Tile* tile);
-    std::list<MapObjectData::MeepleInfo> removeMeepleFromObject(std::shared_ptr<MapObjectData>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
+    void removeMeepleFromObject(std::shared_ptr<MapObjectData>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
 
-    bool builderBonus = false;
+    int bonusTurn = -1;
 
-    QAbstractListModel* getLogMessages();
+    QAbstractListModel* getTurnLogRecords();
 
     void updateScorableFieldIds();
 
     bool abbeyStage = false;
+
+    void onObjectCompleted(unsigned objectId);
+    void logObjectCompletion(unsigned objectId);
+    void onTileFixed(Tile *tile);
 
 public:
     explicit QmlPresenter(QObject *parent = nullptr);

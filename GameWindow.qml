@@ -534,6 +534,13 @@ Item {
         GameLog {
             anchors.fill: parent
             visible: menuTabs.activeTab === 2
+
+            onHighlightedTileChanged: {
+                if (highlightedTile)
+                    dimmer.dimAround(highlightedTile.X, highlightedTile.Y)
+                else
+                    dimmer.undim()
+            }
         }
 
         Image {

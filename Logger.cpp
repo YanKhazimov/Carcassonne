@@ -24,49 +24,58 @@ Logger *Logger::instance()
     return m_instance;
 }
 
-void Logger::log(const std::shared_ptr<LogRecord> &record)
+int Logger::currentTurn() const
+{
+    return Logger::m_turn;
+}
+
+void Logger::logNewTurn(const std::shared_ptr<NewTurnLogRecord> &record)
 {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_messages.append(record);
+    m_turnLogs.push_back({ record, std::make_shared<TurnLog>() });
     endInsertRows();
+}
+
+void Logger::logAction(const std::shared_ptr<LogRecord> &record)
+{
+    m_turnLogs.back().second->logAction(record);
+}
+
+void Logger::logEffect(const std::shared_ptr<LogRecord> &record)
+{
+    m_turnLogs.back().second->logEffect(record);
 }
 
 int Logger::rowCount(const QModelIndex &parent) const
 {
-    return m_messages.size();
+    return m_turnLogs.size();
 }
 
 QVariant Logger::data(const QModelIndex &index, int role) const
 {
-    if (role == DataRoles::EventType)
-        return int(m_messages.at(index.row())->type());
+    if (role == DataRoles::TurnIndex)
+        return int(m_turnLogs.at(index.row()).first->objectSize());
 
-    if (role == DataRoles::PlayerName)
-        return m_messages.at(index.row())->name();
+    if (role == DataRoles::TurnActions)
+        return QVariant::fromValue(m_turnLogs.at(index.row()).second.get());
 
     if (role == DataRoles::PlayerColor)
-        return m_messages.at(index.row())->color();
+        return m_turnLogs.at(index.row()).first->color();
 
-    if (role == DataRoles::EventPoints)
-        return m_messages.at(index.row())->points();
+//    if (role == DataRoles::EventPoints)
+//        return m_messages.at(index.row())->points();
 
-    if (role == DataRoles::EventObjectType)
-        return m_messages.at(index.row())->objectType();
+//    if (role == DataRoles::EventMeepleType)
+//        return m_messages.at(index.row())->meeple();
 
-    if (role == DataRoles::EventObjectSize)
-        return m_messages.at(index.row())->objectSize();
-
-    if (role == DataRoles::EventMeepleType)
-        return m_messages.at(index.row())->meeple();
-
-    if (role == DataRoles::EventMeepleTypes) {
-        QVariantList meeples;
-        for (auto meeple: m_messages.at(index.row())->meeples())
-        {
-            meeples.push_back(meeple.meepleType);
-        }
-        return meeples;
-    }
+//    if (role == DataRoles::EventMeepleTypes) {
+//        QVariantList meeples;
+//        for (auto meeple: m_messages.at(index.row())->meeples())
+//        {
+//            meeples.push_back(meeple.meepleType);
+//        }
+//        return meeples;
+//    }
 
     return QVariant();
 }
@@ -74,184 +83,141 @@ QVariant Logger::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> Logger::roleNames() const
 {
     return {
-        { DataRoles::EventType, "TYPE" },
+//        { DataRoles::PlayerName, "NAME" },
+        { DataRoles::PlayerColor, "COLOR" },
+//        { DataRoles::EventPoints, "POINTS" },
+//        { DataRoles::EventObjectType, "OBJECT_TYPE" },
+//        { DataRoles::EventObjectSize, "OBJECT_SIZE" },
+//        { DataRoles::EventMeepleType, "MEEPLE_TYPE" },
+//        { DataRoles::EventMeeples, "MEEPLE_TYPES" },
+        { DataRoles::TurnIndex, "TURN" },
+        { DataRoles::TurnActions, "ACTIONS" }
+    };
+}
+
+TurnLog::TurnLog(QObject *parent) : QAbstractListModel(parent)
+{
+}
+
+void TurnLog::logAction(std::shared_ptr<LogRecord> actionRecord)
+{
+    beginInsertRows(QModelIndex(), rowCount(), rowCount());
+    actionRecords.push_back({ actionRecord, std::make_shared<EffectsModel>() });
+    endInsertRows();
+}
+
+void TurnLog::logEffect(std::shared_ptr<LogRecord> effectRecord)
+{
+    if (actionRecords.empty())
+    {
+        logAction(effectRecord);
+    }
+    actionRecords.back().second->logEffect(effectRecord);
+}
+
+int TurnLog::rowCount(const QModelIndex &parent) const
+{
+    return actionRecords.size();
+}
+
+QVariant TurnLog::data(const QModelIndex &index, int role) const
+{
+    if (role == DataRoles::PlayerColor)
+        return actionRecords.at(index.row()).first->color();
+
+    if (role == DataRoles::PlayerName)
+        return actionRecords.at(index.row()).first->name();
+
+    if (role == DataRoles::EventType)
+        return int(actionRecords.at(index.row()).first->type());
+
+    if (role == DataRoles::EventObjectType)
+        return actionRecords.at(index.row()).first->objectType();
+
+    if (role == DataRoles::EventObjectSize)
+        return actionRecords.at(index.row()).first->objectSize();
+
+    if (role == DataRoles::EventObjectId)
+        return actionRecords.at(index.row()).first->objectId();
+
+    if (role == DataRoles::EventMeepleType)
+        return actionRecords.at(index.row()).first->meeple();
+
+    if (role == DataRoles::ActionEffects)
+        return QVariant::fromValue(actionRecords.at(index.row()).second.get());
+
+    if (role == DataRoles::EventTile)
+        return QVariant::fromValue(actionRecords.at(index.row()).first->tile());
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> TurnLog::roleNames() const
+{
+    return {
+        { DataRoles::EventType, "EVENT_TYPE" },
         { DataRoles::PlayerName, "NAME" },
+        { DataRoles::PlayerColor, "COLOR" },
+        { DataRoles::EventObjectType, "OBJECT_TYPE" },
+        { DataRoles::EventObjectSize, "OBJECT_SIZE" },
+        { DataRoles::EventObjectId, "OBJECT_ID" },
+        { DataRoles::EventMeepleType, "MEEPLE_TYPE" },
+        { DataRoles::ActionEffects, "EFFECTS" },
+        { DataRoles::EventTile, "TILE" }
+    };
+}
+
+EffectsModel::EffectsModel(QObject *parent) : QAbstractListModel(parent)
+{
+}
+
+void EffectsModel::logEffect(std::shared_ptr<LogRecord> effectRecord)
+{
+    beginInsertRows(QModelIndex(), rowCount(), rowCount());
+    effectRecords.push_back(effectRecord);
+    endInsertRows();
+}
+
+int EffectsModel::rowCount(const QModelIndex &parent) const
+{
+    return effectRecords.size();
+}
+
+QVariant EffectsModel::data(const QModelIndex &index, int role) const
+{
+    if (role == DataRoles::EventType)
+        return int(effectRecords.at(index.row())->type());
+
+    if (role == DataRoles::PlayerColor)
+        return effectRecords.at(index.row())->color();
+
+    if (role == DataRoles::EventPoints)
+        return effectRecords.at(index.row())->points();
+
+    if (role == DataRoles::EventObjectType)
+        return effectRecords.at(index.row())->objectType();
+
+    if (role == DataRoles::EventObjectSize)
+        return effectRecords.at(index.row())->objectSize();
+
+    if (role == DataRoles::EventResourceType)
+        return effectRecords.at(index.row())->resourceType();
+
+    if (role == DataRoles::EventMeeples)
+        return QVariant::fromValue(effectRecords.at(index.row())->meeples());
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> EffectsModel::roleNames() const
+{
+    return {
+        { DataRoles::EventType, "EVENT_TYPE" },
         { DataRoles::PlayerColor, "COLOR" },
         { DataRoles::EventPoints, "POINTS" },
         { DataRoles::EventObjectType, "OBJECT_TYPE" },
         { DataRoles::EventObjectSize, "OBJECT_SIZE" },
-        { DataRoles::EventMeepleType, "MEEPLE_TYPE" },
-        { DataRoles::EventMeepleTypes, "MEEPLE_TYPES" }
+        { DataRoles::EventResourceType, "RESOURCE_TYPE" },
+        { DataRoles::EventMeeples, "MEEPLES" }
     };
-}
-
-LogRecord::LogRecord(QmlEnums::LogRecordType type, QObject *parent)
-    : QObject(parent), m_type(type)
-{
-}
-
-QmlEnums::LogRecordType LogRecord::type()
-{
-    return m_type;
-}
-
-QColor LogRecord::color() const
-{
-    return "black";
-}
-
-QString LogRecord::name() const
-{
-    return "-";
-}
-
-int LogRecord::points() const
-{
-    qWarning() << "accessing abstract points data of LogRecord";
-    return -1;
-}
-
-QString LogRecord::objectType() const
-{
-    qWarning() << "accessing abstract ObjectType data of LogRecord";
-    return objectStrings.value("acc").value(ObjectType::None);
-}
-
-int LogRecord::objectSize() const
-{
-    qWarning() << "accessing abstract ObjectSize data of LogRecord";
-    return -1;
-}
-
-QmlEnums::MeepleType LogRecord::meeple() const
-{
-    return QmlEnums::MeepleType::MeepleNone;
-}
-
-QList<MapObjectData::MeepleInfo> LogRecord::meeples() const
-{
-    return {};
-}
-
-ScoringLogRecord::ScoringLogRecord(QColor color, QString name, int points, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogScoring, color, name, parent), m_points(points)
-{
-}
-
-int ScoringLogRecord::points() const
-{
-    return m_points;
-}
-
-CompletionLogRecord::CompletionLogRecord(QColor color, QString name, ObjectType objectType, int objectSize, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogObjectCompletion, color, name, parent),
-    m_objectType(objectType), m_objectSize(objectSize)
-{
-}
-
-QString CompletionLogRecord::objectType() const
-{
-    return objectStrings.value("acc").value(m_objectType);
-}
-
-int CompletionLogRecord::objectSize() const
-{
-    return m_objectSize;
-}
-
-FreeTurnLogRecord::FreeTurnLogRecord(QColor color, QString name, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogFreeTurn, color, name, parent)
-{
-}
-
-RoadLeadLogRecord::RoadLeadLogRecord(QColor color, QString name, int objectSize, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogRoadLeadChange, color, name, parent), m_objectSize(objectSize)
-{
-}
-
-int RoadLeadLogRecord::objectSize() const
-{
-    return m_objectSize;
-}
-
-TownLeadLogRecord::TownLeadLogRecord(QColor color, QString name, int objectSize, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogTownLeadChange, color, name, parent), m_objectSize(objectSize)
-{
-}
-
-int TownLeadLogRecord::objectSize() const
-{
-    return m_objectSize;
-}
-
-MeeplePlaceLogRecord::MeeplePlaceLogRecord(QColor color, QString name, ObjectType objectType, QmlEnums::MeepleType meeple, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogMeeplePlaced, color, name, parent), m_objectType(objectType), m_meeple(meeple)
-{
-}
-
-QString MeeplePlaceLogRecord::objectType() const
-{
-    return objectStrings.value("acc").value(m_objectType);
-}
-
-QmlEnums::MeepleType MeeplePlaceLogRecord::meeple() const
-{
-    return m_meeple;
-}
-
-FieldMeepleReleaseLogRecord::FieldMeepleReleaseLogRecord(QColor color, QString name,
-                                                         QList<MapObjectData::MeepleInfo> meeples, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogMeepleReleased, color, name, parent), m_meeples(meeples)
-{
-}
-
-QList<MapObjectData::MeepleInfo> FieldMeepleReleaseLogRecord::meeples() const
-{
-    return m_meeples;
-}
-
-NewTurnLogRecord::NewTurnLogRecord(QColor color, QString name, int turn, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogNewTurn, color, name, parent), m_turn(turn)
-{
-}
-
-int NewTurnLogRecord::objectSize() const
-{
-    return m_turn;
-}
-
-ResourceLeadLogRecord::ResourceLeadLogRecord(QColor color, QString name, int amount, QString resourceType, QObject *parent)
-    : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogResourceLeadChange, color, name, parent),
-    m_amount(amount), m_resourceType(resourceType)
-{
-}
-
-int ResourceLeadLogRecord::objectSize() const
-{
-    return m_amount;
-}
-
-QString ResourceLeadLogRecord::objectType() const
-{
-    return m_resourceType;
-}
-
-GameEndLogRecord::GameEndLogRecord(QObject *parent)
-    : LogRecord(QmlEnums::LogRecordType::LogGameEnd, parent)
-{
-}
-
-PlayerSpecificLogRecord::PlayerSpecificLogRecord(QmlEnums::LogRecordType type, QColor color, QString name, QObject *parent)
-    : LogRecord(type, parent), m_color(color), m_name(name)
-{
-}
-
-QColor PlayerSpecificLogRecord::color() const
-{
-    return m_color;
-}
-
-QString PlayerSpecificLogRecord::name() const
-{
-    return m_name;
 }

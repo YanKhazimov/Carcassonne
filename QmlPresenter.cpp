@@ -24,60 +24,30 @@ MapModel *QmlPresenter::getMapModel()
     return &mapModel;
 }
 
-void QmlPresenter::addWheatToActivePlayer(int amount)
+void QmlPresenter::addResourceToActivePlayer(int amount, QmlEnums::BonusType resourceType)
 {
-    Player* acivePlayerPtr = getPlayer(activePlayer());
-    acivePlayerPtr->addWheat(amount);
+    Player* activePlayerPtr = getPlayer(activePlayer());
+    activePlayerPtr->addResource(amount, resourceType);
 
-    maxWheat = qMax(maxWheat, acivePlayerPtr->getWheat());
+    maxResources[resourceType] = qMax(maxResources[resourceType], activePlayerPtr->getResource(resourceType));
 
     for (int i = 0; i < players.rowCount(); ++i)
     {
         Player* player = getPlayer(i);
-        player->setWheatLead(player->getWheat() == maxWheat);
-
-        if (player->getWheatLead())
-        {
-            Logger::instance()->log(std::make_shared<ResourceLeadLogRecord>(player->getColor(), player->getName(), maxWheat, "пшенице"));
-        }
+        player->setResourceLead(resourceType, player->getResource(resourceType) == maxResources[resourceType]);
     }
-}
 
-void QmlPresenter::addBarrelsToActivePlayer(int amount)
-{
-    Player* acivePlayerPtr = getPlayer(activePlayer());
-    acivePlayerPtr->addBarrels(amount);
-
-    maxBarrels = qMax(maxBarrels, acivePlayerPtr->getBarrels());
-
-    for (int i = 0; i < players.rowCount(); ++i)
+    if (maxResources[resourceType] == activePlayerPtr->getResource(resourceType))
     {
-        Player* player = getPlayer(i);
-        player->setBarrelsLead(player->getBarrels() == maxBarrels);
-
-        if (player->getBarrelsLead())
-        {
-            Logger::instance()->log(std::make_shared<ResourceLeadLogRecord>(player->getColor(), player->getName(), maxBarrels, "бочкам"));
-        }
+        // took or extended the lead -> log it
+        Logger::instance()->logEffect(std::make_shared<ResourceLeadLogRecord>(activePlayerPtr->getColor(), activePlayerPtr->getName(),
+                                                                              maxResources[resourceType], amount, resourceType));
     }
-}
-
-void QmlPresenter::addClothToActivePlayer(int amount)
-{
-    Player* acivePlayerPtr = getPlayer(activePlayer());
-    acivePlayerPtr->addCloth(amount);
-
-    maxCloth = qMax(maxCloth, acivePlayerPtr->getCloth());
-
-    for (int i = 0; i < players.rowCount(); ++i)
+    else
     {
-        Player* player = getPlayer(i);
-        player->setClothLead(player->getCloth() == maxCloth);
-
-        if (player->getClothLead())
-        {
-            Logger::instance()->log(std::make_shared<ResourceLeadLogRecord>(player->getColor(), player->getName(), maxCloth, "ткани"));
-        }
+        // no lead -> log gathered amount
+        Logger::instance()->logEffect(std::make_shared<ResourceLogRecord>(activePlayerPtr->getColor(), activePlayerPtr->getName(),
+                                                                          amount, resourceType));
     }
 }
 
@@ -149,7 +119,7 @@ void QmlPresenter::scoreCompletionBonuses(unsigned objectId)
 }
 
 QmlPresenter::QmlPresenter(QObject *parent)
-    : QObject(parent), gameState(GameState::Initialization)
+    : QObject(parent), gameState(GameState::Initialization), maxResources {-1, 0, 0, 0}
 {
     connect(&players, &QAbstractListModel::rowsInserted, this, &QmlPresenter::playerCountChanged);
 
@@ -172,14 +142,11 @@ void QmlPresenter::AddTiles(std::list<Tile> &tiles)
         unassignedBarrels += barrels;
         unassignedCloth += cloth;
 
-        connect(&tile, &Tile::objectCompleted, this, [this](unsigned objectId) {
-            Player* player = getPlayer(activePlayer());
-            auto objectManager = ObjectManager::instance();
-            Logger::instance()->log(std::make_shared<CompletionLogRecord>(player->getColor(), player->getName(),
-                                                                          objectManager->GetObject(objectId)->type, objectManager->countObjectTiles(objectId)));
+        connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::onObjectCompleted);
+        connect(&tile, &Tile::isFixedChanged, this, [&tile, this]() {
+            if (tile.fixed())
+                onTileFixed(&tile);
         });
-        connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
-        connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::scoreCompletionBonuses);
     }
 
     deck.AddTiles(tiles);
@@ -212,8 +179,12 @@ void QmlPresenter::populatePlayers(QVariantList colors, QVariantList names)
     for (int i = 0; i < colors.length(); ++i)
     {
         players.AddPlayer(colors[i].value<QColor>(), names[i].value<QString>());
-        getPlayer(i)->createAbbeyTile();
-        connect(getPlayer(i)->getAbbeyTile(), &Tile::objectCompleted, this, &QmlPresenter::scoreCompletedObject);
+        auto abbeyTile = getPlayer(i)->createAbbeyTile();
+        connect(abbeyTile.get(), &Tile::objectCompleted, this, &QmlPresenter::onObjectCompleted);
+        connect(abbeyTile.get(), &Tile::isFixedChanged, this, [abbeyTile, this]() {
+            if (abbeyTile->fixed())
+                onTileFixed(abbeyTile.get());
+        });
     }
 
     emit players.dataChanged(players.index(0, 0), players.index(players.rowCount() - 1, 0), {DataRoles::PlayerScore});
@@ -233,23 +204,23 @@ void QmlPresenter::scoreTownResorces(unsigned townId)
 {
     auto [wheat, barrels, cloth] = ObjectManager::instance()->getTownResources(townId);
 
-    if (wheat > 0)
-    {
-        addWheatToActivePlayer(wheat);
-        unassignedWheat -= wheat;
-        emit unassignedWheatChanged();
-    }
-
     if (barrels > 0)
     {
-        addBarrelsToActivePlayer(barrels);
+        addResourceToActivePlayer(barrels, QmlEnums::BonusType::Barrel);
         unassignedBarrels -= barrels;
         emit unassignedBarrelsChanged();
     }
 
+    if (wheat > 0)
+    {
+        addResourceToActivePlayer(wheat, QmlEnums::BonusType::Wheat);
+        unassignedWheat -= wheat;
+        emit unassignedWheatChanged();
+    }
+
     if (cloth > 0)
     {
-        addClothToActivePlayer(cloth);
+        addResourceToActivePlayer(cloth, QmlEnums::BonusType::Cloth);
         unassignedCloth -= cloth;
         emit unassignedClothChanged();
     }
@@ -277,7 +248,7 @@ void QmlPresenter::scoreLargestTown(unsigned townId)
 
             if (player->getTownLead())
             {
-                Logger::instance()->log(std::make_shared<TownLeadLogRecord>(player->getColor(), player->getName(), maxTown));
+                Logger::instance()->logEffect(std::make_shared<TownLeadLogRecord>(player->getColor(), player->getName(), maxTown));
             }
         }
     }
@@ -305,7 +276,7 @@ void QmlPresenter::scoreLongestRoad(unsigned roadId)
 
             if (player->getRoadLead())
             {
-                Logger::instance()->log(std::make_shared<RoadLeadLogRecord>(player->getColor(), player->getName(), maxRoad));
+                Logger::instance()->logEffect(std::make_shared<RoadLeadLogRecord>(player->getColor(), player->getName(), maxRoad));
             }
         }
     }
@@ -340,13 +311,7 @@ void QmlPresenter::scoreFieldMeeples(unsigned objectId, int meepleScore)
             std::set<int> pigs = object->pigs();
             int fieldTowns = objectManager->countTownsAround(object->initialId);
 
-            auto removedMeeples = removeMeepleFromObject(object, { QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeeplePig });
-            if (gameState != GameState::GameEnd)
-            {
-                Player* player = getPlayer(activePlayer());
-                Logger::instance()->log(std::make_shared<FieldMeepleReleaseLogRecord>(player->getColor(), player->getName(),
-                                                                                      QList<MapObjectData::MeepleInfo>(removedMeeples.begin(), removedMeeples.end())));
-            }
+            removeMeepleFromObject(object, { QmlEnums::MeepleSmall, QmlEnums::MeepleBig, QmlEnums::MeeplePig });
 
             for (auto playerIndex: mostPresentPlayers)
             {
@@ -463,19 +428,24 @@ void QmlPresenter::addMeepleToObject(std::shared_ptr<MapObjectData> &object, Qml
     }
 }
 
-std::list<MapObjectData::MeepleInfo> QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
+void QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
 {
-    auto removedMeepleles = object->freeMeeples(typesToRemove);
+    auto removedMeeples = object->freeMeeples(typesToRemove);
     if (object->type == ObjectType::Field && object->mostPresentPlayers().empty())
     {
         if (scorableFields.erase(object->currentObject()->initialId) > 0)
             emit scorableFieldsChanged();
     }
 
-    return removedMeepleles;
+    if (gameState != GameState::GameEnd && !removedMeeples.empty())
+    {
+        Player* player = getPlayer(activePlayer());
+        Logger::instance()->logEffect(std::make_shared<FieldMeepleReleaseLogRecord>(player->getColor(), player->getName(),
+                                                                                    std::vector<MapObjectData::MeepleInfo>(removedMeeples.begin(), removedMeeples.end())));
+    }
 }
 
-QAbstractListModel *QmlPresenter::getLogMessages()
+QAbstractListModel *QmlPresenter::getTurnLogRecords()
 {
     return Logger::instance();
 }
@@ -489,6 +459,33 @@ void QmlPresenter::updateScorableFieldIds()
     }
     scorableFields.insert(currentIds.begin(), currentIds.end());
     emit scorableFieldsChanged();
+}
+
+void QmlPresenter::onObjectCompleted(unsigned int objectId)
+{
+    // first, logging the completion action
+    logObjectCompletion(objectId);
+
+    // then processing the effects from completion
+    scoreCompletedObject(objectId);
+    scoreCompletionBonuses(objectId);
+}
+
+void QmlPresenter::logObjectCompletion(unsigned int objectId)
+{
+    Player* player = getPlayer(activePlayer());
+    auto objectManager = ObjectManager::instance();
+    Logger::instance()->logAction(std::make_shared<CompletionLogRecord>(player->getColor(), player->getName(),
+                                                                        objectManager->GetObject(objectId)->type,
+                                                                        objectManager->countObjectTiles(objectId),
+                                                                        objectManager->GetObject(objectId)->initialId));
+}
+
+void QmlPresenter::onTileFixed(Tile* tile)
+{
+    Player* player = getPlayer(activePlayer());
+    if (player)
+        Logger::instance()->logAction(std::make_shared<TilePlaceLogRecord>(player->getColor(), player->getName(), tile));
 }
 
 bool QmlPresenter::processGameEnd(int fixedTilesCount)
@@ -547,20 +544,21 @@ bool QmlPresenter::processGameEnd(int fixedTilesCount)
 
 void QmlPresenter::fixTile(Tile *tile)
 {
-    if (builderBonus)
+    std::shared_ptr<const MapObjectData> builderObject(nullptr);
+    if (bonusTurn != Logger::instance()->currentTurn() && (builderObject = mapModel.builderObjectProgression(tile, activePlayer())))
     {
-        builderBonus = false;
+        bonusTurn = Logger::instance()->currentTurn() + 1;
     }
-    else if (mapModel.builderObjectProgression(tile, activePlayer()))
-    {
-        builderBonus = true;
-    }
+
     mapModel.fixTile(tile);
 
-    if (builderBonus)
+    if (bonusTurn == Logger::instance()->currentTurn() + 1)
     {
         Player* player = getPlayer(activePlayer());
-        Logger::instance()->log(std::make_shared<FreeTurnLogRecord>(player->getColor(), player->getName()));
+        Logger::instance()->logAction(std::make_shared<FreeTurnLogRecord>(
+            player->getColor(), player->getName(), builderObject->type, builderObject->initialId));
+        Logger::instance()->logEffect(std::make_shared<FreeTurnLogRecord>(
+            player->getColor(), player->getName(), builderObject->type, builderObject->initialId));
     }
 }
 
@@ -571,17 +569,17 @@ void QmlPresenter::passTurn(int fixedTilesCount)
 
     if (!processGameEnd(fixedTilesCount))
     {
-        if (!builderBonus)
+        if (Logger::instance()->currentTurn() + 1 != bonusTurn)
         {
             setActivePlayer((activePlayer() + 1) % players.rowCount());
         }
 
         Player* player = getPlayer(activePlayer());
-        Logger::instance()->log(std::make_shared<NewTurnLogRecord>(player->getColor(), player->getName(), Logger::incrementTurn()));
+        Logger::instance()->logNewTurn(std::make_shared<NewTurnLogRecord>(player->getColor(), player->getName(), Logger::incrementTurn()));
     }
     else
     {
-        Logger::instance()->log(std::make_shared<GameEndLogRecord>());
+//        Logger::instance()->log(std::make_shared<GameEndLogRecord>());
     }
 }
 
@@ -592,7 +590,8 @@ void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectI
         addMeepleToObject(object, (QmlEnums::MeepleType)meepleType, playerIndex, tile);
 
         Player* player = getPlayer(activePlayer());
-        Logger::instance()->log(std::make_shared<MeeplePlaceLogRecord>(player->getColor(), player->getName(), object->type, (QmlEnums::MeepleType)meepleType));
+        Logger::instance()->logAction(std::make_shared<MeeplePlaceLogRecord>(player->getColor(), player->getName(), object->type,
+                                                                             (QmlEnums::MeepleType)meepleType, object->initialId));
 
         if (object->isCompleted())
         {

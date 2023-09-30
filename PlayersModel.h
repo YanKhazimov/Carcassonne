@@ -18,6 +18,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     void AddPlayer(QColor color, QString name);
+    Q_INVOKABLE QColor getPlayerColor(int index) const;
 };
 
 #endif // PLAYERSMODEL_H

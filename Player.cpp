@@ -1,11 +1,13 @@
 #include "Player.h"
-#include <QQmlEngine>
 #include "Tile.h"
 #include "DeckBuilder.h"
 #include "Logger.h"
 
+#include <QQmlEngine>
+#include <QDebug>
+
 Player::Player(QColor _color, QString _name, QObject *parent)
-    : QObject(parent), color(_color), active(false), name(_name)
+    : QObject(parent), color(_color), active(false), name(_name), resources {-1, 0, 0, 0}
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     turnTimer.setTimerType(Qt::VeryCoarseTimer);
@@ -53,9 +55,9 @@ void Player::setActive(bool value)
     }
 }
 
-void Player::createAbbeyTile()
+std::shared_ptr<Tile> Player::createAbbeyTile()
 {
-    abbeyTile = DeckBuilder::createAbbeyTile("img/pnp/tiles", "png");
+    return abbeyTile = DeckBuilder::createAbbeyTile("img/pnp/tiles", "png");
 }
 
 Tile* Player::getAbbeyTile()
@@ -66,7 +68,7 @@ Tile* Player::getAbbeyTile()
 void Player::scorePoints(int points)
 {
     setScore(getScore() + points);
-    Logger::instance()->log(std::make_shared<ScoringLogRecord>(color, name, points));
+    Logger::instance()->logEffect(std::make_shared<ScoringLogRecord>(color, name, points));
 }
 
 int Player::getScore() const
@@ -74,19 +76,41 @@ int Player::getScore() const
     return score;
 }
 
+int Player::getResource(QmlEnums::BonusType resourceType)
+{
+    return resources[resourceType];
+}
+
+void Player::setResourceLead(QmlEnums::BonusType resourceType, bool value)
+{
+    switch (resourceType) {
+    case QmlEnums::BonusType::Barrel:
+        setBarrelsLead(value);
+        break;
+    case QmlEnums::BonusType::Wheat:
+        setWheatLead(value);
+        break;
+    case QmlEnums::BonusType::Cloth:
+        setClothLead(value);
+        break;
+    default:
+        break;
+    }
+}
+
 int Player::getWheat() const
 {
-    return wheat;
+    return resources[QmlEnums::BonusType::Wheat];
 }
 
 int Player::getBarrels() const
 {
-    return barrels;
+    return resources[QmlEnums::BonusType::Barrel];
 }
 
 int Player::getCloth() const
 {
-    return cloth;
+    return resources[QmlEnums::BonusType::Cloth];
 }
 
 void Player::setWheatLead(bool value)
@@ -141,19 +165,22 @@ bool Player::getClothLead() const
     return clothLead;
 }
 
-void Player::addWheat(int amount)
+void Player::addResource(int amount, QmlEnums::BonusType resourceType)
 {
-    setWheat(wheat + amount);
-}
-
-void Player::addBarrels(int amount)
-{
-    setBarrels(barrels + amount);
-}
-
-void Player::addCloth(int amount)
-{
-    setCloth(cloth + amount);
+    switch (resourceType) {
+    case QmlEnums::BonusType::Barrel:
+        setBarrels(resources[resourceType] + amount);
+        break;
+    case QmlEnums::BonusType::Wheat:
+        setWheat(resources[resourceType] + amount);
+        break;
+    case QmlEnums::BonusType::Cloth:
+        setCloth(resources[resourceType] + amount);
+        break;
+    default:
+        qCritical() << "adding unknown resource type" << resourceType;
+        break;
+    }
 }
 
 void Player::setTownLead(bool value)
@@ -233,27 +260,27 @@ void Player::setScore(int value)
 
 void Player::setWheat(int value)
 {
-    if (wheat != value)
+    if (resources[QmlEnums::BonusType::Wheat] != value)
     {
-        wheat= value;
+        resources[QmlEnums::BonusType::Wheat] = value;
         emit wheatChanged();
     }
 }
 
 void Player::setBarrels(int value)
 {
-    if (barrels != value)
+    if (resources[QmlEnums::BonusType::Barrel] != value)
     {
-        barrels = value;
+        resources[QmlEnums::BonusType::Barrel] = value;
         emit barrelsChanged();
     }
 }
 
 void Player::setCloth(int value)
 {
-    if (cloth != value)
+    if (resources[QmlEnums::BonusType::Cloth] != value)
     {
-        cloth = value;
+        resources[QmlEnums::BonusType::Cloth] = value;
         emit clothChanged();
     }
 }

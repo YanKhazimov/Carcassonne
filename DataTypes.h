@@ -31,6 +31,7 @@ namespace QmlEnums {
         Wheat,
         Barrel,
         Cloth,
+        MaxResourceType,
         Shield,
         DoubleShield,
         TownCenter,
@@ -57,9 +58,11 @@ namespace QmlEnums {
         LogRoadLeadChange,
         LogTownLeadChange,
         LogMeeplePlaced,
-        LogMeepleReleased,
+        LogTilePlaced,
+        LogMeeplesReleased,
         LogNewTurn,
         LogResourceLeadChange,
+        LogResource,
         LogGameEnd
     };
     Q_ENUM_NS(LogRecordType)

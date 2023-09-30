@@ -74,7 +74,7 @@ bool MapModel::canMergeAbbeyTile() const
     return false;
 }
 
-bool MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
+std::shared_ptr<const MapObjectData> MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
 {
     QPoint position = tile->position();
     
@@ -82,32 +82,40 @@ bool MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
     {
         if (auto object = nextNorth->checkConnector(TileSide::South);
             object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
-            (!tile->isAbbeyTile() || object->isCompleted()))
-            return true;
+            // either the connector on the non-abbey tile extends the existing connector object
+            // or the abbey tile is about to close the existing connector object with valency 1
+            (!tile->isAbbeyTile() || object->currentObject()->valency == 1))
+            return object;
     }
     if (Tile* nextEast = nextTileEast(position.x(), position.y()); nextEast)
     {
         if (auto object = nextEast->checkConnector(TileSide::West);
             object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
-            (!tile->isAbbeyTile() || object->isCompleted()))
-            return true;
+            // either the connector on the non-abbey tile extends the existing connector object
+            // or the abbey tile is about to close the existing connector object with valency 1
+            (!tile->isAbbeyTile() || object->currentObject()->valency == 1))
+            return object;
     }
     if (Tile* nextSouth = nextTileSouth(position.x(), position.y()); nextSouth)
     {
         if (auto object = nextSouth->checkConnector(TileSide::North);
             object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
-            (!tile->isAbbeyTile() || object->isCompleted()))
-            return true;
+            // either the connector on the non-abbey tile extends the existing connector object
+            // or the abbey tile is about to close the existing connector object with valency 1
+            (!tile->isAbbeyTile() || object->currentObject()->valency == 1))
+            return object;
     }
     if (Tile* nextWest = nextTileWest(position.x(), position.y()); nextWest)
     {
         if (auto object = nextWest->checkConnector(TileSide::East);
             object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
-            (!tile->isAbbeyTile() || object->isCompleted()))
-            return true;
+            // either the connector on the non-abbey tile extends the existing connector object
+            // or the abbey tile is about to close the existing connector object with valency 1
+            (!tile->isAbbeyTile() || object->currentObject()->valency == 1))
+            return object;
     }
 
-    return false;
+    return nullptr;
 }
 
 int MapModel::playSize() const

@@ -34,7 +34,7 @@ class Player : public QObject
     std::shared_ptr<Tile> abbeyTile;
     int score = 0;
     int place = 0;
-    int wheat = 0, barrels = 0, cloth = 0;
+    int resources[QmlEnums::BonusType::MaxResourceType];
     bool wheatLead = false, barrelsLead = false, clothLead = false;
     int biggestTown = 0, biggestRoad = 0;
     bool townLead = false, roadLead = false;
@@ -46,6 +46,9 @@ class Player : public QObject
     void setWheat(int value);
     void setBarrels(int value);
     void setCloth(int value);
+    int getWheat() const;
+    int getBarrels() const;
+    int getCloth() const;
 
     void addToPreviousTime(int seconds);
 
@@ -58,14 +61,13 @@ public:
     bool isActive() const;
     void setActive(bool value);
 
-    void createAbbeyTile();
+    std::shared_ptr<Tile> createAbbeyTile();
     Tile* getAbbeyTile();
 
     Q_INVOKABLE void scorePoints(int points);
     int getScore() const;
-    int getWheat() const;
-    int getBarrels() const;
-    int getCloth() const;
+    int getResource(QmlEnums::BonusType resourceType);
+    void setResourceLead(QmlEnums::BonusType resourceType, bool value);
     Q_INVOKABLE void setWheatLead(bool value);
     Q_INVOKABLE void setBarrelsLead(bool value);
     Q_INVOKABLE void setClothLead(bool value);
@@ -74,9 +76,7 @@ public:
     bool getWheatLead() const;
     bool getBarrelsLead() const;
     bool getClothLead() const;
-    void addWheat(int amount);
-    void addBarrels(int amount);
-    void addCloth(int amount);
+    void addResource(int amount, QmlEnums::BonusType resourceType);
     Q_INVOKABLE void setTownLead(bool value);
     bool getTownLead() const;
     Q_INVOKABLE void setRoadLead(bool value);

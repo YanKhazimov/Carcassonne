@@ -24,15 +24,6 @@ QMap<QString, QMap<ObjectType, QString>> objectStrings = {
       { ObjectType::Field, "поле" },
       { ObjectType::Monastery, "монастырь" },
       { ObjectType::Abbey, "аббатство" }
-     }},
-     {"inst",
-     {
-      { ObjectType::None, "None" },
-      { ObjectType::Town, "городом" },
-      { ObjectType::Road, "дорогой" },
-      { ObjectType::Field, "полем" },
-      { ObjectType::Monastery, "монастырем" },
-      { ObjectType::Abbey, "аббатством" }
      }}
      }
 };
