@@ -21,7 +21,6 @@ Window {
     Loader {
         id: loader
 
-        anchors.fill: parent
         source: "qrc:/SettingsWindow.qml"
         asynchronous: true
         visible: status == Loader.Ready

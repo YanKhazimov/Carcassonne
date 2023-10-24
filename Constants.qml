@@ -1,8 +1,10 @@
 pragma Singleton
 import QtQuick 2.15
+import QtQuick.Window 2.15
 
 QtObject {
     property real mapScale: 1.0
+    property real screenScale: Screen.width / 1920
 
     readonly property real defaultTileSize: 192
     readonly property int tilePreviewSize: 96

@@ -160,6 +160,7 @@
         <file>GameLog.qml</file>
         <file>HFadeawayText.qml</file>
         <file>EventProperties.qml</file>
+        <file>ScreenAdapter.qml</file>
     </qresource>
     <qresource prefix="/img">
         <file alias="x_icon.png">img/x_icon.png</file>
@@ -183,7 +184,6 @@
         <file alias="pattern.png">img/pattern.png</file>
         <file alias="right.png">img/right.png</file>
         <file alias="title.png">img/title.png</file>
-<!--        <file alias="wood.jpg">img/wooden-texture.jpg</file>-->
         <file alias="back.png">img/arrow_back.png</file>
         <file alias="star.png">img/star.png</file>
     </qresource>

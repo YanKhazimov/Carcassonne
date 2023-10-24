@@ -97,6 +97,7 @@ Item {
 
     Shape {
         id: playerNameShape
+
         anchors.top: parent.top; anchors.topMargin: 50
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 20

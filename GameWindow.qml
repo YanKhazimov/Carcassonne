@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQml 2.15
 import QmlPresenter 1.0
 import QtGraphicalEffects 1.15
+import QtQuick.Window 2.15
 import EngineEnums 1.0
 import "schematic"
 
@@ -17,12 +18,41 @@ Item {
     property int tilesInDeck
     property Item lastPlacedTile: null
     property var scoresByTile: ({})
+    property var lastKeyPressed
 
     signal urlRequested(var urlAddress)
     signal exitRequested()
 
     function onLoaded() {
         initialAnimation.start()
+    }
+
+    width: Screen.width
+    height: Screen.height
+
+    Keys.onPressed: {
+        if (lastKeyPressed !== event.key) {
+            lastKeyPressed = event.key
+
+            if (event.key === Qt.Key_G) {
+                Preferences.greyoutView = !Preferences.greyoutView
+            }
+            if (event.key === Qt.Key_Tab) {
+                engine.passTurn(regularTiles.length)
+            }
+            if (event.key === Qt.Key_S) {
+                Preferences.schematicView = !Preferences.schematicView
+            }
+        }
+    }
+
+    Keys.onReleased: {
+        lastKeyPressed = undefined
+    }
+
+    Component.onCompleted: {
+        tilesInDeck = engine.deck.rowCount() - 1
+        forceActiveFocus()
     }
 
     SequentialAnimation {
@@ -64,31 +94,10 @@ Item {
         restoreMode: Binding.RestoreBindingOrValue
     }
 
-    Keys.onPressed: {
-        if (lastKeyPressed !== event.key) {
-            lastKeyPressed = event.key
-
-            if (event.key === Qt.Key_G) {
-                Preferences.greyoutView = !Preferences.greyoutView
-            }
-            if (event.key === Qt.Key_Tab) {
-                engine.passTurn(regularTiles.length)
-            }
-            if (event.key === Qt.Key_S) {
-                Preferences.schematicView = !Preferences.schematicView
-            }
-        }
-    }
-    Keys.onReleased: {
-        lastKeyPressed = undefined
-    }
-
-    property var lastKeyPressed
-
     function createTileItem(x, y, getX) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
-            var obj = comp.createObject(root,
+            var obj = comp.createObject(screenAdapter,
                                      {
                                             "tileData": engine.getTile(regularTiles.length),
                                             "x": getX ? Qt.binding(getX) : x,
@@ -132,7 +141,7 @@ Item {
     function createAbbeyTileItem(position, playerIndex) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
-            var obj = comp.createObject(root,
+            var obj = comp.createObject(screenAdapter,
                                         {
                                             "tileData": engine.getAbbeyTile(playerIndex),
                                             "x": position.x,
@@ -170,7 +179,7 @@ Item {
         {
             if (zones[zone].playerData) {
                 let positionInZone = zones[zone].getAbbeyTilePosition()
-                let globalPosition = zones[zone].mapToItem(root, positionInZone)
+                let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
                 abbeyTiles.push(createAbbeyTileItem(globalPosition, zone))
             }
         }
@@ -191,7 +200,7 @@ Item {
     function createMeepleItem(type, position, playerIndex) {
         var comp = Qt.createComponent(type)
         if (comp.status === Component.Ready) {
-            var obj = comp.createObject(root,
+            var obj = comp.createObject(screenAdapter,
                                         {
                                             "x": position.x,
                                             "y": position.y,
@@ -254,31 +263,31 @@ Item {
                 // in the order of the layout
                 for (let i = 0; i < smallMeepleTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleSmall)
-                    let globalPosition = zones[zone].mapToItem(root, positionInZone)
+                    let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
                     meeples.push(createMeepleItem("MeepleSmall.qml", globalPosition, zone))
                 }
 
                 for (let i = 0; i < bigMeepleTotal; ++i) { // false positive warnings
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleBig)
-                    let globalPosition = zones[zone].mapToItem(root, positionInZone)
+                    let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
                     meeples.push(createMeepleItem("MeepleBig.qml", globalPosition, zone))
                 }
 
                 for (let i = 0; i < builderTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleBuilder)
-                    let globalPosition = zones[zone].mapToItem(root, positionInZone)
+                    let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
                     meeples.push(createMeepleItem("MeepleBuilder.qml", globalPosition, zone))
                 }
 
                 for (let i = 0; i < pigTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeeplePig)
-                    let globalPosition = zones[zone].mapToItem(root, positionInZone)
+                    let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
                     meeples.push(createMeepleItem("MeeplePig.qml", globalPosition, zone))
                 }
 
                 for (let i = 0; i < barnTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleBarn)
-                    let globalPosition = zones[zone].mapToItem(root, positionInZone)
+                    let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
                     meeples.push(createMeepleItem("MeepleBarn.qml", globalPosition, zone))
                 }
             }
@@ -330,7 +339,7 @@ Item {
     }
 
     function drawTile() {
-        let globalPosition = common.mapToItem(root, regularTilePlaceholder.x, regularTilePlaceholder.y)
+        let globalPosition = common.mapToItem(screenAdapter, regularTilePlaceholder.x, regularTilePlaceholder.y)
         var tile = createTileItem(globalPosition.x, globalPosition.y, null)
         tile.playerIndex = engine.ActivePlayer
         board.activeTile = tile
@@ -343,16 +352,11 @@ Item {
         engine.passTurn(regularTiles.length)
     }
 
-    Component.onCompleted: {
-        tilesInDeck = engine.deck.rowCount() - 1
-        forceActiveFocus()
-    }
-
     Rectangle {
         id: backgroundLeft
 
         color: "black"
-        width: boardFinalPosition.x
+        width: boardFinalPosition.x * Constants.screenScale
         height: parent.height
         x: width * (-1 + slideInAnimation.progressPercentage)
 
@@ -370,9 +374,9 @@ Item {
         id: backgroundRight
 
         color: "black"
-        anchors.left: board.left
+        x: board.x * Constants.screenScale
         height: parent.height
-        width: board.width
+        width: board.width * Constants.screenScale
 
         Image {
             opacity: 0.3
@@ -384,395 +388,402 @@ Item {
         }
     }
 
-    Item {
-        id: boardFinalPosition
+    ScreenAdapter {
+        id: screenAdapter
 
-        width: board.width
-        height: board.height
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.right
-    }
+        width: 1920
+        height: 1080
+        anchors.centerIn: parent
 
-    Board {
-        id: board
+        Item {
+            id: boardFinalPosition
 
-        height: 990
-        width: height
-        y: boardFinalPosition.y
-        anchors.right: boardFinalPosition.right; anchors.rightMargin: width * (-1 + slideInAnimation.progressPercentage)
-
-        Component.onCompleted: {
-            // place and fix the starting tile
-            engine.mapModel.placeTile(engine.getTile(0), 0, 0)
-            engine.fixTile(engine.getTile(0))
-
-            // create an Item for it
-            let tile = createTileItem(boardFinalPosition.x + board.getX(0), boardFinalPosition.y + board.getY(0),
-                                      function() {
-                                          return board.x + board.getX(0)
-                                      })
-            tile.isInHand = false
-            regularTiles.push(tile)
+            width: board.width
+            height: board.height
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
         }
 
-        Connections {
-            target: engine
-            function onPointsScored(points, playerColor, tile) {
-                let scoreComponent = Qt.createComponent("HFadeawayText.qml")
-                if (scoreComponent.status === Component.Ready) {
-                    if (tile in scoresByTile) {
-                        scoresByTile[tile]++
+        Board {
+            id: board
+
+            height: 990
+            width: height
+            y: boardFinalPosition.y
+            anchors.right: boardFinalPosition.right; anchors.rightMargin: width * (-1 + slideInAnimation.progressPercentage)
+
+            Component.onCompleted: {
+                // place and fix the starting tile
+                engine.mapModel.placeTile(engine.getTile(0), 0, 0)
+                engine.fixTile(engine.getTile(0))
+
+                // create an Item for it
+                let tile = createTileItem(boardFinalPosition.x + board.getX(0), boardFinalPosition.y + board.getY(0),
+                                          function() {
+                                              return board.x + board.getX(0)
+                                          })
+                tile.isInHand = false
+                regularTiles.push(tile)
+            }
+
+            Connections {
+                target: engine
+                function onPointsScored(points, playerColor, tile) {
+                    let scoreComponent = Qt.createComponent("HFadeawayText.qml")
+                    if (scoreComponent.status === Component.Ready) {
+                        if (tile in scoresByTile) {
+                            scoresByTile[tile]++
+                        }
+                        else {
+                            scoresByTile[tile] = 0
+                        }
+
+                        let coeff = tile.Y > 0 ? -100 : 100
+                        let startPos = board.mapToItem(root,
+                                                       board.getX(tile.X),
+                                                       board.getY(tile.Y) + coeff * scoresByTile[tile])
+                        var obj = scoreComponent.createObject(root,
+                                                              {
+                                                                  "startPos": startPos,
+                                                                  "hDelta": -500,
+                                                                  "opacity": 1.0,
+                                                                  "color": playerColor,
+                                                                  "text": "+" + points,
+                                                                  "z": 1,
+                                                                  "font.pixelSize": 100,
+                                                                  "font.family": Fonts.funny
+                                                              })
+                        obj.run()
                     }
                     else {
-                        scoresByTile[tile] = 0
+                        console.error("AnimatedScore component status:", scoreComponent.status, scoreComponent.errorString())
                     }
-
-                    let coeff = tile.Y > 0 ? -100 : 100
-                    let startPos = board.mapToItem(root,
-                                                   board.getX(tile.X),
-                                                   board.getY(tile.Y) + coeff * scoresByTile[tile])
-                    var obj = scoreComponent.createObject(root,
-                                                          {
-                                                              "startPos": startPos,
-                                                              "hDelta": -500,
-                                                              "opacity": 1.0,
-                                                              "color": playerColor,
-                                                              "text": "+" + points,
-                                                              "z": 1,
-                                                              "font.pixelSize": 100,
-                                                              "font.family": Fonts.funny
-                                                          })
-                    obj.run()
-                }
-                else {
-                    console.error("AnimatedScore component status:", scoreComponent.status, scoreComponent.errorString())
                 }
             }
         }
-    }
 
-    Dimmer {
-        id: dimmer
+        Dimmer {
+            id: dimmer
 
-        board: board
-        z: 1
-    }
+            board: board
+            z: 1
+        }
 
-    Row {
-        anchors.horizontalCenter: board.horizontalCenter
-        anchors.bottom: board.top
-        anchors.top: parent.top
-        spacing: 50
+        Row {
+            anchors.horizontalCenter: board.horizontalCenter
+            anchors.bottom: board.top
+            anchors.top: parent.top
+            spacing: 50
 
-        Repeater {
-            model: [
-                [ Qt.Key_Escape, "Esc", "Меню" ],
-                [ Qt.Key_G, "G", "Ч/б" ],
-                [ Qt.Key_S, "S", "Схемы" ]
-            ]
-            delegate: Row {
-                anchors.verticalCenter: parent.verticalCenter
+            Repeater {
+                model: [
+                    [ Qt.Key_Escape, "Esc", "Меню" ],
+                    [ Qt.Key_G, "G", "Ч/б" ],
+                    [ Qt.Key_S, "S", "Схемы" ]
+                ]
+                delegate: Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 10
+
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: root.lastKeyPressed === modelData[0] ? "grey" : "white"
+                        border.width: 2
+                        border.color: "black"
+                        radius: 5
+                        width: Math.max(30, keyText.contentWidth + 20)
+                        height: 30
+
+                        Text {
+                            id: keyText
+                            text: modelData[1]
+                            anchors.centerIn: parent
+                        }
+                    }
+
+                    MyText {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: modelData[2]
+                        color: "white"
+                    }
+                }
+            }
+        }
+
+        MenuTabs {
+            id: menuTabs
+
+            x: width * (-1 + slideInAnimation.progressPercentage)
+            width: boardFinalPosition.x
+            anchors.top: scoreboardSpace.bottom; anchors.topMargin: 20
+        }
+
+        Item {
+            id: tabsSpace
+
+            width: boardFinalPosition.x
+            x: width * (-1 + slideInAnimation.progressPercentage)
+            anchors.top: menuTabs.bottom
+            anchors.bottom: board.bottom
+
+            LinearGradient {
+                anchors.fill: parent
+                start: Qt.point(width/2, 0)
+                end: Qt.point(width/2, height)
+
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#bb000000" }
+                    GradientStop { position: 1.0; color: "transparent" }
+                }
+            }
+
+            RemainingContent {
+                anchors.fill: parent
+                visible: menuTabs.activeTab === 1
+            }
+
+            GameLog {
+                anchors.fill: parent
+                visible: menuTabs.activeTab === 2
+
+                onHighlightedTileChanged: {
+                    if (highlightedTile)
+                        dimmer.dimAround(highlightedTile.X, highlightedTile.Y)
+                    else
+                        dimmer.undim()
+                }
+            }
+
+            Image {
+                visible: menuTabs.activeTab === 0
+                width: parent.width
+                height: sourceSize.height
+                source: "qrc:/img/pattern.png"
+                fillMode: Image.TileHorizontally
+            }
+
+            Row {
+                id: playersRow
+
+                visible: menuTabs.activeTab === 0
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: parent.height
+                width: childrenRect.width
+                spacing: 10
+
+                PlayerZone {
+                    id: playerZone0
+
+                    height: parent.height
+                    playerIndex: 0
+                    visible: engine && engine.PlayerCount > playerIndex
+                }
+
+                PlayerZone {
+                    id: playerZone1
+
+                    height: parent.height
+                    playerIndex: 1
+                    visible: engine && engine.PlayerCount > playerIndex
+                }
+
+                PlayerZone {
+                    id: playerZone2
+
+                    height: parent.height
+                    playerIndex: 2
+                    visible: engine && engine.PlayerCount > playerIndex
+                }
+
+                PlayerZone {
+                    id: playerZone3
+
+                    height: parent.height
+                    playerIndex: 3
+                    visible: engine && engine.PlayerCount > playerIndex
+                }
+            }
+        }
+
+        Column {
+            id: common
+
+            readonly property point position: engine && (engine.ActivePlayer !== -1) ?
+                                                  zones[engine.ActivePlayer].mapToItem(screenAdapter,
+                                                                                       zones[engine.ActivePlayer].width/2 - width/2,
+                                                                                       zones[engine.ActivePlayer].bannerEnd) :
+                                                  Qt.point(0, 0)
+
+            spacing: 10
+            visible: engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready && menuTabs.activeTab === 0
+            x: position.x
+            y: position.y
+
+            Row {
+                id: regularTilePlaceholder
+
+                anchors.horizontalCenter: parent.horizontalCenter
                 spacing: 10
 
                 Rectangle {
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: root.lastKeyPressed === modelData[0] ? "grey" : "white"
+                    width: Constants.tilePreviewSize
+                    height: Constants.tilePreviewSize
+                    color: "transparent"
                     border.width: 2
-                    border.color: "black"
-                    radius: 5
-                    width: Math.max(30, keyText.contentWidth + 20)
-                    height: 30
+                    border.color: "grey"
 
-                    Text {
-                        id: keyText
-                        text: modelData[1]
+                    Image {
                         anchors.centerIn: parent
+                        source: "qrc:/img/x_icon.png"
+                    }
+
+                    Image {
+                        id: tileBack
+
+                        source: "qrc:/img/tileBack.png"
+                        anchors.fill: parent
+                        visible: tilesInDeck > 0
+
+                        Rectangle {
+                            id: border
+
+                            anchors.fill: parent
+                            color: "transparent"
+                            border.width: 2
+                            border.color: "black"
+                        }
+                    }
+
+                    MouseArea {
+                        id: deckBackMouseArea
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        visible: engine && tilesInDeck > 0 && !engine.AllFttingTilesPlayed &&
+                                 (engine.GameState === GameEngine.NewTurn ||
+                                  engine.GameState === GameEngine.TilePlaced &&
+                                  engine.getAbbeyTile(engine.ActivePlayer).IsPlaced &&
+                                  !engine.getAbbeyTile(engine.ActivePlayer).IsFixed)
+                        onClicked: drawTile()
+                    }
+
+                    ElementActionIndicator {
+                        target: parent
+                        visible: deckBackMouseArea.visible
                     }
                 }
 
                 MyText {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: modelData[2]
+                    id: tilesLeft
+
+                    anchors.verticalCenter: regularTilePlaceholder.verticalCenter
+                    text: "x" + tilesInDeck
+                    font.pixelSize: 20
                     color: "white"
                 }
             }
-        }
-    }
 
-    MenuTabs {
-        id: menuTabs
+            MenuButton {
+                id: rotateTileButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Повернуть"
+                font.family: Fonts.font4
+                onClicked: regularTiles[regularTiles.length - 1].tileData.rotateClockwise()
+            }
 
-        anchors.left: backgroundLeft.left
-        anchors.right: backgroundLeft.right
-        anchors.top: scoreboardSpace.bottom; anchors.topMargin: 20
-    }
+            MenuButton {
+                id: fixTileButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Поставить"
+                font.family: Fonts.font4
+                onClicked: {
+                    engine.fixTile(board.activeTile.tileData)
+                    lastPlacedTile = board.activeTile
+                    if (board.activeTile.tileData.Abbey) {
+                        board.activeTile.z = 0
+                    }
+                    engine.updateHighlight()
+                    board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
+                    board.activeTile = null
+                    engine.GameState = GameEngine.TileFixed
+                }
+            }
 
-    Item {
-        id: tabsSpace
+            MenuButton {
+                id: fixMeepleButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Занять"
+                font.family: Fonts.font4
+                onClicked: {
+                    lastPlacedTile.fixMeeple()
+                    root.activeMeeple = null
+                    endTurn()
+                }
+            }
 
-        width: boardFinalPosition.x
-        anchors.right: backgroundLeft.right
-        anchors.top: menuTabs.bottom
-        anchors.bottom: board.bottom
-
-        LinearGradient {
-            anchors.fill: parent
-            start: Qt.point(width/2, 0)
-            end: Qt.point(width/2, height)
-
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#bb000000" }
-                GradientStop { position: 1.0; color: "transparent" }
+            MenuButton {
+                id: skipMeepleButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Передать ход"
+                font.family: Fonts.font4
+                onClicked: {
+                    if (root.activeMeeple) {
+                        root.activeMeeple.resetPosition()
+                        if (engine.GameState === GameEngine.MeeplePlaced)
+                            zones[engine.ActivePlayer].addMeeple(root.activeMeeple.type, 1)
+                        root.activeMeeple = null
+                    }
+                    endTurn()
+                }
             }
         }
 
-        RemainingContent {
-            anchors.fill: parent
-            visible: menuTabs.activeTab === 1
-        }
+        Item {
+            id: scoreboardSpace
 
-        GameLog {
-            anchors.fill: parent
-            visible: menuTabs.activeTab === 2
+            anchors.top: parent.top; anchors.topMargin: 10
+            height: 160
+            width: boardFinalPosition.x - 2 * 10
+            x: width * (-1 + slideInAnimation.progressPercentage) + 10
 
-            onHighlightedTileChanged: {
-                if (highlightedTile)
-                    dimmer.dimAround(highlightedTile.X, highlightedTile.Y)
-                else
-                    dimmer.undim()
+            Scoreboard {
+                anchors.centerIn: parent
             }
         }
 
-        Image {
-            visible: menuTabs.activeTab === 0
-            width: parent.width
-            height: sourceSize.height
-            source: "qrc:/img/pattern.png"
-            fillMode: Image.TileHorizontally
-        }
+        Popup {
+            id: gameEndPopup
 
-        Row {
-            id: playersRow
-
-            visible: menuTabs.activeTab === 0
-            anchors.horizontalCenter: parent.horizontalCenter
-            height: parent.height
-            width: childrenRect.width
-            spacing: 10
-
-            PlayerZone {
-                id: playerZone0
-
-                height: parent.height
-                playerIndex: 0
-                visible: engine && engine.PlayerCount > playerIndex
-            }
-
-            PlayerZone {
-                id: playerZone1
-
-                height: parent.height
-                playerIndex: 1
-                visible: engine && engine.PlayerCount > playerIndex
-            }
-
-            PlayerZone {
-                id: playerZone2
-
-                height: parent.height
-                playerIndex: 2
-                visible: engine && engine.PlayerCount > playerIndex
-            }
-
-            PlayerZone {
-                id: playerZone3
-
-                height: parent.height
-                playerIndex: 3
-                visible: engine && engine.PlayerCount > playerIndex
-            }
-        }
-    }
-
-    Column {
-        id: common
-
-        readonly property point position: engine && (engine.ActivePlayer !== -1) ?
-                                              zones[engine.ActivePlayer].mapToItem(root,
-                                                                                   zones[engine.ActivePlayer].width/2 - width/2,
-                                                                                   zones[engine.ActivePlayer].bannerEnd) :
-                                              Qt.point(0, 0)
-
-        spacing: 10
-        visible: engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready && menuTabs.activeTab === 0
-        x: position.x
-        y: position.y
-
-        Row {
-            id: regularTilePlaceholder
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 10
+            anchors.centerIn: parent
+            width: 600
+            height: 200
+            modal: true
+            closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
 
             Rectangle {
-                width: Constants.tilePreviewSize
-                height: Constants.tilePreviewSize
-                color: "transparent"
-                border.width: 2
-                border.color: "grey"
+                color: "lightgrey"
+                anchors.fill: parent
 
-                Image {
+                Column {
                     anchors.centerIn: parent
-                    source: "qrc:/img/x_icon.png"
-                }
+                    spacing: 10
 
-                Image {
-                    id: tileBack
+                    Text {
+                        id: endGamePopupText
 
-                    source: "qrc:/img/tileBack.png"
-                    anchors.fill: parent
-                    visible: tilesInDeck > 0
-
-                    Rectangle {
-                        id: border
-
-                        anchors.fill: parent
-                        color: "transparent"
-                        border.width: 2
-                        border.color: "black"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 25
                     }
-                }
 
-                MouseArea {
-                    id: deckBackMouseArea
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    visible: engine && tilesInDeck > 0 && !engine.AllFttingTilesPlayed &&
-                             (engine.GameState === GameEngine.NewTurn ||
-                              engine.GameState === GameEngine.TilePlaced &&
-                              engine.getAbbeyTile(engine.ActivePlayer).IsPlaced &&
-                              !engine.getAbbeyTile(engine.ActivePlayer).IsFixed)
-                    onClicked: drawTile()
-                }
+                    MenuButton {
+                        id: endGamePopupButton
 
-                ElementActionIndicator {
-                    target: parent
-                    visible: deckBackMouseArea.visible
-                }
-            }
-
-            MyText {
-                id: tilesLeft
-
-                anchors.verticalCenter: regularTilePlaceholder.verticalCenter
-                text: "x" + tilesInDeck
-                font.pixelSize: 20
-                color: "white"
-            }
-        }
-
-        MenuButton {
-            id: rotateTileButton
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "Повернуть"
-            font.family: Fonts.font4
-            onClicked: regularTiles[regularTiles.length - 1].tileData.rotateClockwise()
-        }
-
-        MenuButton {
-            id: fixTileButton
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "Поставить"
-            font.family: Fonts.font4
-            onClicked: {
-                engine.fixTile(board.activeTile.tileData)
-                lastPlacedTile = board.activeTile
-                if (board.activeTile.tileData.Abbey) {
-                    board.activeTile.z = 0
-                }
-                engine.updateHighlight()
-                board.activeTile.tileData.layoutChanged.disconnect(board.updateActiveTileRotation)
-                board.activeTile = null
-                engine.GameState = GameEngine.TileFixed
-            }
-        }
-
-        MenuButton {
-            id: fixMeepleButton
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "Занять"
-            font.family: Fonts.font4
-            onClicked: {
-                lastPlacedTile.fixMeeple()
-                root.activeMeeple = null
-                endTurn()
-            }
-        }
-
-        MenuButton {
-            id: skipMeepleButton
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "Передать ход"
-            font.family: Fonts.font4
-            onClicked: {
-                if (root.activeMeeple) {
-                    root.activeMeeple.resetPosition()
-                    if (engine.GameState === GameEngine.MeeplePlaced)
-                        zones[engine.ActivePlayer].addMeeple(root.activeMeeple.type, 1)
-                    root.activeMeeple = null
-                }
-                endTurn()
-            }
-        }
-    }
-
-    Item {
-        id: scoreboardSpace
-
-        anchors.top: parent.top
-        height: 160
-        width: boardFinalPosition.x - 2 * anchors.margins
-        anchors.right: backgroundLeft.right
-        anchors.margins: 10
-
-        Scoreboard {
-            anchors.centerIn: parent
-        }
-    }
-
-    Popup {
-        id: gameEndPopup
-
-        anchors.centerIn: parent
-        width: 600
-        height: 200
-        modal: true
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-
-        Rectangle {
-            color: "lightgrey"
-            anchors.fill: parent
-
-            Column {
-                anchors.centerIn: parent
-                spacing: 10
-
-                Text {
-                    id: endGamePopupText
-
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: 25
-                }
-
-                MenuButton {
-                    id: endGamePopupButton
-
-                    property var gameState
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Ок"
-                    onClicked: {
-                        engine.GameState = gameState
-                        gameEndPopup.close()
+                        property var gameState
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Ок"
+                        onClicked: {
+                            engine.GameState = gameState
+                            gameEndPopup.close()
+                        }
                     }
                 }
             }
