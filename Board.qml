@@ -2,16 +2,15 @@ import QtQuick 2.15
 import QmlPresenter 1.0
 import QtGraphicalEffects 1.15
 
-Rectangle {
+Item {
     id: root
-
-    color: "#aaaaaa"
 
     property int capacity
     readonly property int maxCapacity: engine ? engine.mapModel.MaxCapacity : 0
     readonly property bool maxCapacityReached: capacity === maxCapacity
     property real centerTileHOffset
     property real centerTileVOffset
+    property int tilesSpace
 
     property real centerTileCenterHOffset: centerTileHOffset + 0.5
     property real centerTileCenterVOffset: centerTileVOffset + 0.5
@@ -23,6 +22,7 @@ Rectangle {
 
     Component.onCompleted: {
         capacity = root.width / Constants.defaultTileSize
+        tilesSpace = capacity * Constants.defaultTileSize
         centerTileHOffset = -0.5
         centerTileVOffset = -0.5
     }
@@ -155,7 +155,7 @@ Rectangle {
 
     function expandNorthWest() {
         capacity++
-        Constants.mapScale = root.width / Constants.defaultTileSize / capacity
+        Constants.mapScale = root.tilesSpace / Constants.defaultTileSize / capacity
         centerTileHOffset += 0.5
         centerTileVOffset += 0.5
 
@@ -164,7 +164,7 @@ Rectangle {
 
     function expandNorthEast() {
         capacity++
-        Constants.mapScale = root.width / Constants.defaultTileSize / capacity
+        Constants.mapScale = root.tilesSpace / Constants.defaultTileSize / capacity
         centerTileHOffset -= 0.5
         centerTileVOffset += 0.5
 
@@ -173,7 +173,7 @@ Rectangle {
 
     function expandSouthEast() {
         capacity++
-        Constants.mapScale = root.width / Constants.defaultTileSize / capacity
+        Constants.mapScale = root.tilesSpace / Constants.defaultTileSize / capacity
         centerTileHOffset -= 0.5
         centerTileVOffset -= 0.5
 
@@ -182,7 +182,7 @@ Rectangle {
 
     function expandSouthWest() {
         capacity++
-        Constants.mapScale = 1.0 * root.width / Constants.defaultTileSize / capacity
+        Constants.mapScale = root.tilesSpace / Constants.defaultTileSize / capacity
         centerTileHOffset += 0.5
         centerTileVOffset -= 0.5
 
@@ -205,14 +205,12 @@ Rectangle {
             internal.boardLength = capacity * Constants.defaultTileSize
         }
 
-//        Image {
-//            source: "qrc:/img/wood.jpg"
-//            anchors.fill: parent
-////            anchors.fill: grid
-////            anchors.centerIn: parent
-////            width: parent.width * maxCapacity / capacity
-////            height: parent.height * maxCapacity / capacity
-//        }
+        Image {
+            source: "qrc:/img/table.jpg"
+            anchors.centerIn: grid
+            width: grid.size * root.tilesSpace / Math.max(1, root.maxCapacity)
+            height: grid.size * root.tilesSpace / Math.max(1, root.maxCapacity)
+        }
 
         Grid {
             id: grid
@@ -220,11 +218,11 @@ Rectangle {
             property int size
 
             Component.onCompleted: {
-                size = 1 + (maxCapacity - 1) * 2 + 2
+                // 3x3 is the guaranteed center
+                size = 3 + (maxCapacity - 3) * 2 + 2
             }
 
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.centerIn: parent
             anchors.horizontalCenterOffset: centerTileCenterHOffset * Constants.tileSize
             anchors.verticalCenterOffset: centerTileCenterVOffset * Constants.tileSize
 
@@ -239,18 +237,32 @@ Rectangle {
                 model: grid.columns * grid.rows
 
                 Rectangle {
+                    readonly property bool inHorizontal: engine &&
+                                                         (dropArea.xIndex >= engine.mapModel.MinPlayableX && dropArea.xIndex <= engine.mapModel.MaxPlayableX ||
+                                                          !engine.mapModel.XRangeDefined)
+                    readonly property bool inVertictal: engine &&
+                                                        (dropArea.yIndex >= engine.mapModel.MinPlayableY && dropArea.yIndex <= engine.mapModel.MaxPlayableY ||
+                                                         !engine.mapModel.YRangeDefined)
+                    readonly property bool isPlayable: inHorizontal && inVertictal
+
                     width: Constants.tileSize
                     height: Constants.tileSize
-                    color: !engine ||
-                           (dropArea.yIndex >= engine.mapModel.MinPlayableY && dropArea.yIndex <= engine.mapModel.MaxPlayableY ||
-                            !engine.mapModel.YRangeDefined) &&
-                           (dropArea.xIndex >= engine.mapModel.MinPlayableX && dropArea.xIndex <= engine.mapModel.MaxPlayableX ||
-                            !engine.mapModel.XRangeDefined)
-                           ? "transparent" : "cyan"
-                    border.color: activeTile && activeTile.dragActive ? "silver" : "transparent"
+                    color: isPlayable ? "transparent" : "cyan"
+                    border.color: root.activeDrag ? "silver" : "transparent"
 
                     Behavior on width { NumberAnimation { duration: 200 } }
                     Behavior on height { NumberAnimation { duration: 200 } }
+
+                    Image {
+                        source: "qrc:/img/edge.png"
+                        visible: !parent.isPlayable
+                        anchors.right: engine && dropArea.xIndex === engine.mapModel.MinPlayableX - 1 ? parent.right : undefined
+                        anchors.left: engine && dropArea.xIndex === engine.mapModel.MaxPlayableX + 1 ? parent.left : undefined
+                        anchors.bottom: engine && dropArea.yIndex === engine.mapModel.MinPlayableY - 1 ? parent.bottom : undefined
+                        anchors.top: engine && dropArea.yIndex === engine.mapModel.MaxPlayableY + 1 ? parent.top : undefined
+                        anchors.horizontalCenter: anchors.bottom !== undefined || anchors.top !== undefined ? parent.horizontalCenter : undefined
+                        anchors.verticalCenter: anchors.left !== undefined || anchors.right !== undefined ? parent.verticalCenter : undefined
+                    }
 
                     DropArea {
                         id: dropArea

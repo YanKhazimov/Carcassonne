@@ -120,6 +120,7 @@ std::shared_ptr<const MapObjectData> MapModel::builderObjectProgression(Tile *ti
 
 int MapModel::playSize() const
 {
+    // 3x3 is the guaranteed center
     return (size - 3) / 2 + 3;
 }
 

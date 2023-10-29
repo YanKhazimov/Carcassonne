@@ -186,6 +186,8 @@
         <file alias="title.png">img/title.png</file>
         <file alias="back.png">img/arrow_back.png</file>
         <file alias="star.png">img/star.png</file>
+        <file alias="edge.png">img/edge.png</file>
+        <file alias="table.jpg">img/table.jpg</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="gravtrac_compressed_bd.otf">fonts/gravtrac_compressed_bd.otf</file>
