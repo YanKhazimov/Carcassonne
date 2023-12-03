@@ -240,6 +240,14 @@ int Player::getCurrentTurnSeconds() const
     return currentTurnSeconds;
 }
 
+void Player::setTimerRunning(bool value)
+{
+    if (value)
+        turnTimer.start();
+    else
+        turnTimer.stop();
+}
+
 void Player::addToPreviousTime(int seconds)
 {
     if (seconds != 0)

@@ -601,7 +601,7 @@ Item {
                 color: "white"
                 text: "Конец игры"
                 font.pixelSize: 25
-                visible: engine.GameState === GameEngine.GameEnd
+                visible: engine && engine.GameState === GameEngine.GameEnd
             }
         }
     }

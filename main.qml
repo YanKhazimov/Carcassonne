@@ -18,10 +18,15 @@ Window {
         fillMode: Image.Stretch
     }
 
+    SettingsWindow {
+        gameWindowLoader: loader
+    }
+
     Loader {
         id: loader
 
-        source: "qrc:/SettingsWindow.qml"
+        active: false
+        source: "qrc:/GameWindow.qml"
         asynchronous: true
         visible: status == Loader.Ready
         onStatusChanged: {
@@ -47,17 +52,6 @@ Window {
             running: loadingIndicator.visible
             loops: Animation.Infinite
             duration: 500
-        }
-    }
-
-    Connections {
-        target: loader.item
-        function onUrlRequested(urlAddress) {
-            loader.source = urlAddress
-        }
-        function onExitRequested() {
-            loader.source = ""
-            Qt.quit()
         }
     }
 }

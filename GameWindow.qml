@@ -19,12 +19,22 @@ Item {
     property Item lastPlacedTile: null
     property var scoresByTile: ({})
     property var lastKeyPressed
-
-    signal urlRequested(var urlAddress)
-    signal exitRequested()
+    readonly property bool isLoading: pauseAnimation.running || unpauseAnimation.running || initialAnimation.running
 
     function onLoaded() {
         initialAnimation.start()
+    }
+
+    function tryPauseGame() {
+        if (engine.GameState !== GameEngine.Initialization && internal.gameViewLoadProgress === 1.0) {
+            engine.getPlayer(engine.ActivePlayer).setTimerRunning(false)
+            pauseAnimation.start()
+        }
+    }
+
+    function unpauseGame() {
+        engine.getPlayer(engine.ActivePlayer).setTimerRunning(true)
+        unpauseAnimation.start()
     }
 
     width: Screen.width
@@ -43,6 +53,9 @@ Item {
             if (event.key === Qt.Key_S) {
                 Preferences.schematicView = !Preferences.schematicView
             }
+            if (event.key === Qt.Key_Escape) {
+                tryPauseGame()
+            }
         }
     }
 
@@ -55,6 +68,32 @@ Item {
         forceActiveFocus()
     }
 
+    QtObject {
+        id: internal
+
+        property real gameViewLoadProgress: 0.0
+    }
+
+    NumberAnimation {
+        id: pauseAnimation
+
+        duration: 500
+        from: 1.0
+        to: 0.0
+        target: internal
+        property: "gameViewLoadProgress"
+    }
+
+    NumberAnimation {
+        id: unpauseAnimation
+
+        duration: 500
+        from: slideInAnimation.from
+        to: slideInAnimation.to
+        target: slideInAnimation.target
+        property: slideInAnimation.property
+    }
+
     SequentialAnimation {
         id: initialAnimation
 
@@ -64,13 +103,11 @@ Item {
         NumberAnimation {
             id: slideInAnimation
 
-            property real progressPercentage: 0.0
-
             duration: 1500
             from: 0.0
             to: 1.0
-            target: slideInAnimation
-            property: "progressPercentage"
+            target: internal
+            property: "gameViewLoadProgress"
         }
 
         ScriptAction {
@@ -94,14 +131,15 @@ Item {
         restoreMode: Binding.RestoreBindingOrValue
     }
 
-    function createTileItem(x, y, getX) {
+    function createTileItem(x, y) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
             var obj = comp.createObject(screenAdapter,
                                      {
                                             "tileData": engine.getTile(regularTiles.length),
-                                            "x": getX ? Qt.binding(getX) : x,
+                                            "x": x,
                                             "y": y,
+                                            "gameView": Qt.binding(isGameView),
                                             "board": board,
                                             "tabs": menuTabs
                                      })
@@ -138,6 +176,10 @@ Item {
         return null
     }
 
+    function isGameView() {
+        return internal.gameViewLoadProgress === 1.0
+    }
+
     function createAbbeyTileItem(position, playerIndex) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
@@ -149,6 +191,7 @@ Item {
                                             "board": board,
                                             "playerIndex": playerIndex,
                                             "opacity": 0,
+                                            "gameView": Qt.binding(isGameView),
                                             "tabs": menuTabs
                                         })
             obj.dragStarted.connect(function() {
@@ -206,6 +249,7 @@ Item {
                                             "y": position.y,
                                             "playerIndex": playerIndex,
                                             "opacity": 0,
+                                            "gameView": Qt.binding(isGameView),
                                             "tabs": menuTabs
                                         })
             obj.dragStarted.connect(function() {
@@ -340,7 +384,7 @@ Item {
 
     function drawTile() {
         let globalPosition = common.mapToItem(screenAdapter, regularTilePlaceholder.x, regularTilePlaceholder.y)
-        var tile = createTileItem(globalPosition.x, globalPosition.y, null)
+        var tile = createTileItem(globalPosition.x, globalPosition.y)
         tile.playerIndex = engine.ActivePlayer
         board.activeTile = tile
         regularTiles.push(tile)
@@ -358,7 +402,7 @@ Item {
         color: "black"
         width: boardFinalPosition.x * Constants.screenScale
         height: parent.height
-        x: width * (-1 + slideInAnimation.progressPercentage)
+        x: width * (-1 + internal.gameViewLoadProgress)
 
         Image {
             opacity: 0.3
@@ -410,7 +454,7 @@ Item {
             height: 990
             width: height
             y: boardFinalPosition.y
-            anchors.right: boardFinalPosition.right; anchors.rightMargin: width * (-1 + slideInAnimation.progressPercentage)
+            anchors.right: boardFinalPosition.right; anchors.rightMargin: width * (-1 + internal.gameViewLoadProgress)
 
             Component.onCompleted: {
                 // place and fix the starting tile
@@ -418,10 +462,7 @@ Item {
                 engine.fixTile(engine.getTile(0))
 
                 // create an Item for it
-                let tile = createTileItem(boardFinalPosition.x + board.getX(0), boardFinalPosition.y + board.getY(0),
-                                          function() {
-                                              return board.x + board.getX(0)
-                                          })
+                let tile = createTileItem(boardFinalPosition.x + board.getX(0), boardFinalPosition.y + board.getY(0))
                 tile.isInHand = false
                 regularTiles.push(tile)
             }
@@ -475,45 +516,35 @@ Item {
             anchors.top: parent.top
             spacing: 50
 
-            Repeater {
-                model: [
-                    [ Qt.Key_Escape, "Esc", "Меню" ],
-                    [ Qt.Key_G, "G", "Ч/б" ],
-                    [ Qt.Key_S, "S", "Схемы" ]
-                ]
-                delegate: Row {
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 10
+            MenuButton {
+                color: root.lastKeyPressed === Qt.Key_Escape ? "grey" : "white"
+                hotkeyText: "Esc"
+                text: "Меню"
+                activeIndicator: false
+                onClicked: tryPauseGame()
+            }
 
-                    Rectangle {
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: root.lastKeyPressed === modelData[0] ? "grey" : "white"
-                        border.width: 2
-                        border.color: "black"
-                        radius: 5
-                        width: Math.max(30, keyText.contentWidth + 20)
-                        height: 30
+            MenuButton {
+                color: root.lastKeyPressed === Qt.Key_G ? "grey" : "white"
+                hotkeyText: "G"
+                text: "Ч/б"
+                activeIndicator: false
+                onClicked: Preferences.greyoutView = !Preferences.greyoutView
+            }
 
-                        Text {
-                            id: keyText
-                            text: modelData[1]
-                            anchors.centerIn: parent
-                        }
-                    }
-
-                    MyText {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: modelData[2]
-                        color: "white"
-                    }
-                }
+            MenuButton {
+                color: root.lastKeyPressed === Qt.Key_S ? "grey" : "white"
+                hotkeyText: "S"
+                text: "Схемы"
+                activeIndicator: false
+                onClicked: Preferences.schematicView = !Preferences.schematicView
             }
         }
 
         MenuTabs {
             id: menuTabs
 
-            x: width * (-1 + slideInAnimation.progressPercentage)
+            x: width * (-1 + internal.gameViewLoadProgress)
             width: boardFinalPosition.x
             anchors.top: scoreboardSpace.bottom; anchors.topMargin: 20
         }
@@ -522,7 +553,7 @@ Item {
             id: tabsSpace
 
             width: boardFinalPosition.x
-            x: width * (-1 + slideInAnimation.progressPercentage)
+            x: width * (-1 + internal.gameViewLoadProgress)
             anchors.top: menuTabs.bottom
             anchors.bottom: board.bottom
 
@@ -615,7 +646,7 @@ Item {
                                                   Qt.point(0, 0)
 
             spacing: 10
-            visible: engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready && menuTabs.activeTab === 0
+            visible: internal.gameViewLoadProgress === 1.0 && engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready && menuTabs.activeTab === 0
             x: position.x
             y: position.y
 
@@ -743,7 +774,7 @@ Item {
             anchors.top: parent.top; anchors.topMargin: 10
             height: 160
             width: boardFinalPosition.x - 2 * 10
-            x: width * (-1 + slideInAnimation.progressPercentage) + 10
+            x: width * (-1 + internal.gameViewLoadProgress) + 10
 
             Scoreboard {
                 anchors.centerIn: parent

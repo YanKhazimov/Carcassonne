@@ -20,8 +20,9 @@ AnimatedItem {
     readonly property bool acceptsActiveMeeple: dropArea.accepts
 
     property bool isInHand: true
+    property bool gameView: true
 
-    visible: !isInHand || tabs.handsTabActive
+    visible: (!isInHand || tabs.handsTabActive) && gameView
     width: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
     height: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
     animationDuration: 500

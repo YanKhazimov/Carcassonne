@@ -91,6 +91,7 @@ public:
 
     int getPrevTurnsSeconds() const;
     int getCurrentTurnSeconds() const;
+    Q_INVOKABLE void setTimerRunning(bool value);
 
 signals:
     void isActiveChanged();

@@ -21,8 +21,9 @@ AnimatedItem {
     property MenuTabs tabs: null
 
     property bool isInHand: true
+    property bool gameView: true
 
-    visible: !isInHand || !tabs || tabs.handsTabActive
+    visible: (!isInHand || !tabs || tabs.handsTabActive) && gameView
     width: typeWidthModifier * (isInHand ? Constants.smallMeeplePreviewSize : Constants.smallMeepleSize)
     height: typeHeightModifier * (isInHand ? Constants.smallMeeplePreviewSize : Constants.smallMeepleSize)
 

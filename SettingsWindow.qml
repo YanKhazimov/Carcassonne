@@ -6,10 +6,8 @@ import QtQuick.Window 2.15
 Item {
     id: root
 
-    signal urlRequested(var urlAddress)
-    signal exitRequested()
-
     property var currentColorOffsets: [ 0, 1, 2, 3 ]
+    required property Item gameWindowLoader
 
     function colorIndex(index) {
         while (index < 0)
@@ -271,8 +269,16 @@ Item {
                     }
                     engine.populatePlayers(colors, names)
                     engine.mapModel.setSize(15)
-                    root.urlRequested("qrc:/GameWindow.qml")
+                    gameWindowLoader.active = true
                 }
+            }
+            MenuButton {
+                anchors.horizontalCenter: parent.horizontalCenter
+                enabled: gameWindowLoader.active && gameWindowLoader.item && !gameWindowLoader.item.isLoading
+                text: "Вернуться"
+                actionIndicated: false
+                font.family: Fonts.font4
+                onClicked: gameWindowLoader.item.unpauseGame()
             }
             MenuButton {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -280,7 +286,7 @@ Item {
                 actionIndicated: false
                 font.family: Fonts.font4
                 onClicked: {
-                    root.exitRequested()
+                    Qt.quit()
                 }
             }
         }

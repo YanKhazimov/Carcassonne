@@ -7,6 +7,8 @@ Rectangle {
     property alias text: text.text
     property alias font: text.font
     property alias actionIndicated: elementActionIndicator.visible
+    property alias hotkeyText: hotkey.text
+    property bool activeIndicator: enabled
 
     signal clicked()
 
@@ -15,10 +17,14 @@ Rectangle {
     radius: 8
     color: "white"
     border.color: enabled ? "black" : "grey"
+    border.width: 2
 
     RadialGradient {
         anchors.fill: parent
-        anchors.margins: -20
+        anchors.topMargin: -10
+        anchors.bottomMargin: -10
+        anchors.leftMargin: -20
+        anchors.rightMargin: -20
         visible: mouseArea.containsMouse
         gradient: Gradient {
             GradientStop { position: 0.0; color: "white" }
@@ -28,9 +34,26 @@ Rectangle {
 
     Text {
         id: text
-        anchors.centerIn: parent
         color: enabled ? "black" : "lightgrey"
         font.pixelSize: 15
+        anchors.centerIn: parent
+    }
+
+    Rectangle {
+        anchors.right: parent.right; anchors.rightMargin: 5
+        anchors.verticalCenter: parent.verticalCenter
+        radius: 3
+        width: hotkey.contentWidth + 6
+        height: root.height - 12
+        color: "#333333"
+        visible: hotkey.text !== ""
+
+        Text {
+            id: hotkey
+            anchors.centerIn: parent
+            color: "white"
+            font.pixelSize: 15
+        }
     }
 
     MouseArea {
@@ -45,6 +68,6 @@ Rectangle {
     ElementActionIndicator {
         id: elementActionIndicator
         target: parent
-        visible: root.enabled
+        visible: activeIndicator
     }
 }
