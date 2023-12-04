@@ -10,7 +10,7 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
     std::list<Tile> tiles;
 
     auto addTile = [&imagesFolder, &imageFormat, &tiles]
-            (const std::vector<std::pair<TileObject, TileData::ObjectLocation>>& objects, const QString& filename, int imageRotation)
+        (const std::vector<std::pair<std::shared_ptr<MapObjectData>, TileData::ObjectLocation>>& objects, const QString& filename, int imageRotation)
     {
         QString imagePath = QString("%1/%2/%3.%4").arg(QDir::currentPath(), imagesFolder, filename, imageFormat);
         if (QFileInfo::exists(imagePath))
@@ -32,44 +32,6 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
                 { objectManager->GenerateTown(1), { {4, 2} } }
             }, "18", 270);
     addTile({
-                { objectManager->GenerateField(), { {0, 0} } },
-                { objectManager->GenerateRoad(1), { {0, 2} } },
-                { objectManager->GenerateField(), { {0, 4}, {4, 4} } },
-                { objectManager->GenerateTown(2, QmlEnums::Wheat), { {2, 0}, {4, 0}, {4, 2} } },
-                { objectManager->GenerateTown(1), { {2, 4} } }
-            }, "21", 90);
-    X_(i, 2)
-    addTile({
-                { objectManager->GenerateTown(2, QmlEnums::Barrel), { {2, 0}, {4, 0}, {2, 2}, {4, 2}, {0, 4}, {4, 4} } },
-                { objectManager->GenerateRoad(1), { {0, 2} } },
-                { objectManager->GenerateField(), { {0, 0} } },
-                { objectManager->GenerateField(), { {0, 3} } },
-                { objectManager->GenerateField(), { {2, 4} } }
-            }, "20", 0);
-    addTile({
-                { objectManager->GenerateTown(2, QmlEnums::Cloth), { {0, 0}, {2, 0}, {4, 0}, {0, 2}, {0, 4}, {4, 4} } },
-                { objectManager->GenerateRoad(1), { {2, 4} } },
-                { objectManager->GenerateRoad(1), { {4, 2} } },
-                { objectManager->GenerateField(), { {1, 4} } },
-                { objectManager->GenerateField(), { {3, 4} } },
-                { objectManager->GenerateField(), { {4, 1} } },
-                { objectManager->GenerateField(), { {4, 3} } }
-            }, "5", 0);
-    X_(i, 3)
-    addTile({
-                { objectManager->GenerateField(), { {0, 0} } },
-                { objectManager->GenerateRoad(1), { {0, 2} } },
-                { objectManager->GenerateField(), { {0, 4}, {4, 4} } },
-                { objectManager->GenerateTown(2, QmlEnums::Cloth), { {2, 0}, {4, 0}, {4, 2} } },
-                { objectManager->GenerateTown(1), { {2, 4} } }
-            }, "11", 0);
-    X_(i, 9)
-    addTile({
-                { objectManager->GenerateRoad(2), { {2, 4}, {4, 2} } },
-                { objectManager->GenerateField(), { {4, 4} } },
-                { objectManager->GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {0, 2}, {0, 4} } }
-            }, "8", 0);
-    addTile({
                 { objectManager->GenerateMonastery(), { {2, 2} } },
                 { objectManager->GenerateField(), { {0, 0} } },
                 { objectManager->GenerateField(), { {4, 0} } },
@@ -90,6 +52,7 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
                         { objectManager->GenerateRoad(1), { {2, 4} } },
                         { objectManager->GenerateTown(1), { {4, 2} } }
                     }, "1", 0);
+    return tiles;
     addTile({
                 { objectManager->GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {0, 4}, {4, 4} } },
                 { objectManager->GenerateTown(1), { {0, 2} } },
@@ -103,11 +66,6 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
                         { objectManager->GenerateTown(1), { {0, 2} } },
                         { objectManager->GenerateRoad(1), { {2, 0} } }
                     }, "3", 0);
-
-
-    return tiles;
-
-
     addTile({
                 { objectManager->GenerateField(), { {0, 0}, {4, 0}, {0, 4}, {4, 4} } },
                 { objectManager->GenerateTown(1), { {2, 0} } },

@@ -4,7 +4,7 @@
 #include <QObject>
 #include "Tile.h"
 #include "TilesModel.h"
-#include "mapmodel.h"
+#include "MapModel.h"
 #include "PlayersModel.h"
 #include "RemainingTilesModel.h"
 #include "ShuffledDeck.h"

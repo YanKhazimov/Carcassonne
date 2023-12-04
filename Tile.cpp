@@ -2,7 +2,7 @@
 #include <QPoint>
 #include <QQmlEngine>
 
-Tile::Tile(const std::vector<std::pair<TileObject, TileData::ObjectLocation>>& objects, const QUrl &image, int imgRotation, QObject *parent)
+Tile::Tile(const std::vector<std::pair<std::shared_ptr<MapObjectData>, TileData::ObjectLocation>>& objects, const QUrl &image, int imgRotation, QObject *parent)
     : QObject(parent), TileData(objects),
       imageUrl(image), imageRotation(imgRotation), x(-100), y(-100), isFixed(false), isPlaced(false)
 {
@@ -14,7 +14,7 @@ Tile::Tile(const std::vector<std::pair<TileObject, TileData::ObjectLocation>>& o
 
     for (auto& tileObject: tileObjects)
     {
-        tileObject.objPtr->setTile(this);
+        tileObject->setTile(this);
     }
 }
 
@@ -55,9 +55,14 @@ void Tile::checkObjectCompletion(std::shared_ptr<MapObjectData> object)
     }
 }
 
-QPoint Tile::position() const
+int Tile::getX() const
 {
-    return QPoint{x, y};
+    return x;
+}
+
+int Tile::getY() const
+{
+    return y;
 }
 
 bool Tile::fixed() const
@@ -119,7 +124,7 @@ std::tuple<int, int, int> Tile::resources() const
     int wheat = 0, barrels = 0, cloth = 0;
     for (auto& tileObject: tileObjects)
     {
-        switch (tileObject.objPtr->bonusType)
+        switch (tileObject->bonusType)
         {
         case QmlEnums::BonusType::Wheat: wheat++; break;
         case QmlEnums::BonusType::Barrel: barrels++; break;

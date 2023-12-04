@@ -761,7 +761,7 @@ int TileData::townWholeId() const
 
 bool TileData::isAbbeyTile() const
 {
-    return tileObjects.size() == 1 && tileObjects[0].objPtr->type == ObjectType::Abbey;
+    return tileObjects.size() == 1 && tileObjects[0]->type == ObjectType::Abbey;
 }
 
 bool TileData::hasRoadNorth() const
@@ -1218,11 +1218,11 @@ bool TileData::hasCentralScorableObject() const
     return hasAbbey() || hasMonastery();
 }
 
-void TileData::getAdjacentTowns(std::shared_ptr<MapObjectData> &object, std::set<std::shared_ptr<MapObjectData>>& towns) const
+void TileData::getAdjacentTowns(const std::shared_ptr<MapObjectData> &object, std::set<std::shared_ptr<MapObjectData>>& towns) const
 {
-    for (auto& tileObject: tileObjects)
+    for (const auto& tileObject: tileObjects)
     {
-        if (object == tileObject.objPtr)
+        if (object == tileObject)
         {
             auto checkInsert = [&towns](const std::shared_ptr<MapObjectData>& object) {
                 if (object && object->type == ObjectType::Town && object->currentObject()->isCompleted())
@@ -1296,9 +1296,9 @@ std::set<unsigned> TileData::getFieldObjectIds() const
     std::set<unsigned> result;
     for (auto& tileObject: tileObjects)
     {
-        if (tileObject.objPtr->type == ObjectType::Field)
+        if (tileObject->type == ObjectType::Field)
         {
-            result.insert(tileObject.objPtr->currentObject()->initialId);
+            result.insert(tileObject->currentObject()->initialId);
         }
     }
 
@@ -1364,7 +1364,7 @@ TileData& TileData::rotateClockwise(int times)
     return *this;
 }
 
-TileData::TileData(const std::vector<std::pair<TileObject, ObjectLocation>>& objects)
+TileData::TileData(const std::vector<std::pair<std::shared_ptr<MapObjectData>, ObjectLocation>>& objects)
     : grid5x5 {
               {nullptr,nullptr,nullptr,nullptr,nullptr},
               {nullptr,nullptr,nullptr,nullptr,nullptr},
@@ -1379,7 +1379,7 @@ TileData::TileData(const std::vector<std::pair<TileObject, ObjectLocation>>& obj
 
         for (auto& location: tileObject.second)
         {
-            grid5x5[location.first][location.second] = tileObject.first.objPtr;
+            grid5x5[location.first][location.second] = tileObject.first;
         }
     }
 }
@@ -1453,11 +1453,6 @@ bool TileData::CanConnect(const TileData &other, TileSide from) const
 
     qDebug() << "Unknown direction" << (int)from;
     return false;
-}
-
-TileObject::TileObject(std::shared_ptr<MapObjectData> _objPtr, TileData *_tile)
-    : objPtr(_objPtr), tile(_tile)
-{
 }
 
 void TileData::Connect(TileData &newTile, TileSide side, std::set<Tile*>& updatedTiles)

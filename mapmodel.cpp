@@ -76,9 +76,10 @@ bool MapModel::canMergeAbbeyTile() const
 
 std::shared_ptr<const MapObjectData> MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
 {
-    QPoint position = tile->position();
+    const int x = tile->getX();
+    const int y = tile->getY();
     
-    if (Tile* nextNorth = nextTileNorth(position.x(), position.y()); nextNorth)
+    if (Tile* nextNorth = nextTileNorth(x, y); nextNorth)
     {
         if (auto object = nextNorth->checkConnector(TileSide::South);
             object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
@@ -87,7 +88,7 @@ std::shared_ptr<const MapObjectData> MapModel::builderObjectProgression(Tile *ti
             (!tile->isAbbeyTile() || object->currentObject()->valency == 1))
             return object;
     }
-    if (Tile* nextEast = nextTileEast(position.x(), position.y()); nextEast)
+    if (Tile* nextEast = nextTileEast(x, y); nextEast)
     {
         if (auto object = nextEast->checkConnector(TileSide::West);
             object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
@@ -96,7 +97,7 @@ std::shared_ptr<const MapObjectData> MapModel::builderObjectProgression(Tile *ti
             (!tile->isAbbeyTile() || object->currentObject()->valency == 1))
             return object;
     }
-    if (Tile* nextSouth = nextTileSouth(position.x(), position.y()); nextSouth)
+    if (Tile* nextSouth = nextTileSouth(x, y); nextSouth)
     {
         if (auto object = nextSouth->checkConnector(TileSide::North);
             object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
@@ -105,7 +106,7 @@ std::shared_ptr<const MapObjectData> MapModel::builderObjectProgression(Tile *ti
             (!tile->isAbbeyTile() || object->currentObject()->valency == 1))
             return object;
     }
-    if (Tile* nextWest = nextTileWest(position.x(), position.y()); nextWest)
+    if (Tile* nextWest = nextTileWest(x, y); nextWest)
     {
         if (auto object = nextWest->checkConnector(TileSide::East);
             object->meeplePresent({QmlEnums::MeepleType::MeepleBuilder}, activePlayer) &&
@@ -136,9 +137,9 @@ void MapModel::checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY)
         if (Tile* northTile = nextTileNorth(x, y))
         {
             vec.push_back(northTile);
-            if (Tile* northWestTile = nextTileWest(northTile->position().x(), northTile->position().y()))
+            if (Tile* northWestTile = nextTileWest(northTile->getX(), northTile->getY()))
                 vec.push_back(northWestTile);
-            if (Tile* northEastTile = nextTileEast(northTile->position().x(), northTile->position().y()))
+            if (Tile* northEastTile = nextTileEast(northTile->getX(), northTile->getY()))
                 vec.push_back(northEastTile);
         }
         if (Tile* westTile = nextTileWest(x, y))
@@ -148,9 +149,9 @@ void MapModel::checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY)
         if (Tile* southTile = nextTileSouth(x, y))
         {
             vec.push_back(southTile);
-            if (Tile* southWestTile = nextTileWest(southTile->position().x(), southTile->position().y()))
+            if (Tile* southWestTile = nextTileWest(southTile->getX(), southTile->getY()))
                 vec.push_back(southWestTile);
-            if (Tile* southEastTile = nextTileEast(southTile->position().x(), southTile->position().y()))
+            if (Tile* southEastTile = nextTileEast(southTile->getX(), southTile->getY()))
                 vec.push_back(southEastTile);
         }
 
@@ -165,7 +166,7 @@ void MapModel::checkNearbyMonasteryAbbeyCompletion(int newTileX, int newTileY)
         if (!monasteryTile->hasCentralScorableObject())
             continue;
 
-        std::vector<Tile*> completionTiles = getTilesAround(monasteryTile->position().x(), monasteryTile->position().y());
+        std::vector<Tile*> completionTiles = getTilesAround(monasteryTile->getX(), monasteryTile->getY());
         if (completionTiles.size() == 8)
         {
             monasteryTile->markCentralObjectCompleted();
@@ -263,30 +264,31 @@ void MapModel::placeTile(Tile *tile, int x, int y)
 
 void MapModel::fixTile(Tile *tile)
 {
-    QPoint position = tile->position();
-    tiles[position.y() + size/2][position.x() + size/2] = tile;
+    const int x = tile->getX();
+    const int y = tile->getY();
+    tiles[y + size/2][x + size/2] = tile;
     tile->setFixed(true);
 
     // update minmax
-    updateMinMax(position.x(), position.y());
+    updateMinMax(x, y);
 
     // merge objects
     std::set<Tile*> updatedTiles;
-    if (Tile* nextNorth = nextTileNorth(position.x(), position.y()); nextNorth)
+    if (Tile* nextNorth = nextTileNorth(x, y); nextNorth)
         nextNorth->Connect(*tile, TileSide::South, updatedTiles);
-    if (Tile* nextEast = nextTileEast(position.x(), position.y()); nextEast)
+    if (Tile* nextEast = nextTileEast(x, y); nextEast)
         nextEast->Connect(*tile, TileSide::West, updatedTiles);
-    if (Tile* nextSouth = nextTileSouth(position.x(), position.y()); nextSouth)
+    if (Tile* nextSouth = nextTileSouth(x, y); nextSouth)
         nextSouth->Connect(*tile, TileSide::North, updatedTiles);
-    if (Tile* nextWest = nextTileWest(position.x(), position.y()); nextWest)
+    if (Tile* nextWest = nextTileWest(x, y); nextWest)
         nextWest->Connect(*tile, TileSide::East, updatedTiles);
 
-    for (Tile* tile: updatedTiles)
+    for (Tile* updatedTile: updatedTiles)
     {
-        emit tile->objectIdsChanged();
+        emit updatedTile->objectIdsChanged();
     }
 
-    checkNearbyMonasteryAbbeyCompletion(position.x(), position.y());
+    checkNearbyMonasteryAbbeyCompletion(x, y);
 
     for (unsigned fieldObjectId: tile->getFieldObjectIds())
     {

@@ -1,19 +1,11 @@
 #ifndef TILEDATA_H
 #define TILEDATA_H
+
 #include "DataTypes.h"
 #include "MapObjectData.h"
 #include <memory>
 #include <vector>
 #include <set>
-
-class TileData;
-
-struct TileObject {
-    std::shared_ptr<MapObjectData> objPtr;
-    TileData* tile;
-
-    TileObject(std::shared_ptr<MapObjectData> objPtr, TileData* tile = nullptr);
-};
 
 class TileData {
     std::shared_ptr<MapObjectData> grid5x5[5][5];
@@ -33,7 +25,7 @@ public:
     void print() const;
     void markCentralObjectCompleted();
     bool hasCentralScorableObject() const;
-    void getAdjacentTowns(std::shared_ptr<MapObjectData>& object, std::set<std::shared_ptr<MapObjectData>> &towns) const;
+    void getAdjacentTowns(const std::shared_ptr<MapObjectData>& object, std::set<std::shared_ptr<MapObjectData>> &towns) const;
     std::set<unsigned> getFieldObjectIds() const;
     unsigned NEBarnCornerId() const;
     unsigned NWBarnCornerId() const;
@@ -44,8 +36,8 @@ public:
     using ObjectLocation = std::vector<std::pair<int, int>>;
 
 protected:
-    std::vector<TileObject> tileObjects;
-    TileData(const std::vector<std::pair<TileObject, ObjectLocation>>& objects);
+    std::vector<std::shared_ptr<MapObjectData>> tileObjects;
+    TileData(const std::vector<std::pair<std::shared_ptr<MapObjectData>, ObjectLocation>>& objects);
     virtual void checkObjectCompletion(std::shared_ptr<MapObjectData> object);
 
     const std::shared_ptr<MapObjectData> NW() const;

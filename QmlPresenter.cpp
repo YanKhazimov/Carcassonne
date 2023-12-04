@@ -361,8 +361,8 @@ void QmlPresenter::scoreBarnes(unsigned fieldObjectId)
 
 bool QmlPresenter::isFieldCorner(Tile *tile, unsigned objectId) const
 {
-    int x = tile->position().x();
-    int y = tile->position().y();
+    int x = tile->getX();
+    int y = tile->getY();
 
     Tile* north = mapModel.nextTileNorth(x, y);
     Tile* west = mapModel.nextTileWest(x, y);
