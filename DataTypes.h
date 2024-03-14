@@ -6,7 +6,7 @@
 #include <QVariantList>
 
 enum TileSide {
-    East,
+    East = 0,
     North,
     South,
     West,
@@ -27,7 +27,7 @@ namespace QmlEnums {
     Q_NAMESPACE
 
     enum BonusType {
-        None,
+        None = 0,
         Wheat,
         Barrel,
         Cloth,
@@ -66,6 +66,28 @@ namespace QmlEnums {
         LogGameEnd
     };
     Q_ENUM_NS(LogRecordType)
+
+    // enum TileRegion
+    // {
+    //     NW = 0,
+    //     NNW,
+    //     N,
+    //     NNE,
+    //     NE,
+    //     NWW,
+    //     NEE,
+    //     W,
+    //     C,
+    //     E,
+    //     SWW,
+    //     SEE,
+    //     SW,
+    //     SSW,
+    //     S,
+    //     SSE,
+    //     SE
+    // };
+    // Q_ENUM_NS(TileRegion)
 }
 
 TileSide opposite(TileSide side);

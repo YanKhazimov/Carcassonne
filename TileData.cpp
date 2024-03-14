@@ -1,5 +1,7 @@
 #include "TileData.h"
+#include "ObjectManager.h"
 #include <QDebug>
+#include <QJsonObject>
 
 const int InvalidId = 0;
 
@@ -19,20 +21,20 @@ bool sameType(T type0, const Ts&... args)
 }
 
 template<typename ... T>
-bool sameInitialId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
+bool sameInitialId(const std::shared_ptr<TileObject>& obj0, const T&... args)
 {
     return ((obj0->initialId == args->initialId) && ...);
 }
 
 template<typename ... T>
-bool sameId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
+bool sameId(const std::shared_ptr<TileObject>& obj0, const T&... args)
 {
     return ((obj0->currentObject()->initialId == args->currentObject()->initialId) && ...);
 }
 
 // ! returns InvalidId in case the ids are not all equal, the id otherwise
 template <typename ... T>
-unsigned commonId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
+unsigned commonId(const std::shared_ptr<TileObject>& obj0, const T&... args)
 {
     return (((obj0->currentObject()->initialId == args->currentObject()->initialId) ? obj0->currentObject()->initialId : InvalidId) & ...);
 }
@@ -59,85 +61,85 @@ void TileData::print() const
     qDebug() << " ";
 }
 
-int TileData::id_NE() const
-{
-    return NE()->currentObject()->initialId;
-}
+// int TileData::id_NE() const
+// {
+//     return NE()->currentObject()->initialId;
+// }
 
-int TileData::id_SE() const
-{
-    return SE()->currentObject()->initialId;
-}
+// int TileData::id_SE() const
+// {
+//     return SE()->currentObject()->initialId;
+// }
 
-int TileData::id_SW() const
-{
-    return SW()->currentObject()->initialId;
-}
+// int TileData::id_SW() const
+// {
+//     return SW()->currentObject()->initialId;
+// }
 
-int TileData::id_NW() const
-{
-    return NW()->currentObject()->initialId;
-}
+// int TileData::id_NW() const
+// {
+//     return NW()->currentObject()->initialId;
+// }
 
-int TileData::id_NEE() const
-{
-    return NEE() ? NEE()->currentObject()->initialId : InvalidId;
-}
+// int TileData::id_NEE() const
+// {
+//     return NEE() ? NEE()->currentObject()->initialId : InvalidId;
+// }
 
-int TileData::id_SEE() const
-{
-    return SEE() ? SEE()->currentObject()->initialId : InvalidId;
-}
+// int TileData::id_SEE() const
+// {
+//     return SEE() ? SEE()->currentObject()->initialId : InvalidId;
+// }
 
-int TileData::id_SSE() const
-{
-    return SSE() ? SSE()->currentObject()->initialId : InvalidId;
-}
+// int TileData::id_SSE() const
+// {
+//     return SSE() ? SSE()->currentObject()->initialId : InvalidId;
+// }
 
-int TileData::id_SSW() const
-{
-    return SSW() ? SSW()->currentObject()->initialId : InvalidId;
-}
+// int TileData::id_SSW() const
+// {
+//     return SSW() ? SSW()->currentObject()->initialId : InvalidId;
+// }
 
-int TileData::id_SWW() const
-{
-    return SWW() ? SWW()->currentObject()->initialId : InvalidId;
-}
+// int TileData::id_SWW() const
+// {
+//     return SWW() ? SWW()->currentObject()->initialId : InvalidId;
+// }
 
-int TileData::id_NWW() const
-{
-    return NWW() ? NWW()->currentObject()->initialId : InvalidId;
-}
+// int TileData::id_NWW() const
+// {
+//     return NWW() ? NWW()->currentObject()->initialId : InvalidId;
+// }
 
-int TileData::id_NNW() const
-{
-    return NNW() ? NNW()->currentObject()->initialId : InvalidId;
-}
+// int TileData::id_NNW() const
+// {
+//     return NNW() ? NNW()->currentObject()->initialId : InvalidId;
+// }
 
-int TileData::id_NNE() const
-{
-    return NNE() ? NNE()->currentObject()->initialId : InvalidId;
-}
+// int TileData::id_NNE() const
+// {
+//     return NNE() ? NNE()->currentObject()->initialId : InvalidId;
+// }
 
-int TileData::id_N() const
-{
-    return N()->currentObject()->initialId;
-}
+// int TileData::id_N() const
+// {
+//     return N()->currentObject()->initialId;
+// }
 
-int TileData::id_S() const
-{
-    return S()->currentObject()->initialId;
-}
+// int TileData::id_S() const
+// {
+//     return S()->currentObject()->initialId;
+// }
 
-int TileData::id_E() const
-{
-    return E()->currentObject()->initialId;
-}
+// int TileData::id_E() const
+// {
+//     return E()->currentObject()->initialId;
+// }
 
-int TileData::id_W() const
-{
-    return W()->currentObject()->initialId;
-}
+// int TileData::id_W() const
+// {
+//     return W()->currentObject()->initialId;
+// }
 
 bool TileData::hasAbbey() const
 {
@@ -146,19 +148,9 @@ bool TileData::hasAbbey() const
            sameInitialId(N(), E(), S(), W(), NW(), NE(), SE(), SW());
 }
 
-int TileData::abbeyId() const
-{
-    return commonId(N(), E(), S(), W(), NW(), NE(), SE(), SW());
-}
-
 bool TileData::hasMonastery() const
 {
     return C() && C()->type == ObjectType::Monastery;
-}
-
-int TileData::monasteryId() const
-{
-    return C() ? C()->initialId : InvalidId;
 }
 
 bool TileData::hasRoadBlock() const
@@ -173,11 +165,6 @@ bool TileData::hasFieldWhole() const
             sameInitialId(NW(), NE(), SE(), SW());
 }
 
-int TileData::fieldWholeId() const
-{
-    return commonId(NW(), NE(), SE(), SW());
-}
-
 bool TileData::hasFieldHalfNorth() const
 {
     return sameType(ObjectType::Field, NW()->type, NE()->type) &&
@@ -188,19 +175,9 @@ bool TileData::hasFieldHalfNorth() const
             !sameInitialId(NE(), SE());
 }
 
-int TileData::fieldHalfNorthId() const
-{
-    return commonId(NW(), NE());
-}
-
 bool TileData::hasFieldHalfEast() const
 {
     return copy().rotateClockwise(3).hasFieldHalfNorth();
-}
-
-int TileData::fieldHalfEastId() const
-{
-    return commonId(SE(), NE());
 }
 
 bool TileData::hasFieldHalfSouth() const
@@ -208,19 +185,9 @@ bool TileData::hasFieldHalfSouth() const
     return copy().rotateClockwise(2).hasFieldHalfNorth();
 }
 
-int TileData::fieldHalfSouthId() const
-{
-    return commonId(SW(), SE());
-}
-
 bool TileData::hasFieldHalfWest() const
 {
     return copy().rotateClockwise(1).hasFieldHalfNorth();
-}
-
-int TileData::fieldHalfWestId() const
-{
-    return commonId(SW(), NW());
 }
 
 bool TileData::hasFieldNorthEast() const
@@ -275,19 +242,9 @@ bool TileData::hasFieldArc3cNorthEast() const
             sameType(ObjectType::Field, N()->type, E()->type);
 }
 
-int TileData::fieldArc3cNorthEastId() const
-{
-    return commonId(N(), E());
-}
-
 bool TileData::hasFieldArc3cSouthEast() const
 {
     return copy().rotateClockwise(3).hasFieldArc3cNorthEast();
-}
-
-int TileData::fieldArc3cSouthEastId() const
-{
-    return commonId(S(), E());
 }
 
 bool TileData::hasFieldArc3cSouthWest() const
@@ -295,19 +252,9 @@ bool TileData::hasFieldArc3cSouthWest() const
     return copy().rotateClockwise(2).hasFieldArc3cNorthEast();
 }
 
-int TileData::fieldArc3cSouthWestId() const
-{
-    return commonId(S(), W());
-}
-
 bool TileData::hasFieldArc3cNorthWest() const
 {
     return copy().rotateClockwise(1).hasFieldArc3cNorthEast();
-}
-
-int TileData::fieldArc3cNorthWestId() const
-{
-    return commonId(N(), W());
 }
 
 bool TileData::hasField3qNoNorthEast() const
@@ -319,19 +266,9 @@ bool TileData::hasField3qNoNorthEast() const
             SW()->initialId != N()->initialId;
 }
 
-int TileData::field3qNoNorthEastId() const
-{
-    return commonId(NW(), SW(), SE());
-}
-
 bool TileData::hasField3qNoNorthWest() const
 {
     return copy().rotateClockwise(1).hasField3qNoNorthEast();
-}
-
-int TileData::field3qNoNorthWestId() const
-{
-    return commonId(NE(), SW(), SE());
 }
 
 bool TileData::hasField3qNoSouthEast() const
@@ -339,19 +276,9 @@ bool TileData::hasField3qNoSouthEast() const
     return copy().rotateClockwise(3).hasField3qNoNorthEast();
 }
 
-int TileData::field3qNoSouthEastId() const
-{
-    return commonId(NE(), SW(), NW());
-}
-
 bool TileData::hasField3qNoSouthWest() const
 {
     return copy().rotateClockwise(2).hasField3qNoNorthEast();
-}
-
-int TileData::field3qNoSouthWestId() const
-{
-    return commonId(NE(), SE(), NW());
 }
 
 bool TileData::hasFieldDiagonalNWSE() const
@@ -362,19 +289,9 @@ bool TileData::hasFieldDiagonalNWSE() const
             !sameInitialId(NW(), NE());
 }
 
-int TileData::fieldDiagonalNWSEId() const
-{
-    return commonId(SE(), NW());
-}
-
 bool TileData::hasFieldDiagonalNESW() const
 {
     return copy().rotateClockwise(1).hasFieldDiagonalNWSE();
-}
-
-int TileData::fieldDiagonalNESWId() const
-{
-    return commonId(NE(), SW());
 }
 
 bool TileData::hasFieldLTriangleNorthEast() const
@@ -601,19 +518,9 @@ bool TileData::hasTown2eNorthSouth() const
             N()->initialValency == 2;
 }
 
-int TileData::town2eNorthSouthId() const
-{
-    return commonId(N(), S());
-}
-
 bool TileData::hasTown2eEastWest() const
 {
     return copy().rotateClockwise(1).hasTown2eNorthSouth();
-}
-
-int TileData::town2eEastWestId() const
-{
-    return commonId(E(), W());
 }
 
 bool TileData::hasTown2e2cNorthEast() const
@@ -626,19 +533,9 @@ bool TileData::hasTown2e2cNorthEast() const
             !sameInitialId(N(), SW());
 }
 
-int TileData::town2e2cNorthEastId() const
-{
-    return commonId(N(), E());
-}
-
 bool TileData::hasTown2e2cNorthWest() const
 {
     return copy().rotateClockwise(1).hasTown2e2cNorthEast();
-}
-
-int TileData::town2e2cNorthWestId() const
-{
-    return commonId(N(), W());
 }
 
 bool TileData::hasTown2e2cSouthEast() const
@@ -646,19 +543,9 @@ bool TileData::hasTown2e2cSouthEast() const
     return copy().rotateClockwise(3).hasTown2e2cNorthEast();
 }
 
-int TileData::town2e2cSouthEastId() const
-{
-    return commonId(S(), E());
-}
-
 bool TileData::hasTown2e2cSouthWest() const
 {
     return copy().rotateClockwise(2).hasTown2e2cNorthEast();
-}
-
-int TileData::town2e2cSouthWestId() const
-{
-    return commonId(S(), W());
 }
 
 bool TileData::hasTown2e3cNorthEast() const
@@ -670,19 +557,9 @@ bool TileData::hasTown2e3cNorthEast() const
             !sameInitialId(N(), W());
 }
 
-int TileData::town2e3cNorthEastId() const
-{
-    return commonId(N(), E());
-}
-
 bool TileData::hasTown2e3cNorthWest() const
 {
     return copy().rotateClockwise(1).hasTown2e3cNorthEast();
-}
-
-int TileData::town2e3cNorthWestId() const
-{
-    return commonId(N(), W());
 }
 
 bool TileData::hasTown2e3cSouthEast() const
@@ -690,19 +567,9 @@ bool TileData::hasTown2e3cSouthEast() const
     return copy().rotateClockwise(3).hasTown2e3cNorthEast();
 }
 
-int TileData::town2e3cSouthEastId() const
-{
-    return commonId(S(), E());
-}
-
 bool TileData::hasTown2e3cSouthWest() const
 {
     return copy().rotateClockwise(2).hasTown2e3cNorthEast();
-}
-
-int TileData::town2e3cSouthWestId() const
-{
-    return commonId(S(), W());
 }
 
 bool TileData::hasTown3e4cNorthEastWest() const
@@ -713,19 +580,9 @@ bool TileData::hasTown3e4cNorthEastWest() const
             !sameInitialId(N(), S());
 }
 
-int TileData::town3e4cNorthEastWestId() const
-{
-    return commonId(N(), E(), W());
-}
-
 bool TileData::hasTown3e4cEastNorthSouth() const
 {
     return copy().rotateClockwise(3).hasTown3e4cNorthEastWest();
-}
-
-int TileData::town3e4cEastNorthSouthId() const
-{
-    return commonId(N(), E(), S());
 }
 
 bool TileData::hasTown3e4cSouthEastWest() const
@@ -733,19 +590,9 @@ bool TileData::hasTown3e4cSouthEastWest() const
     return copy().rotateClockwise(2).hasTown3e4cNorthEastWest();
 }
 
-int TileData::town3e4cSouthEastWestId() const
-{
-    return commonId(S(), E(), W());
-}
-
 bool TileData::hasTown3e4cWestNorthSouth() const
 {
     return copy().rotateClockwise(1).hasTown3e4cNorthEastWest();
-}
-
-int TileData::town3e4cWestNorthSouthId() const
-{
-    return commonId(N(), S(), W());
 }
 
 bool TileData::hasTownWhole() const
@@ -754,14 +601,33 @@ bool TileData::hasTownWhole() const
             sameInitialId(N(), E(), S(), W());
 }
 
-int TileData::townWholeId() const
-{
-    return commonId(N(), E(), S(), W());
-}
-
 bool TileData::isAbbeyTile() const
 {
-    return tileObjects.size() == 1 && tileObjects[0]->type == ObjectType::Abbey;
+    return tileObjects.size() == 1 && (*tileObjects.begin())->type == ObjectType::Abbey;
+}
+
+QJsonArray TileData::serialize() const
+{
+    auto getId = [this](int column, int row) {
+        return grid5x5[column][row] ? (int)grid5x5[column][row]->initialId : ObjectManager::invalidObjectId;
+    };
+    QJsonArray result({
+        QJsonArray { getId(0, 0), getId(0, 1), getId(0, 2), getId(0, 3), getId(0, 4) },
+        QJsonArray { getId(1, 0), getId(1, 1), getId(1, 2), getId(1, 3), getId(1, 4) },
+        QJsonArray { getId(2, 0), getId(2, 1), getId(2, 2), getId(2, 3), getId(2, 4) },
+        QJsonArray { getId(3, 0), getId(3, 1), getId(3, 2), getId(3, 3), getId(3, 4) },
+        QJsonArray { getId(4, 0), getId(4, 1), getId(4, 2), getId(4, 3), getId(4, 4) }
+    });
+
+//    for (auto& tileObject: tileObjects)
+//    {
+//       QJsonObject object;
+//       object["objectId"] = (int)tileObject->initialId;
+//       for (const auto& tileLocation: )
+//       result.push_back(object);
+//    }
+
+    return result;
 }
 
 bool TileData::hasRoadNorth() const
@@ -875,19 +741,9 @@ bool TileData::hasRoadNorthSouth() const
            sw->initialId != se->initialId;
 }
 
-int TileData::roadNorthSouthId() const
-{
-    return commonId(N(), S());
-}
-
 bool TileData::hasRoadEastWest() const
 {
     return copy().rotateClockwise(1).hasRoadNorthSouth();
-}
-
-int TileData::roadEastWestId() const
-{
-    return commonId(E(), W());
 }
 
 bool TileData::hasRoadDownThroughTownNorthSouth() const
@@ -902,19 +758,9 @@ bool TileData::hasRoadDownThroughTownNorthSouth() const
            sw->initialId != se->initialId;
 }
 
-int TileData::roadDownThroughTownNorthSouthId() const
-{
-    return commonId(N(), S());
-}
-
 bool TileData::hasRoadDownThroughTownEastWest() const
 {
     return copy().rotateClockwise(3).hasRoadDownThroughTownNorthSouth();
-}
-
-int TileData::roadDownThroughTownEastWestId() const
-{
-    return commonId(E(), W());
 }
 
 bool TileData::hasRoadDownThroughTownSouthNorth() const
@@ -922,19 +768,9 @@ bool TileData::hasRoadDownThroughTownSouthNorth() const
     return copy().rotateClockwise(2).hasRoadDownThroughTownNorthSouth();
 }
 
-int TileData::roadDownThroughTownSouthNorthId() const
-{
-    return commonId(N(), S());
-}
-
 bool TileData::hasRoadDownThroughTownWestEast() const
 {
     return copy().rotateClockwise(1).hasRoadDownThroughTownNorthSouth();
-}
-
-int TileData::roadDownThroughTownWestEastId() const
-{
-    return commonId(E(), W());
 }
 
 bool TileData::hasT_NorthWestSouthRoad() const
@@ -945,19 +781,9 @@ bool TileData::hasT_NorthWestSouthRoad() const
             N()->initialValency == 3;
 }
 
-int TileData::T_NorthWestSouthRoadId() const
-{
-    return commonId(N(), W(), S());
-}
-
 bool TileData::hasT_WestSouthEastRoad() const
 {
     return copy().rotateClockwise(1).hasT_NorthWestSouthRoad();
-}
-
-int TileData::T_WestSouthEastRoadId() const
-{
-    return commonId(E(), W(), S());
 }
 
 bool TileData::hasT_SouthEastNorthRoad() const
@@ -965,19 +791,9 @@ bool TileData::hasT_SouthEastNorthRoad() const
     return copy().rotateClockwise(2).hasT_NorthWestSouthRoad();
 }
 
-int TileData::T_SouthEastNorthRoadId() const
-{
-    return commonId(E(), N(), S());
-}
-
 bool TileData::hasT_EastNorthWestRoad() const
 {
     return copy().rotateClockwise(3).hasT_NorthWestSouthRoad();
-}
-
-int TileData::T_EastNorthWestRoadId() const
-{
-    return commonId(E(), W(), N());
 }
 
 bool TileData::hasC_NorthEastRoad() const
@@ -989,19 +805,9 @@ bool TileData::hasC_NorthEastRoad() const
             sameInitialId(NW(), SE());
 }
 
-int TileData::C_NorthEastRoadId() const
-{
-    return commonId(E(), N());
-}
-
 bool TileData::hasC_NorthWestRoad() const
 {
     return copy().rotateClockwise(1).hasC_NorthEastRoad();
-}
-
-int TileData::C_NorthWestRoadId() const
-{
-    return commonId(W(), N());
 }
 
 bool TileData::hasC_SouthEastRoad() const
@@ -1009,19 +815,9 @@ bool TileData::hasC_SouthEastRoad() const
     return copy().rotateClockwise(3).hasC_NorthEastRoad();
 }
 
-int TileData::C_SouthEastRoadId() const
-{
-    return commonId(E(), S());
-}
-
 bool TileData::hasC_SouthWestRoad() const
 {
     return copy().rotateClockwise(2).hasC_NorthEastRoad();
-}
-
-int TileData::C_SouthWestRoadId() const
-{
-    return commonId(W(), S());
 }
 
 bool TileData::hasL_NorthEastRoad() const
@@ -1035,19 +831,9 @@ bool TileData::hasL_NorthEastRoad() const
             sameInitialId(NW(), SW());
 }
 
-int TileData::L_NorthEastRoadId() const
-{
-    return commonId(E(), N());
-}
-
 bool TileData::hasL_NorthWestRoad() const
 {
     return copy().rotateClockwise(1).hasL_NorthEastRoad();
-}
-
-int TileData::L_NorthWestRoadId() const
-{
-    return commonId(W(), N());
 }
 
 bool TileData::hasL_SouthEastRoad() const
@@ -1055,19 +841,9 @@ bool TileData::hasL_SouthEastRoad() const
     return copy().rotateClockwise(3).hasL_NorthEastRoad();
 }
 
-int TileData::L_SouthEastRoadId() const
-{
-    return commonId(E(), S());
-}
-
 bool TileData::hasL_SouthWestRoad() const
 {
     return copy().rotateClockwise(2).hasL_NorthEastRoad();
-}
-
-int TileData::L_SouthWestRoadId() const
-{
-    return commonId(W(), S());
 }
 
 bool TileData::hasAnyL_Road() const
@@ -1089,19 +865,9 @@ bool TileData::hasJ_NorthWestRoad() const
             sameInitialId(NE(), SE());
 }
 
-int TileData::J_NorthWestRoadId() const
-{
-    return commonId(W(), N());
-}
-
 bool TileData::hasJ_NorthEastRoad() const
 {
     return copy().rotateClockwise(3).hasJ_NorthWestRoad();
-}
-
-int TileData::J_NorthEastRoadId() const
-{
-    return commonId(E(), N());
 }
 
 bool TileData::hasJ_SouthWestRoad() const
@@ -1109,19 +875,9 @@ bool TileData::hasJ_SouthWestRoad() const
     return copy().rotateClockwise(1).hasJ_NorthWestRoad();
 }
 
-int TileData::J_SouthWestRoadId() const
-{
-    return commonId(S(), W());
-}
-
 bool TileData::hasJ_SouthEastRoad() const
 {
     return copy().rotateClockwise(2).hasJ_NorthWestRoad();
-}
-
-int TileData::J_SouthEastRoadId() const
-{
-    return commonId(E(), S());
 }
 
 bool TileData::hasAnyJ_Road() const
@@ -1132,7 +888,7 @@ bool TileData::hasAnyJ_Road() const
             hasJ_SouthWestRoad();
 }
 
-std::shared_ptr<MapObjectData> TileData::getConnector(TileSide direction)
+std::shared_ptr<TileObject> TileData::getConnector(TileSide direction)
 {
     switch (direction) {
     case TileSide::North: return grid5x5[0][2]; break;
@@ -1143,7 +899,7 @@ std::shared_ptr<MapObjectData> TileData::getConnector(TileSide direction)
     }
 }
 
-std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > TileData::getSideConnectors(TileSide direction) const
+std::pair<std::shared_ptr<TileObject>, std::shared_ptr<TileObject> > TileData::getSideConnectors(TileSide direction) const
 {
     switch (direction) {
     case TileSide::North: return { NNW() ? NNW() : NW(), NNE() ? NNE() : NE() }; break;
@@ -1154,7 +910,7 @@ std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > TileD
     }
 }
 
-std::shared_ptr<const MapObjectData> TileData::checkConnector(TileSide direction) const
+std::shared_ptr<const TileObject> TileData::checkConnector(TileSide direction) const
 {
     switch (direction) {
     case TileSide::North: return N(); break;
@@ -1165,12 +921,12 @@ std::shared_ptr<const MapObjectData> TileData::checkConnector(TileSide direction
     }
 }
 
-void TileData::checkObjectCompletion(std::shared_ptr<MapObjectData> object)
+void TileData::checkObjectCompletion(std::shared_ptr<TileObject> object)
 {
     qDebug() << "Reimplement me";
 }
 
-void TileData::mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject, std::shared_ptr<MapObjectData> absorbedObject) const
+void TileData::mergeObjectShapes(std::shared_ptr<TileObject> absorbingObject, std::shared_ptr<TileObject> absorbedObject) const
 {
     if (absorbedObject->initialId == absorbingObject->initialId)
     {
@@ -1189,23 +945,23 @@ void TileData::mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject,
     }
 }
 
-const std::shared_ptr<MapObjectData> TileData::NW() const { return grid5x5[0][0]; }
-const std::shared_ptr<MapObjectData> TileData::NNW() const { return grid5x5[0][1]; }
-const std::shared_ptr<MapObjectData> TileData::N() const { return grid5x5[0][2]; }
-const std::shared_ptr<MapObjectData> TileData::NNE() const { return grid5x5[0][3]; }
-const std::shared_ptr<MapObjectData> TileData::NE() const { return grid5x5[0][4]; }
-const std::shared_ptr<MapObjectData> TileData::NWW() const { return grid5x5[1][0]; }
-const std::shared_ptr<MapObjectData> TileData::NEE() const { return grid5x5[1][4]; }
-const std::shared_ptr<MapObjectData> TileData::W() const { return grid5x5[2][0]; }
-const std::shared_ptr<MapObjectData> TileData::C() const { return grid5x5[2][2]; }
-const std::shared_ptr<MapObjectData> TileData::E() const { return grid5x5[2][4]; }
-const std::shared_ptr<MapObjectData> TileData::SWW() const { return grid5x5[3][0]; }
-const std::shared_ptr<MapObjectData> TileData::SEE() const { return grid5x5[3][4]; }
-const std::shared_ptr<MapObjectData> TileData::SW() const { return grid5x5[4][0]; }
-const std::shared_ptr<MapObjectData> TileData::SSW() const { return grid5x5[4][1]; }
-const std::shared_ptr<MapObjectData> TileData::S() const { return grid5x5[4][2]; }
-const std::shared_ptr<MapObjectData> TileData::SSE() const { return grid5x5[4][3]; }
-const std::shared_ptr<MapObjectData> TileData::SE() const { return grid5x5[4][4]; }
+std::shared_ptr<TileObject> TileData::NW() const { return grid5x5[0][0]; }
+std::shared_ptr<TileObject> TileData::NNW() const { return grid5x5[0][1]; }
+std::shared_ptr<TileObject> TileData::N() const { return grid5x5[0][2]; }
+std::shared_ptr<TileObject> TileData::NNE() const { return grid5x5[0][3]; }
+std::shared_ptr<TileObject> TileData::NE() const { return grid5x5[0][4]; }
+std::shared_ptr<TileObject> TileData::NWW() const { return grid5x5[1][0]; }
+std::shared_ptr<TileObject> TileData::NEE() const { return grid5x5[1][4]; }
+std::shared_ptr<TileObject> TileData::W() const { return grid5x5[2][0]; }
+std::shared_ptr<TileObject> TileData::C() const { return grid5x5[2][2]; }
+std::shared_ptr<TileObject> TileData::E() const { return grid5x5[2][4]; }
+std::shared_ptr<TileObject> TileData::SWW() const { return grid5x5[3][0]; }
+std::shared_ptr<TileObject> TileData::SEE() const { return grid5x5[3][4]; }
+std::shared_ptr<TileObject> TileData::SW() const { return grid5x5[4][0]; }
+std::shared_ptr<TileObject> TileData::SSW() const { return grid5x5[4][1]; }
+std::shared_ptr<TileObject> TileData::S() const { return grid5x5[4][2]; }
+std::shared_ptr<TileObject> TileData::SSE() const { return grid5x5[4][3]; }
+std::shared_ptr<TileObject> TileData::SE() const { return grid5x5[4][4]; }
 
 void TileData::markCentralObjectCompleted()
 {
@@ -1218,13 +974,13 @@ bool TileData::hasCentralScorableObject() const
     return hasAbbey() || hasMonastery();
 }
 
-void TileData::getAdjacentTowns(const std::shared_ptr<MapObjectData> &object, std::set<std::shared_ptr<MapObjectData>>& towns) const
+void TileData::getAdjacentTowns(const std::shared_ptr<TileObject> &object, std::set<std::shared_ptr<TileObject>>& towns) const
 {
     for (const auto& tileObject: tileObjects)
     {
         if (object == tileObject)
         {
-            auto checkInsert = [&towns](const std::shared_ptr<MapObjectData>& object) {
+            auto checkInsert = [&towns](const std::shared_ptr<TileObject>& object) {
                 if (object && object->type == ObjectType::Town && object->currentObject()->isCompleted())
                     towns.insert(object->currentObject());
             };
@@ -1364,7 +1120,7 @@ TileData& TileData::rotateClockwise(int times)
     return *this;
 }
 
-TileData::TileData(const std::vector<std::pair<std::shared_ptr<MapObjectData>, ObjectLocation>>& objects)
+TileData::TileData(const std::vector<std::pair<std::shared_ptr<TileObject>, ObjectLocation>>& objects)
     : grid5x5 {
               {nullptr,nullptr,nullptr,nullptr,nullptr},
               {nullptr,nullptr,nullptr,nullptr,nullptr},
@@ -1375,11 +1131,43 @@ TileData::TileData(const std::vector<std::pair<std::shared_ptr<MapObjectData>, O
 {
     for (auto& tileObject: objects)
     {
-        tileObjects.push_back(tileObject.first);
+        tileObjects.insert(tileObject.first);
 
         for (auto& location: tileObject.second)
         {
             grid5x5[location.first][location.second] = tileObject.first;
+        }
+    }
+}
+
+TileData::TileData(const std::vector<std::vector<int> > &objectIds)
+{
+    for (int c = 0; c < 5; ++c)
+    {
+        for (int r = 0; r < 5; ++r)
+        {
+            std::shared_ptr<TileObject> object = ObjectManager::instance()->GetAggregateObject(objectIds[c][r]);
+            grid5x5[c][r] = object;
+
+            if (object)
+                tileObjects.insert(object);
+        }
+    }
+}
+
+TileData::TileData(const QJsonArray &json)
+{
+    for (int i = 0; i < 5; ++i)
+    {
+        const auto column = json[i].toArray();
+        for (int j = 0; j < 5; ++j)
+        {
+            int objectId = column[j].toInt();
+            std::shared_ptr<TileObject> object = ObjectManager::instance()->GetObject(objectId);
+            grid5x5[i][j] = object;
+
+            if (object)
+                tileObjects.insert(object);
         }
     }
 }
@@ -1460,8 +1248,8 @@ void TileData::Connect(TileData &newTile, TileSide side, std::set<Tile*>& update
     // not checking the connection validity
 
     // merge objects
-    std::shared_ptr<MapObjectData> connectorObject = getConnector(side);
-    std::shared_ptr<MapObjectData> otherConnectorObject = newTile.getConnector(opposite(side));
+    std::shared_ptr<TileObject> connectorObject = getConnector(side);
+    std::shared_ptr<TileObject> otherConnectorObject = newTile.getConnector(opposite(side));
 
     switch (otherConnectorObject->type) {
     case ObjectType::Town: {

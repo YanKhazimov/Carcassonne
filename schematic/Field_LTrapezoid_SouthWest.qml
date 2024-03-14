@@ -2,6 +2,5 @@ import QtQuick 2.15
 
 Field_LTrapezoid_NorthEast {
     rotation: 180
-    currentId: tileData ? tileData.FieldLTrapezoidSouthWestId : invalidId
-    visible: tileData && tileData.FieldLTrapezoidSouthWest
+    objectData: tileData ? tileData.FieldLTrapezoidSouthWest : null
 }

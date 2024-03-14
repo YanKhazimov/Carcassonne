@@ -11,10 +11,44 @@ Player::Player(QColor _color, QString _name, QObject *parent)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     turnTimer.setTimerType(Qt::VeryCoarseTimer);
+    turnTimer.setInterval(1000);
     connect(&turnTimer, &QTimer::timeout, this, [this](){
         currentTurnSeconds++;
         emit currentTurnSecondsChanged();
     });
+}
+
+Player::Player(const QJsonObject& json, QObject *parent)
+    : QObject(parent)
+{
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+    turnTimer.setTimerType(Qt::VeryCoarseTimer);
+    turnTimer.setInterval(1000);
+    connect(&turnTimer, &QTimer::timeout, this, [this](){
+        currentTurnSeconds++;
+        emit currentTurnSecondsChanged();
+    });
+
+    color = json["color"].toString();
+    name = json["name"].toString();
+    active = json["isActive"].toBool();
+    score = json["score"].toInt();
+    place = json["place"].toInt();
+    resources[QmlEnums::BonusType::None] = -1;
+    resources[QmlEnums::BonusType::Wheat] = json["wheat"].toInt();
+    resources[QmlEnums::BonusType::Barrel] = json["barrels"].toInt();
+    resources[QmlEnums::BonusType::Cloth] = json["cloth"].toInt();
+    wheatLead = json["wheatLead"].toBool();
+    barrelsLead = json["barrelsLead"].toBool();
+    clothLead = json["clothLead"].toBool();
+    biggestTown = json["biggestTown"].toInt();
+    biggestRoad = json["biggestRoad"].toInt();
+    townLead = json["townLead"].toBool();
+    roadLead = json["roadLead"].toBool();
+    prevTurnsSeconds = json["prevTurnsSeconds"].toInt();
+    currentTurnSeconds = json["currentTurnSeconds"].toInt();
+
+    abbeyTile = DeckBuilder::readAbbeyTile(json["abbeyTile"].toObject());
 }
 
 Player::Player(Player &&other) noexcept
@@ -42,7 +76,7 @@ void Player::setActive(bool value)
 
         if (active)
         {
-            turnTimer.start(1000);
+            turnTimer.start();
         }
         else
         {
@@ -58,6 +92,11 @@ void Player::setActive(bool value)
 std::shared_ptr<Tile> Player::createAbbeyTile()
 {
     return abbeyTile = DeckBuilder::createAbbeyTile("img/pnp/tiles", "png");
+}
+
+void Player::deserializeAbbeyTile(const QJsonObject &json)
+{
+    abbeyTile = DeckBuilder::readAbbeyTile(json);
 }
 
 Tile* Player::getAbbeyTile()
@@ -246,6 +285,30 @@ void Player::setTimerRunning(bool value)
         turnTimer.start();
     else
         turnTimer.stop();
+}
+
+QJsonObject Player::serialilze() const
+{
+    return QJsonObject({
+                        { "color", color.name(QColor::HexArgb) },
+                        { "isActive", active },
+                        { "name", name },
+                        { "score", score },
+                        { "place", place },
+                        { "wheat", resources[QmlEnums::BonusType::Wheat] },
+                        { "barrels", resources[QmlEnums::BonusType::Barrel] },
+                        { "cloth", resources[QmlEnums::BonusType::Cloth] },
+                        { "wheatLead", wheatLead },
+                        { "barrelsLead", barrelsLead },
+                        { "clothLead", clothLead },
+                        { "biggestTown", biggestTown },
+                        { "biggestRoad", biggestRoad },
+                        { "townLead", townLead },
+                        { "roadLead", roadLead },
+                        { "prevTurnsSeconds", prevTurnsSeconds },
+                        { "currentTurnSeconds",currentTurnSeconds },
+                        { "abbeyTile", abbeyTile->serialize() }
+    });
 }
 
 void Player::addToPreviousTime(int seconds)

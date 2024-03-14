@@ -5,8 +5,8 @@ import "qrc:/"
 BaseMapObject {
     id: root
 
-    currentId: -1
-    visible: tileData && tileData.RoadBlock
+    objectData: null
+    visible: tileData && tileData.HasRoadBlock
 
     ShapePath {
         startX: side/2 - 2 * halfRoadWidth

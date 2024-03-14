@@ -8,7 +8,7 @@ class TilesModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    QList<Tile*> tilesList;
+    QList<std::shared_ptr<Tile>> tilesList;
 
 public:
     TilesModel(QObject* parent = 0);
@@ -17,7 +17,8 @@ public:
 
     virtual QHash<int,QByteArray> roleNames() const override;
 
-    void AddTiles(std::list<Tile> &tiles);
+    void setTiles(const std::vector<std::shared_ptr<Tile> > &tiles);
+    void clear();
 };
 
 #endif // TILESMODEL_H

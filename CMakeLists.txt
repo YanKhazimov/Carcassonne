@@ -21,8 +21,8 @@ set(PROJECT_SOURCES
         TileData.cpp
         ObjectManager.h
         ObjectManager.cpp
-        MapObjectData.h
-        MapObjectData.cpp
+        TileObject.h
+        TileObject.cpp
         Tile.h
         Tile.cpp
         QmlPresenter.h

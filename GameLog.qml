@@ -181,7 +181,7 @@ Item {
                                 }
                                 return ""
                             }
-                            color: engine.Players.getPlayerColor(MEEPLE_PLAYER)
+                            color: engine ? engine.Players.getPlayerColor(MEEPLE_PLAYER) : "white"
                         }
                     }
                 }

@@ -3,6 +3,7 @@
 
 #include "Tile.h"
 #include <QAbstractTableModel>
+#include <QJsonObject>
 #include <vector>
 
 class MapModel : public QObject
@@ -23,7 +24,7 @@ class MapModel : public QObject
     Q_PROPERTY(Tile* LatestTile MEMBER latestTile NOTIFY latestTileChanged)
 
     std::vector<std::vector<Tile*>> tiles;
-    unsigned size = 0;
+    int size = 0;
     int minOccupiedX, maxOccupiedX, minOccupiedY, maxOccupiedY;
     int minPlayableX, maxPlayableX, minPlayableY, maxPlayableY;
     Tile* latestTile = nullptr;
@@ -42,7 +43,7 @@ class MapModel : public QObject
 public:
     explicit MapModel(QObject* parent = 0);
 
-    Q_INVOKABLE void setSize(unsigned playableSize);
+    Q_INVOKABLE void setSize(int playableSize);
     Q_INVOKABLE void placeTile(Tile* tile, int x, int y);
     void fixTile(Tile* tile);
     Q_INVOKABLE bool isFreeAdjacent(int x, int y) const;
@@ -50,7 +51,7 @@ public:
     Q_INVOKABLE bool canMergeRotated(int x, int y, Tile* tile) const;
     bool fitsCurrentBoard(Tile* tile) const;
     bool canMergeAbbeyTile() const;
-    std::shared_ptr<const MapObjectData> builderObjectProgression(Tile* tile, int activePlayer) const;
+    std::shared_ptr<const TileObject> builderObjectProgression(Tile* tile, int activePlayer) const;
 
     Tile* nextTileNorth(int x, int y) const;
     Tile* nextTileSouth(int x, int y) const;
@@ -60,6 +61,9 @@ public:
     Tile* nextTileSouthEast(int x, int y) const;
     Tile* nextTileSouthWest(int x, int y) const;
     Tile* nextTileNorthWest(int x, int y) const;
+
+    QJsonObject serialize() const;
+    void deserialize(const QJsonObject& json, const std::vector<std::shared_ptr<Tile> > &shuffledDeck, const std::vector<Tile *> &abbeyTiles);
 
 signals:
     void minMaxChanged();

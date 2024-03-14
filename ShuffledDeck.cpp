@@ -1,4 +1,6 @@
 #include "ShuffledDeck.h"
+#include "Tile.h"
+#include "DataRoles.h"
 #include <QDebug>
 
 int myrandom(int i) { return std::rand()%i; }
@@ -14,7 +16,7 @@ void ShuffledDeck::setSource(QAbstractItemModel *source)
     if (!sourceModel())
     {
         setSourceModel(source);
-        connect(source, &QAbstractItemModel::rowsInserted, this, &ShuffledDeck::shuffle);
+        connect(source, &QAbstractItemModel::modelReset, this, &ShuffledDeck::shuffle);
         sort(0); // initiates custom sorting
         shuffle();
     }
@@ -44,6 +46,26 @@ QModelIndex ShuffledDeck::mapToSource(const QModelIndex &index) const
     return QModelIndex();
 }
 
+QJsonArray ShuffledDeck::serialize() const
+{
+    QJsonArray result;
+
+    for (int i = 0; i < rowCount(); ++i)
+    {
+        if (Tile* tile = index(i, 0).data(DataRoles::TilePtr).value<Tile*>(); tile)
+        {
+            result.push_back(tile->serialize());
+        }
+        else
+        {
+            qWarning() << "Cannot get tile pointer data in ShuffledDeck";
+            break;
+        }
+    }
+
+    return result;
+}
+
 bool ShuffledDeck::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
 {
     if (sourceIndexes.empty())
@@ -58,7 +80,15 @@ void ShuffledDeck::shuffle()
     std::iota(sourceIndexes.begin(), sourceIndexes.end(), 0); // fill with values 0, 1, ...
     if (!sourceIndexes.empty())
     {
-        //std::random_shuffle(sourceIndexes.begin() + 1, sourceIndexes.end(), myrandom); // leaving startng tile first
+        if (random)
+        {
+            std::random_shuffle(sourceIndexes.begin() + 1, sourceIndexes.end(), myrandom); // leaving startng tile first
+        }
         invalidate();
     }
+}
+
+void ShuffledDeck::setRandom(bool value)
+{
+    random = value;
 }

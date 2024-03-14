@@ -23,8 +23,8 @@ AnimatedItem {
     property bool gameView: true
 
     visible: (!isInHand || tabs.handsTabActive) && gameView
-    width: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
-    height: isPreview || isInHand ? Constants.tilePreviewSize : Constants.tileSize
+    width: isPreview || isInHand ? Constants.tilePreviewSize : (Constants.tileSize * board.scale)
+    height: isPreview || isInHand ? Constants.tilePreviewSize : (Constants.tileSize * board.scale)
     animationDuration: 500
     pauseDuration: 100
 
@@ -76,9 +76,10 @@ AnimatedItem {
         if (meeple) {
             meeple.xRatio = (meeple.x + meeple.width/2 - root.x) / Constants.tileSize
             meeple.yRatio = (meeple.y + meeple.height/2 - root.y) / Constants.tileSize
-            meeple.draggable = false
 
-            engine.placeMeeple(meeple.type, meeple.playerIndex, dropArea.selectedObject.currentId, tileData)
+            engine.placeMeeple(meeple.type, meeple.playerIndex, dropArea.selectedObject.objectData.InitialId,
+                               meeple.xRatio, meeple.yRatio)
+            meeple.draggable = false
         }
     }
 
@@ -173,7 +174,7 @@ AnimatedItem {
     DropArea {
         id: dropArea
 
-        property Item selectedObject
+        property BaseMapObject selectedObject
         property bool accepts
 
         anchors.fill: parent

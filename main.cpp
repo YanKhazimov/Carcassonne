@@ -1,14 +1,11 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "ObjectManager.h"
+#include "DataTypes.h"
 #include "QmlPresenter.h"
-#include "DeckBuilder.h"
-#include <iostream>
-#include <memory>
-#include <vector>
 #include <QIcon>
 #include <QSurfaceFormat>
+#include <QList>
 
 int main(int argc, char *argv[])
 {
@@ -30,20 +27,17 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
 
+    qmlRegisterUncreatableType<TileObject>("com.carcassonne.cppTypes", 1, 0, "TileObject", "");
     qmlRegisterUncreatableType<Tile>("com.carcassonne.cppTypes", 1, 0, "TileData", "");
     qmlRegisterUncreatableType<Player>("com.carcassonne.cppTypes", 1, 0, "Player", "");
     qmlRegisterUncreatableType<QmlPresenter>("QmlPresenter", 1, 0, "GameEngine",
                                                        "QmlPresenter class defines the game engine");
     qmlRegisterUncreatableMetaObject(QmlEnums::staticMetaObject, "EngineEnums", 1, 0, "EngineEnums", "Error: only enums");
-
-    std::list<Tile> tiles = DeckBuilder::BuildDeck("img/pnp/tiles", "png");
-
-    QmlPresenter presenter;
-
-    presenter.AddTiles(tiles);
-
+    // qRegisterMetaType<QList<QmlEnums::TileRegion>>("TileRegionList");
+    qRegisterMetaType<QList<MeepleInfo>>("MeepleInfoList");
     app.setWindowIcon(QIcon(":/img/bigMeeple.png"));
 
+    QmlPresenter presenter;
     engine.rootContext()->setContextProperty("engine", &presenter);
 
     engine.load(url);

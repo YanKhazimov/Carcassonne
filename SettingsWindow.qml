@@ -257,6 +257,7 @@ Item {
 
             MenuButton {
                 anchors.horizontalCenter: parent.horizontalCenter
+                enabled: !gameWindowLoader.active || !gameWindowLoader.item || !gameWindowLoader.item.isLoading
                 text: "Начать игру"
                 actionIndicated: false
                 font.family: Fonts.font4
@@ -267,9 +268,12 @@ Item {
                         colors.push(engine.PossibleColors[currentColorOffsets[i]])
                         names.push(playerRepeater.itemAt(i).text)
                     }
+                    engine.createRandomTiles()
                     engine.populatePlayers(colors, names)
                     engine.mapModel.setSize(15)
-                    gameWindowLoader.active = true
+                    engine.mapModel.placeTile(engine.getTile(0), 0, 0)
+                    engine.fixTile(engine.getTile(0))
+                    gameWindowLoader.loadNewGame()
                 }
             }
             MenuButton {
@@ -279,6 +283,27 @@ Item {
                 actionIndicated: false
                 font.family: Fonts.font4
                 onClicked: gameWindowLoader.item.unpauseGame()
+            }
+            MenuButton {
+                anchors.horizontalCenter: parent.horizontalCenter
+                enabled: !gameWindowLoader.active || !gameWindowLoader.item || !gameWindowLoader.item.isLoading
+                text: "Загрузить"
+                actionIndicated: false
+                font.family: Fonts.font4
+                onClicked: {
+                    engine.loadGame()
+                    gameWindowLoader.loadOldGame()
+                }
+            }
+            MenuButton {
+                anchors.horizontalCenter: parent.horizontalCenter
+                enabled: gameWindowLoader.active && gameWindowLoader.item && !gameWindowLoader.item.isLoading
+                text: "Сохранить"
+                actionIndicated: false
+                font.family: Fonts.font4
+                onClicked: {
+                    engine.saveGame()
+                }
             }
             MenuButton {
                 anchors.horizontalCenter: parent.horizontalCenter

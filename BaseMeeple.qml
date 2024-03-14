@@ -19,13 +19,14 @@ AnimatedItem {
     required property real typeWidthModifier
     required property real typeHeightModifier
     property MenuTabs tabs: null
+    property Board board: null
 
     property bool isInHand: true
     property bool gameView: true
 
     visible: (!isInHand || !tabs || tabs.handsTabActive) && gameView
-    width: typeWidthModifier * (isInHand ? Constants.smallMeeplePreviewSize : Constants.smallMeepleSize)
-    height: typeHeightModifier * (isInHand ? Constants.smallMeeplePreviewSize : Constants.smallMeepleSize)
+    width: typeWidthModifier * (isInHand ? Constants.smallMeeplePreviewSize : (Constants.smallMeepleSize * board.scale))
+    height: typeHeightModifier * (isInHand ? Constants.smallMeeplePreviewSize : (Constants.smallMeepleSize * board.scale))
 
     QtObject {
         id: internal

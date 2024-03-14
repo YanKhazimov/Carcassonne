@@ -15,7 +15,8 @@ void RemainingTilesModel::setSource(QAbstractItemModel *source)
     {
         setSourceModel(source);
         connect(source, &QAbstractItemModel::dataChanged, this, &RemainingTilesModel::onDataChanged);
-        connect(source, &QAbstractItemModel::rowsInserted, this, &RemainingTilesModel::onRowsInserted);
+        // connect(source, &QAbstractItemModel::rowsInserted, this, &RemainingTilesModel::onRowsInserted);
+        connect(source, &QAbstractItemModel::modelReset, this, &RemainingTilesModel::onSourceReset);
         sort(0);
     }
     else
@@ -52,7 +53,7 @@ void RemainingTilesModel::onDataChanged(QModelIndex first, QModelIndex last, QVe
 {
     if (roles.contains(DataRoles::IsTileFixed))
     {
-        // tile is fixed -> move it to the other map and resort
+        // tile is fixed -> move it to the other map and re-sort
         for (int i = first.row(); i <= last.row(); ++i)
         {
             const QModelIndex sourceIndex = sourceModel()->index(i, 0);
@@ -76,9 +77,20 @@ void RemainingTilesModel::onRowsInserted(const QModelIndex &source_parent, int f
     {
         const QModelIndex sourceIndex = sourceModel()->index(i, 0, source_parent);
         Tile* tile = sourceIndex.data(DataRoles::TilePtr).value<Tile*>();
-        // initially all tiles are not fixed
-        unfixedTiles[sourceIndex.data(DataRoles::TileImagePath).value<QString>()].push_back(tile);
+        const QString& picture = sourceIndex.data(DataRoles::TileImagePath).value<QString>();
+
+        if (tile->fixed())
+            fixedTiles[picture].push_back(tile);
+        else
+            unfixedTiles[picture].push_back(tile);
     }
+
+    invalidate();
+}
+
+void RemainingTilesModel::onSourceReset()
+{
+    onRowsInserted(QModelIndex(), 0, sourceModel()->rowCount() - 1);
 }
 
 bool RemainingTilesModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const

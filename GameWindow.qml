@@ -21,8 +21,17 @@ Item {
     property var lastKeyPressed
     readonly property bool isLoading: pauseAnimation.running || unpauseAnimation.running || initialAnimation.running
 
-    function onLoaded() {
+    function onNewGameLoaded() {
+        createOpenRegularTileItems()
         initialAnimation.start()
+    }
+
+    function onOldGameLoaded() {
+        board.resetViewport()
+        createOpenRegularTileItems()
+        createAbbeyTileItems()
+        createMeepleItems()
+        unpauseGame()
     }
 
     function tryPauseGame() {
@@ -35,6 +44,103 @@ Item {
     function unpauseGame() {
         engine.getPlayer(engine.ActivePlayer).setTimerRunning(true)
         unpauseAnimation.start()
+    }
+
+    function createOpenRegularTileItems() {
+        regularTiles = []
+        // create refular tile Items
+        for (let i = 0; i < engine.deck.rowCount(); ++i)
+        {
+            let tile = engine.getTile(i)
+            if (tile.IsPlaced) {
+                let tileItem = createRegularTileItem(boardFinalPosition.x + board.getX(tile.X),
+                                                     boardFinalPosition.y + board.getY(tile.Y),
+                                                     false)
+                regularTiles.push(tileItem)
+            }
+            else {
+                if (engine.GameState == GameEngine.TileDrawn)
+                {
+                    let globalPosition = common.animatedPosition
+                    globalPosition.x += boardFinalPosition.x
+
+                    let tileItem = createRegularTileItem(globalPosition.x,
+                                                         globalPosition.y,
+                                                         true)
+                    regularTiles.push(tileItem)
+                    console.log("TileDrawn " + i)
+                }
+                break
+            }
+        }
+    }
+
+    function createAbbeyTileItems() {
+        abbeyTiles = []
+        // create abbey tile Items
+        for (let j = 0; j < engine.Players.rowCount(); ++j) {
+            let abbeyTile = engine.getAbbeyTile(j)
+
+            let globalPosition
+            if (!abbeyTile.IsPlaced) {
+                let positionInZone = zones[j].getAbbeyTilePosition()
+                globalPosition = zones[j].mapToItem(screenAdapter, positionInZone)
+                globalPosition.x += boardFinalPosition.x
+            }
+            else {
+                globalPosition = Qt.point(boardFinalPosition.x + board.getX(abbeyTile.X),
+                                          boardFinalPosition.y + board.getY(abbeyTile.Y))
+            }
+
+            let tileItem = createAbbeyTileItem(globalPosition, j, false)
+            abbeyTiles.push(tileItem)
+        }
+
+        // lastPlacedTile = engine.mapModel.LatestTile
+    }
+
+    function createMeepleItems() {
+        meeples = []
+
+        let freeMeeples = []
+        let i
+        for (i = 0; i < engine.Players.rowCount(); ++i) {
+            freeMeeples.push([0, // MeepleNone
+                              Constants.smallMeepleTotal,
+                              Constants.bigMeepleTotal,
+                              Constants.barnTotal,
+                              Constants.builderTotal,
+                              Constants.pigTotal
+                             ])
+        }
+
+        // create meeple Items for placed meeples
+        let activeMeeples = engine.activeMeeples()
+        for (i = 0; i < activeMeeples.length; ++i) {
+            let meepleData = activeMeeples[i]
+            let position = Qt.point(boardFinalPosition.x + board.getX(meepleData.TileX) + Constants.tileSize * meepleData.TileXRatio,
+                                    boardFinalPosition.y + board.getY(meepleData.TileY) + Constants.tileSize * meepleData.TileYRatio)
+            let meeple = createMeepleItem(meepleData.MeepleType, position, meepleData.PlayerIndex, false, false)
+            meeple.x -= meeple.width/2
+            meeple.y -= meeple.height/2
+            meeples.push(meeple)
+
+            freeMeeples[meepleData.PlayerIndex][meepleData.MeepleType]--
+        }
+
+        // create meeple Items for free meeples
+        for (let playerIndex = 0; playerIndex < freeMeeples.length; ++playerIndex) {
+            for (let meepleType = EngineEnums.MeepleSmall; meepleType < freeMeeples[playerIndex].length; ++meepleType) {
+                let count = freeMeeples[playerIndex][meepleType]
+                for (i = 0; i < count; ++i) {
+                    let positionInZone = zones[playerIndex].getMeeplePosition(meepleType)
+                    let globalPosition = zones[playerIndex].mapToItem(screenAdapter, positionInZone)
+                    globalPosition.x += boardFinalPosition.x
+                    meeples.push(createMeepleItem(meepleType, globalPosition, playerIndex, false, true))
+                }
+                zones[playerIndex].addMeeple(meepleType, count)
+            }
+        }
     }
 
     width: Screen.width
@@ -68,6 +174,20 @@ Item {
         forceActiveFocus()
     }
 
+    Connections {
+        target: engine
+        function onShowMessage(message, state) {
+            endGamePopupText.text = message
+            endGamePopupButton.gameState = state
+            gameEndPopup.visible = true
+        }
+
+        // function onGameObjectsLoaded() {
+        //     resetTileItems()
+        //     initialAnimation.start()
+        // }
+    }
+
     QtObject {
         id: internal
 
@@ -87,7 +207,7 @@ Item {
     NumberAnimation {
         id: unpauseAnimation
 
-        duration: 500
+        duration: 1500//500
         from: slideInAnimation.from
         to: slideInAnimation.to
         target: slideInAnimation.target
@@ -131,7 +251,7 @@ Item {
         restoreMode: Binding.RestoreBindingOrValue
     }
 
-    function createTileItem(x, y) {
+    function createRegularTileItem(x, y, inHand) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
             var obj = comp.createObject(screenAdapter,
@@ -139,18 +259,19 @@ Item {
                                             "tileData": engine.getTile(regularTiles.length),
                                             "x": x,
                                             "y": y,
+                                            "isInHand": inHand,
                                             "gameView": Qt.binding(isGameView),
                                             "board": board,
                                             "tabs": menuTabs
                                      })
 
-            if (engine.ActivePlayer !== -1 &&
+            if (engine.ActivePlayer !== -1 && abbeyTiles[engine.ActivePlayer] !== undefined &&
                     abbeyTiles[engine.ActivePlayer].tileData.IsPlaced && !abbeyTiles[engine.ActivePlayer].tileData.IsFixed)
             {
                 abbeyTiles[engine.ActivePlayer].tileData.displace()
                 abbeyTiles[engine.ActivePlayer].resetPosition()
                 abbeyTiles[engine.ActivePlayer].z = 0
-                engine.GameState = GameEngine.NewTurn
+                engine.GameState = GameEngine.NewTurn // GameEngine.TileDrawn ?
             }
 
             obj.dragStarted.connect(function() {
@@ -180,7 +301,7 @@ Item {
         return internal.gameViewLoadProgress === 1.0
     }
 
-    function createAbbeyTileItem(position, playerIndex) {
+    function createAbbeyTileItem(position, playerIndex, animate) {
         var comp = Qt.createComponent("Tile.qml")
         if (comp.status === Component.Ready) {
             var obj = comp.createObject(screenAdapter,
@@ -188,9 +309,10 @@ Item {
                                             "tileData": engine.getAbbeyTile(playerIndex),
                                             "x": position.x,
                                             "y": position.y,
+                                            "isInHand": !engine.getAbbeyTile(playerIndex).IsPlaced,
                                             "board": board,
                                             "playerIndex": playerIndex,
-                                            "opacity": 0,
+                                            "opacity": animate ? 0 : 1,
                                             "gameView": Qt.binding(isGameView),
                                             "tabs": menuTabs
                                         })
@@ -223,10 +345,11 @@ Item {
             if (zones[zone].playerData) {
                 let positionInZone = zones[zone].getAbbeyTilePosition()
                 let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
-                abbeyTiles.push(createAbbeyTileItem(globalPosition, zone))
+                abbeyTiles.push(createAbbeyTileItem(globalPosition, zone, true))
             }
         }
 
+        var connectedAbbeyTiles = 0
         for (let i = 0; i < abbeyTiles.length; ++i)
             abbeyTiles[i].appeared.connect(function() {
                 connectedAbbeyTiles++
@@ -236,21 +359,23 @@ Item {
                     initialAnimation.abbeyTilesSpawned()
             })
 
-        var connectedAbbeyTiles = 0
         abbeyTiles[0].appear()
     }
 
-    function createMeepleItem(type, position, playerIndex) {
-        var comp = Qt.createComponent(type)
+    function createMeepleItem(type, position, playerIndex, animate, inHand) {
+        let qmls = [ "", "MeepleSmall.qml", "MeepleBig.qml", "MeepleBarn.qml", "MeepleBuilder.qml", "MeeplePig.qml" ]
+        let comp = Qt.createComponent(qmls[type])
         if (comp.status === Component.Ready) {
             var obj = comp.createObject(screenAdapter,
                                         {
                                             "x": position.x,
                                             "y": position.y,
                                             "playerIndex": playerIndex,
-                                            "opacity": 0,
+                                            "opacity": animate ? 0 : 1,
+                                            "isInHand": inHand,
                                             "gameView": Qt.binding(isGameView),
-                                            "tabs": menuTabs
+                                            "tabs": menuTabs,
+                                            "board": board
                                         })
             obj.dragStarted.connect(function() {
                 if (root.activeMeeple !== obj)
@@ -293,75 +418,72 @@ Item {
     }
 
     function spawnMeepleItems() {
-        const smallMeepleTotal = 8
-        const bigMeepleTotal = 2
-        const barnTotal = 1
-        const builderTotal = 1
-        const pigTotal = 1
-        const meepleCountSum = smallMeepleTotal + bigMeepleTotal + barnTotal + builderTotal + pigTotal
-
-        for (var zone = 0; zone < zones.length; ++zone)
+        for (let zone = 0; zone < zones.length; ++zone)
         {
             if (zones[zone].playerData)
             {
+                let i
                 // in the order of the layout
-                for (let i = 0; i < smallMeepleTotal; ++i) {
+                for (i = 0; i < Constants.smallMeepleTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleSmall)
                     let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
-                    meeples.push(createMeepleItem("MeepleSmall.qml", globalPosition, zone))
+                    meeples.push(createMeepleItem(EngineEnums.MeepleSmall, globalPosition, zone, true, true))
                 }
 
-                for (let i = 0; i < bigMeepleTotal; ++i) { // false positive warnings
+                for (i = 0; i < Constants.bigMeepleTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleBig)
                     let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
-                    meeples.push(createMeepleItem("MeepleBig.qml", globalPosition, zone))
+                    meeples.push(createMeepleItem(EngineEnums.MeepleBig, globalPosition, zone, true, true))
                 }
 
-                for (let i = 0; i < builderTotal; ++i) {
+                for (i = 0; i < Constants.builderTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleBuilder)
                     let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
-                    meeples.push(createMeepleItem("MeepleBuilder.qml", globalPosition, zone))
+                    meeples.push(createMeepleItem(EngineEnums.MeepleBuilder, globalPosition, zone, true, true))
                 }
 
-                for (let i = 0; i < pigTotal; ++i) {
+                for (i = 0; i < Constants.pigTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeeplePig)
                     let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
-                    meeples.push(createMeepleItem("MeeplePig.qml", globalPosition, zone))
+                    meeples.push(createMeepleItem(EngineEnums.MeeplePig, globalPosition, zone, true, true))
                 }
 
-                for (let i = 0; i < barnTotal; ++i) {
+                for (i = 0; i < Constants.barnTotal; ++i) {
                     let positionInZone = zones[zone].getMeeplePosition(EngineEnums.MeepleBarn)
                     let globalPosition = zones[zone].mapToItem(screenAdapter, positionInZone)
-                    meeples.push(createMeepleItem("MeepleBarn.qml", globalPosition, zone))
+                    meeples.push(createMeepleItem(EngineEnums.MeepleBarn, globalPosition, zone, true, true))
                 }
             }
         }
 
+        const meepleCountSum = Constants.smallMeepleTotal + Constants.bigMeepleTotal + Constants.barnTotal + Constants.builderTotal + Constants.pigTotal
+
+        var connectedMeeplesCount = 0
         for (let i = 0; i < meeples.length; ++i)
             meeples[i].appeared.connect(function() {
                 let playerIndex = Math.floor(connectedMeeplesCount / meepleCountSum)
                 let meepleIndex = connectedMeeplesCount % meepleCountSum
-                if (meepleIndex < smallMeepleTotal) {
+                if (meepleIndex < Constants.smallMeepleTotal) {
                     zones[playerIndex].smallMeepleCount++
                 }
                 else {
-                    meepleIndex -= smallMeepleTotal
-                    if (meepleIndex < bigMeepleTotal) {
+                    meepleIndex -= Constants.smallMeepleTotal
+                    if (meepleIndex < Constants.bigMeepleTotal) {
                         zones[playerIndex].bigMeepleCount++
                     }
                     else {
-                        meepleIndex -= bigMeepleTotal
-                        if (meepleIndex < builderTotal) {
+                        meepleIndex -= Constants.bigMeepleTotal
+                        if (meepleIndex < Constants.builderTotal) {
                             zones[playerIndex].builderCount++
                         }
                         else {
-                            meepleIndex -= builderTotal
-                            if (meepleIndex < pigTotal) {
+                            meepleIndex -= Constants.builderTotal
+                            if (meepleIndex < Constants.pigTotal) {
                                 zones[playerIndex].pigCount++
                             }
                             else {
-                                meepleIndex -= pigTotal
-                                if (meepleIndex < barnTotal) {
+                                meepleIndex -= Constants.pigTotal
+                                if (meepleIndex < Constants.barnTotal) {
                                     zones[playerIndex].barnCount++
                                 }
                                 else
@@ -378,13 +500,12 @@ Item {
                     initialAnimation.meeplesSpawned()
             })
 
-        var connectedMeeplesCount = 0
         meeples[0].appear()
     }
 
     function drawTile() {
         let globalPosition = common.mapToItem(screenAdapter, regularTilePlaceholder.x, regularTilePlaceholder.y)
-        var tile = createTileItem(globalPosition.x, globalPosition.y)
+        var tile = createRegularTileItem(globalPosition.x, globalPosition.y, true)
         tile.playerIndex = engine.ActivePlayer
         board.activeTile = tile
         regularTiles.push(tile)
@@ -456,16 +577,16 @@ Item {
             y: boardFinalPosition.y
             anchors.right: boardFinalPosition.right; anchors.rightMargin: width * (-1 + internal.gameViewLoadProgress)
 
-            Component.onCompleted: {
-                // place and fix the starting tile
-                engine.mapModel.placeTile(engine.getTile(0), 0, 0)
-                engine.fixTile(engine.getTile(0))
+            // Component.onCompleted: {
+            //     // place and fix the starting tile
+            //     engine.mapModel.placeTile(engine.getTile(0), 0, 0)
+            //     engine.fixTile(engine.getTile(0))
 
-                // create an Item for it
-                let tile = createTileItem(boardFinalPosition.x + board.getX(0), boardFinalPosition.y + board.getY(0))
-                tile.isInHand = false
-                regularTiles.push(tile)
-            }
+            //     // create an Item for it
+            //     let tile = createTileItem(boardFinalPosition.x + board.getX(0), boardFinalPosition.y + board.getY(0))
+            //     tile.isInHand = false
+            //     regularTiles.push(tile)
+            // }
 
             Connections {
                 target: engine
@@ -639,14 +760,15 @@ Item {
         Column {
             id: common
 
-            readonly property point position: engine && (engine.ActivePlayer !== -1) ?
-                                                  zones[engine.ActivePlayer].mapToItem(screenAdapter,
-                                                                                       zones[engine.ActivePlayer].width/2 - width/2,
-                                                                                       zones[engine.ActivePlayer].bannerEnd) :
-                                                  Qt.point(0, 0)
+            // startPosition has to depend on internal.gameViewLoadProgress to send update calls to mapToItem
+            readonly property point position: engine && engine.ActivePlayer !== -1 && internal.gameViewLoadProgress > 0.0 ?
+                                                            zones[engine.ActivePlayer].mapToItem(screenAdapter,
+                                                                                                 zones[engine.ActivePlayer].width/2 - width/2,
+                                                                                                 zones[engine.ActivePlayer].bannerEnd) :
+                                                       Qt.point(-width, 0)
 
             spacing: 10
-            visible: internal.gameViewLoadProgress === 1.0 && engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready && menuTabs.activeTab === 0
+            visible: engine && engine.ActivePlayer !== -1 && zones[engine.ActivePlayer].ready && menuTabs.activeTab === 0
             x: position.x
             y: position.y
 
@@ -818,15 +940,6 @@ Item {
                     }
                 }
             }
-        }
-    }
-
-    Connections {
-        target: engine
-        function onShowMessage(message, state) {
-            endGamePopupText.text = message
-            endGamePopupButton.gameState = state
-            gameEndPopup.visible = true
         }
     }
 

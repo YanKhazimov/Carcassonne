@@ -2,100 +2,97 @@
 #define TILEDATA_H
 
 #include "DataTypes.h"
-#include "MapObjectData.h"
+#include "TileObject.h"
 #include <memory>
 #include <vector>
 #include <set>
+#include <QJsonArray>
 
 class TileData {
-    std::shared_ptr<MapObjectData> grid5x5[5][5];
+    std::shared_ptr<TileObject> grid5x5[5][5];
 
-    std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData>> getSideConnectors(TileSide direction) const;
-    std::shared_ptr<MapObjectData> getConnector(TileSide direction);
-    void mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject, std::shared_ptr<MapObjectData> absorbedObject) const;
+    std::pair<std::shared_ptr<TileObject>, std::shared_ptr<TileObject>> getSideConnectors(TileSide direction) const;
+    std::shared_ptr<TileObject> getConnector(TileSide direction);
+    void mergeObjectShapes(std::shared_ptr<TileObject> absorbingObject, std::shared_ptr<TileObject> absorbedObject) const;
 
 public:
     void RotateClockwise();
     void RotateCounterclockwise();
     bool CanConnect(const TileData& other, TileSide from) const;
     void Connect(TileData& newTile, TileSide side, std::set<Tile*>& updatedTiles);
-    std::shared_ptr<const MapObjectData> checkConnector(TileSide direction) const;
+    std::shared_ptr<const TileObject> checkConnector(TileSide direction) const;
     TileData copy() const;
     TileData& rotateClockwise(int times = 1);
     void print() const;
     void markCentralObjectCompleted();
     bool hasCentralScorableObject() const;
-    void getAdjacentTowns(const std::shared_ptr<MapObjectData>& object, std::set<std::shared_ptr<MapObjectData>> &towns) const;
+    void getAdjacentTowns(const std::shared_ptr<TileObject>& object, std::set<std::shared_ptr<TileObject>> &towns) const;
     std::set<unsigned> getFieldObjectIds() const;
     unsigned NEBarnCornerId() const;
     unsigned NWBarnCornerId() const;
     unsigned SEBarnCornerId() const;
     unsigned SWBarnCornerId() const;
     bool isAbbeyTile() const;
+    QJsonArray serialize() const;
 
     using ObjectLocation = std::vector<std::pair<int, int>>;
 
 protected:
-    std::vector<std::shared_ptr<MapObjectData>> tileObjects;
-    TileData(const std::vector<std::pair<std::shared_ptr<MapObjectData>, ObjectLocation>>& objects);
-    virtual void checkObjectCompletion(std::shared_ptr<MapObjectData> object);
+    std::set<std::shared_ptr<TileObject>> tileObjects;
+    TileData(const std::vector<std::pair<std::shared_ptr<TileObject>, ObjectLocation>>& objects);
+    TileData(const std::vector<std::vector<int>>& objectIds);
+    TileData(const QJsonArray &json);
+    virtual void checkObjectCompletion(std::shared_ptr<TileObject> object);
 
-    const std::shared_ptr<MapObjectData> NW() const;
-    const std::shared_ptr<MapObjectData> NNW() const;
-    const std::shared_ptr<MapObjectData> N() const;
-    const std::shared_ptr<MapObjectData> NNE() const;
-    const std::shared_ptr<MapObjectData> NE() const;
-    const std::shared_ptr<MapObjectData> NWW() const;
-    const std::shared_ptr<MapObjectData> NEE() const;
-    const std::shared_ptr<MapObjectData> W() const;
-    const std::shared_ptr<MapObjectData> C() const;
-    const std::shared_ptr<MapObjectData> E() const;
-    const std::shared_ptr<MapObjectData> SWW() const;
-    const std::shared_ptr<MapObjectData> SEE() const;
-    const std::shared_ptr<MapObjectData> SW() const;
-    const std::shared_ptr<MapObjectData> SSW() const;
-    const std::shared_ptr<MapObjectData> S() const;
-    const std::shared_ptr<MapObjectData> SSE() const;
-    const std::shared_ptr<MapObjectData> SE() const;
+    std::shared_ptr<TileObject> NW() const;
+    std::shared_ptr<TileObject> NNW() const;
+    std::shared_ptr<TileObject> N() const;
+    std::shared_ptr<TileObject> NNE() const;
+    std::shared_ptr<TileObject> NE() const;
+    std::shared_ptr<TileObject> NWW() const;
+    std::shared_ptr<TileObject> NEE() const;
+    std::shared_ptr<TileObject> W() const;
+    std::shared_ptr<TileObject> C() const;
+    std::shared_ptr<TileObject> E() const;
+    std::shared_ptr<TileObject> SWW() const;
+    std::shared_ptr<TileObject> SEE() const;
+    std::shared_ptr<TileObject> SW() const;
+    std::shared_ptr<TileObject> SSW() const;
+    std::shared_ptr<TileObject> S() const;
+    std::shared_ptr<TileObject> SSE() const;
+    std::shared_ptr<TileObject> SE() const;
 
-    int id_NE() const;
-    int id_SE() const;
-    int id_SW() const;
-    int id_NW() const;
+    // int id_NE() const;
+    // int id_SE() const;
+    // int id_SW() const;
+    // int id_NW() const;
 
-    int id_NEE() const;
-    int id_SEE() const;
-    int id_SSE() const;
-    int id_SSW() const;
-    int id_SWW() const;
-    int id_NWW() const;
-    int id_NNW() const;
-    int id_NNE() const;
+    // int id_NEE() const;
+    // int id_SEE() const;
+    // int id_SSE() const;
+    // int id_SSW() const;
+    // int id_SWW() const;
+    // int id_NWW() const;
+    // int id_NNW() const;
+    // int id_NNE() const;
 
-    int id_N() const;
-    int id_S() const;
-    int id_E() const;
-    int id_W() const;
+    // int id_N() const;
+    // int id_S() const;
+    // int id_E() const;
+    // int id_W() const;
 
     bool hasAbbey() const;
-    int abbeyId() const;
 
     bool hasMonastery() const;
-    int monasteryId() const;
 
     bool hasRoadBlock() const;
 
     bool hasFieldWhole() const;
-    int fieldWholeId() const;
 
     bool hasFieldHalfNorth() const;
-    int fieldHalfNorthId() const;
     bool hasFieldHalfEast() const;
-    int fieldHalfEastId() const;
     bool hasFieldHalfSouth() const;
-    int fieldHalfSouthId() const;
     bool hasFieldHalfWest() const;
-    int fieldHalfWestId() const;
 
     bool hasFieldNorthEast() const;
     bool hasFieldSouthEast() const;
@@ -108,27 +105,17 @@ protected:
     bool hasFieldArc2cWest() const;
 
     bool hasFieldArc3cNorthEast() const;
-    int fieldArc3cNorthEastId() const;
     bool hasFieldArc3cSouthEast() const;
-    int fieldArc3cSouthEastId() const;
     bool hasFieldArc3cSouthWest() const;
-    int fieldArc3cSouthWestId() const;
     bool hasFieldArc3cNorthWest() const;
-    int fieldArc3cNorthWestId() const;
 
     bool hasField3qNoNorthEast() const;
-    int field3qNoNorthEastId() const;
     bool hasField3qNoNorthWest() const;
-    int field3qNoNorthWestId() const;
     bool hasField3qNoSouthEast() const;
-    int field3qNoSouthEastId() const;
     bool hasField3qNoSouthWest() const;
-    int field3qNoSouthWestId() const;
 
     bool hasFieldDiagonalNWSE() const;
-    int fieldDiagonalNWSEId() const;
     bool hasFieldDiagonalNESW() const;
-    int fieldDiagonalNESWId() const;
 
     bool hasFieldLTriangleNorthEast() const;
     bool hasFieldLTriangleNorthWest() const;
@@ -179,56 +166,34 @@ protected:
     bool hasC_ToTown_WestSouthRoad() const;
 
     bool hasRoadNorthSouth() const;
-    int roadNorthSouthId() const;
     bool hasRoadEastWest() const;
-    int roadEastWestId() const;
 
     bool hasRoadDownThroughTownNorthSouth() const;
-    int roadDownThroughTownNorthSouthId() const;
     bool hasRoadDownThroughTownEastWest() const;
-    int roadDownThroughTownEastWestId() const;
     bool hasRoadDownThroughTownSouthNorth() const;
-    int roadDownThroughTownSouthNorthId() const;
     bool hasRoadDownThroughTownWestEast() const;
-    int roadDownThroughTownWestEastId() const;
 
     bool hasT_NorthWestSouthRoad() const;
-    int T_NorthWestSouthRoadId() const;
     bool hasT_WestSouthEastRoad() const;
-    int T_WestSouthEastRoadId() const;
     bool hasT_SouthEastNorthRoad() const;
-    int T_SouthEastNorthRoadId() const;
     bool hasT_EastNorthWestRoad() const;
-    int T_EastNorthWestRoadId() const;
 
     bool hasC_NorthEastRoad() const;
-    int C_NorthEastRoadId() const;
     bool hasC_NorthWestRoad() const;
-    int C_NorthWestRoadId() const;
     bool hasC_SouthEastRoad() const;
-    int C_SouthEastRoadId() const;
     bool hasC_SouthWestRoad() const;
-    int C_SouthWestRoadId() const;
 
     bool hasL_NorthEastRoad() const;
-    int L_NorthEastRoadId() const;
     bool hasL_NorthWestRoad() const;
-    int L_NorthWestRoadId() const;
     bool hasL_SouthEastRoad() const;
-    int L_SouthEastRoadId() const;
     bool hasL_SouthWestRoad() const;
-    int L_SouthWestRoadId() const;
 
     bool hasAnyL_Road() const;
 
     bool hasJ_NorthWestRoad() const;
-    int J_NorthWestRoadId() const;
     bool hasJ_NorthEastRoad() const;
-    int J_NorthEastRoadId() const;
     bool hasJ_SouthWestRoad() const;
-    int J_SouthWestRoadId() const;
     bool hasJ_SouthEastRoad() const;
-    int J_SouthEastRoadId() const;
 
     bool hasAnyJ_Road() const;
 
@@ -253,39 +218,24 @@ protected:
     bool hasTown1e3cWestToNorthEast() const;
 
     bool hasTown2eNorthSouth() const;
-    int town2eNorthSouthId() const;
     bool hasTown2eEastWest() const;
-    int town2eEastWestId() const;
 
     bool hasTown2e2cNorthEast() const;
-    int town2e2cNorthEastId() const;
     bool hasTown2e2cNorthWest() const;
-    int town2e2cNorthWestId() const;
     bool hasTown2e2cSouthEast() const;
-    int town2e2cSouthEastId() const;
     bool hasTown2e2cSouthWest() const;
-    int town2e2cSouthWestId() const;
 
     bool hasTown2e3cNorthEast() const;
-    int town2e3cNorthEastId() const;
     bool hasTown2e3cNorthWest() const;
-    int town2e3cNorthWestId() const;
     bool hasTown2e3cSouthEast() const;
-    int town2e3cSouthEastId() const;
     bool hasTown2e3cSouthWest() const;
-    int town2e3cSouthWestId() const;
 
     bool hasTown3e4cNorthEastWest() const;
-    int town3e4cNorthEastWestId() const;
     bool hasTown3e4cEastNorthSouth() const;
-    int town3e4cEastNorthSouthId() const;
     bool hasTown3e4cSouthEastWest() const;
-    int town3e4cSouthEastWestId() const;
     bool hasTown3e4cWestNorthSouth() const;
-    int town3e4cWestNorthSouthId() const;
 
     bool hasTownWhole() const;
-    int townWholeId() const;
 };
 
 #endif // TILEDATA_H

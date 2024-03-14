@@ -2,12 +2,28 @@
 #include "DataRoles.h"
 #include "ObjectManager.h"
 #include "DataTypes.h"
+#include "Logger.h"
+#include "DeckBuilder.h"
 #include <iostream>
 #include <QPoint>
 #include <QDebug>
 #include <QGuiApplication>
 #include <QCursor>
-#include "Logger.h"
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
+
+std::vector<std::shared_ptr<Tile>> QmlPresenter::deserializeTiles(const QJsonArray &json)
+{
+    return DeckBuilder::BuildDeck(json);
+}
+
+void QmlPresenter::setDeck(const std::vector<std::shared_ptr<Tile>>& tiles)
+{
+    shuffledDeck.setRandom(false);
+    deck.setTiles(tiles);
+    connectTiles(tiles);
+}
 
 RemainingTilesModel *QmlPresenter::getRemainingTiles()
 {
@@ -51,6 +67,25 @@ void QmlPresenter::addResourceToActivePlayer(int amount, QmlEnums::BonusType res
     }
 }
 
+void QmlPresenter::deserializePlayers(const QJsonArray &json, std::vector<Tile*>& abbeyTiles)
+{
+    players.resetPlayers(json);
+    abbeyTiles.resize(players.rowCount());
+
+    for (int i = 0; i < players.rowCount(); ++i)
+    {
+        auto abbeyTile = getPlayer(i)->getAbbeyTile();
+        connect(abbeyTile, &Tile::objectCompleted, this, &QmlPresenter::onObjectCompleted);
+        connect(abbeyTile, &Tile::isFixedChanged, this, [abbeyTile, this]() {
+            if (abbeyTile->fixed())
+                onTileFixed(abbeyTile);
+        });
+        abbeyTiles[i] = abbeyTile;
+    }
+
+    // emit players.dataChanged(players.index(0, 0), players.index(players.rowCount() - 1, 0), {DataRoles::PlayerScore});
+}
+
 PlayersModel *QmlPresenter::getPlayers()
 {
     return &players;
@@ -66,7 +101,7 @@ int QmlPresenter::activePlayer() const
     for (int i = 0; i < players.rowCount(); ++i)
     {
         Player* player = players.index(i, 0).data(DataRoles::PlayerPtr).value<Player*>();
-        if (player->isActive())
+        if (player && player->isActive())
             return i;
     }
 
@@ -106,7 +141,7 @@ unsigned QmlPresenter::highlightedObjectId() const
 
 void QmlPresenter::scoreCompletionBonuses(unsigned objectId)
 {
-    auto object = ObjectManager::instance()->GetObject(objectId);
+    auto object = ObjectManager::instance()->GetAggregateObject(objectId);
     if (object->type == ObjectType::Town)
     {
         scoreTownResorces(objectId);
@@ -121,7 +156,8 @@ void QmlPresenter::scoreCompletionBonuses(unsigned objectId)
 QmlPresenter::QmlPresenter(QObject *parent)
     : QObject(parent), gameState(GameState::Initialization), maxResources {-1, 0, 0, 0}
 {
-    connect(&players, &QAbstractListModel::rowsInserted, this, &QmlPresenter::playerCountChanged);
+    // connect(&players, &QAbstractListModel::rowsInserted, this, &QmlPresenter::playerCountChanged);
+    connect(&players, &QAbstractListModel::modelReset, this, &QmlPresenter::playerCountChanged);
 
     sortedPlayers.setSource(&players);
 
@@ -133,23 +169,20 @@ QmlPresenter::QmlPresenter(QObject *parent)
     shuffledDeck.setSource(&deck);
 }
 
-void QmlPresenter::AddTiles(std::list<Tile> &tiles)
+void QmlPresenter::createRandomTiles()
 {
-    for (Tile& tile: tiles)
-    {
-        auto [wheat, barrels, cloth] = tile.resources();
-        unassignedWheat += wheat;
-        unassignedBarrels += barrels;
-        unassignedCloth += cloth;
+    std::vector<std::shared_ptr<Tile>> tiles = DeckBuilder::BuildDeck("img/pnp/tiles", "png");
+    shuffledDeck.setRandom(true);
+    deck.setTiles(tiles);
+    connectTiles(tiles);
+    calculateUnassignedResources(tiles);
 
-        connect(&tile, &Tile::objectCompleted, this, &QmlPresenter::onObjectCompleted);
-        connect(&tile, &Tile::isFixedChanged, this, [&tile, this]() {
-            if (tile.fixed())
-                onTileFixed(&tile);
-        });
-    }
-
-    deck.AddTiles(tiles);
+    // for (int i = 0; i < shuffledDeck.rowCount(); ++i)
+    // {
+    //     Tile* tt = shuffledDeck.index(i, 0).data(DataRoles::TilePtr).value<Tile*>();
+    //     qWarning() << tt->property("Picture").toString() + " ";
+    // }
+    // qWarning();
 }
 
 Tile *QmlPresenter::getTile(int i)
@@ -164,21 +197,23 @@ Tile *QmlPresenter::getRemainingTile(int i)
 
 void QmlPresenter::highlight(int id)
 {
-    auto targetObject = ObjectManager::instance()->GetObject(id);
+    auto targetObject = ObjectManager::instance()->GetAggregateObject(id);
     setHighlightedObjectId(targetObject->initialId);
 }
 
 void QmlPresenter::updateHighlight()
 {
-    highlight(ObjectManager::instance()->GetObject(highlightedObjId)->initialId);
+    highlight(ObjectManager::instance()->GetAggregateObject(highlightedObjId)->initialId);
 }
 
 void QmlPresenter::populatePlayers(QVariantList colors, QVariantList names)
 {
-    Q_ASSERT(colors.length() == names.length());
-    for (int i = 0; i < colors.length(); ++i)
+    // Q_ASSERT(colors.length() == names.length());
+    players.resetPlayers(colors, names);
+
+    for (int i = 0; i < players.rowCount(); ++i)
     {
-        players.AddPlayer(colors[i].value<QColor>(), names[i].value<QString>());
+        // players.AddPlayer(colors[i].value<QColor>(), names[i].value<QString>());
         auto abbeyTile = getPlayer(i)->createAbbeyTile();
         connect(abbeyTile.get(), &Tile::objectCompleted, this, &QmlPresenter::onObjectCompleted);
         connect(abbeyTile.get(), &Tile::isFixedChanged, this, [abbeyTile, this]() {
@@ -285,7 +320,7 @@ void QmlPresenter::scoreLongestRoad(unsigned roadId)
 void QmlPresenter::scoreCompletedObject(unsigned objectId)
 {
     auto objectManager = ObjectManager::instance();
-    if (auto object = objectManager->GetObject(objectId); object)
+    if (auto object = objectManager->GetAggregateObject(objectId); object)
     {
         int points = objectManager->getPoints(objectId);
         std::vector<int> mostPresentPlayers = object->mostPresentPlayers();
@@ -303,7 +338,7 @@ void QmlPresenter::scoreCompletedObject(unsigned objectId)
 void QmlPresenter::scoreFieldMeeples(unsigned objectId, int meepleScore)
 {
     auto objectManager = ObjectManager::instance();
-    if (auto object = objectManager->GetObject(objectId); object && object->type == ObjectType::Field)
+    if (auto object = objectManager->GetAggregateObject(objectId); object && object->type == ObjectType::Field)
     {
         std::vector<int> mostPresentPlayers = object->mostPresentPlayers();
         if (!mostPresentPlayers.empty())
@@ -328,7 +363,7 @@ void QmlPresenter::checkFieldIntegrity(unsigned fieldObjectId)
 {
     for (auto& barnFieldInitialId: barnFieldInitialIds)
     {
-        if (fieldObjectId == ObjectManager::instance()->GetObject(barnFieldInitialId.first)->initialId)
+        if (fieldObjectId == ObjectManager::instance()->GetAggregateObject(barnFieldInitialId.first)->initialId)
         {
             scoreFieldMeeples(fieldObjectId, 1);
         }
@@ -340,7 +375,7 @@ void QmlPresenter::scoreBarnes(unsigned fieldObjectId)
     std::vector<unsigned> idsToDelete;
     for (auto& barnFieldInitialId: barnFieldInitialIds)
     {
-        auto barnField = ObjectManager::instance()->GetObject(barnFieldInitialId.first);
+        auto barnField = ObjectManager::instance()->GetAggregateObject(barnFieldInitialId.first);
         if (fieldObjectId == barnField->initialId)
         {
             for (auto& playerIndex: barnFieldInitialId.second)
@@ -418,9 +453,10 @@ QVariantList QmlPresenter::getScorableFields() const
     return QVariantList(scorableFields.begin(), scorableFields.end());
 }
 
-void QmlPresenter::addMeepleToObject(std::shared_ptr<MapObjectData> &object, QmlEnums::MeepleType meepleType, int playerIndex, Tile *tile)
+void QmlPresenter::addMeepleToObject(std::shared_ptr<TileObject> &object, QmlEnums::MeepleType meepleType, int playerIndex,
+                                     qreal tileXRatio, qreal tileYRatio)
 {
-    object->addMeeple(playerIndex, meepleType, tile);
+    object->setMeeple(playerIndex, meepleType, tileXRatio, tileYRatio);
     if (object->type == ObjectType::Field)
     {
         if (scorableFields.insert(object->currentObject()->initialId).second)
@@ -428,7 +464,7 @@ void QmlPresenter::addMeepleToObject(std::shared_ptr<MapObjectData> &object, Qml
     }
 }
 
-void QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
+void QmlPresenter::removeMeepleFromObject(std::shared_ptr<TileObject> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
 {
     auto removedMeeples = object->freeMeeples(typesToRemove);
     if (object->type == ObjectType::Field && object->mostPresentPlayers().empty())
@@ -441,7 +477,7 @@ void QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object
     {
         Player* player = getPlayer(activePlayer());
         Logger::instance()->logEffect(std::make_shared<FieldMeepleReleaseLogRecord>(player->getColor(), player->getName(),
-                                                                                    std::vector<MapObjectData::MeepleInfo>(removedMeeples.begin(), removedMeeples.end())));
+                                                                                    std::vector<MeepleInfo>(removedMeeples.begin(), removedMeeples.end())));
     }
 }
 
@@ -455,7 +491,7 @@ void QmlPresenter::updateScorableFieldIds()
     std::vector<unsigned> currentIds;
     for (auto fieldId: scorableFields)
     {
-        currentIds.push_back(ObjectManager::instance()->GetObject(fieldId)->initialId);
+        currentIds.push_back(ObjectManager::instance()->GetAggregateObject(fieldId)->initialId);
     }
     scorableFields.insert(currentIds.begin(), currentIds.end());
     emit scorableFieldsChanged();
@@ -476,16 +512,27 @@ void QmlPresenter::logObjectCompletion(unsigned int objectId)
     Player* player = getPlayer(activePlayer());
     auto objectManager = ObjectManager::instance();
     Logger::instance()->logAction(std::make_shared<CompletionLogRecord>(player->getColor(), player->getName(),
-                                                                        objectManager->GetObject(objectId)->type,
+                                                                        objectManager->GetAggregateObject(objectId)->type,
                                                                         objectManager->countObjectTiles(objectId),
-                                                                        objectManager->GetObject(objectId)->initialId));
+                                                                        objectManager->GetAggregateObject(objectId)->initialId));
 }
 
 void QmlPresenter::onTileFixed(Tile* tile)
 {
     Player* player = getPlayer(activePlayer());
     if (player)
-        Logger::instance()->logAction(std::make_shared<TilePlaceLogRecord>(player->getColor(), player->getName(), tile));
+    {
+        for (int i = 0; i < shuffledDeck.rowCount(); ++i)
+        {
+            if (tile == shuffledDeck.data(shuffledDeck.index(i, 0), DataRoles::TilePtr).value<Tile*>())
+            {
+                Logger::instance()->logAction(std::make_shared<TilePlaceLogRecord>(player->getColor(), player->getName(), tile, i));
+                return;
+            }
+        }
+
+        qCritical() << "Cannot find fixed tile in the deck to log!";
+    }
 }
 
 bool QmlPresenter::processGameEnd(int fixedTilesCount)
@@ -542,9 +589,87 @@ bool QmlPresenter::processGameEnd(int fixedTilesCount)
     return true;
 }
 
+QJsonObject QmlPresenter::serializeGameState()
+{
+    QJsonObject json;
+
+    json["unassignedWheat"] = unassignedWheat;
+    json["unassignedBarrels"] = unassignedBarrels;
+    json["unassignedCloth"] = unassignedCloth;
+
+    json["gameState"] = static_cast<int>(gameState);
+
+    json["objectManager"] = ObjectManager::instance()->serialize();
+    json["deck"] = shuffledDeck.serialize();
+    json["map"] = mapModel.serialize();
+    json["players"] = players.serialize();
+    json["log"] = Logger::instance()->serialize();
+
+    return json;
+}
+
+void QmlPresenter::deserializeGameState(const QJsonObject &json)
+{
+    for (const auto& module: { "unassignedWheat", "unassignedBarrels", "unassignedCloth",
+                               "gameState", "objectManager", "players", "deck", "map" })
+    {
+        if (!json.contains(module))
+        {
+            qCritical() << "Could not load module" << module << "from the save file.";
+            return;
+        }
+    }
+
+    unassignedWheat = json["unassignedWheat"].toInt(-1);
+    emit unassignedWheatChanged();
+    unassignedBarrels = json["unassignedBarrels"].toInt(-1);
+    emit unassignedBarrelsChanged();
+    unassignedCloth = json["unassignedCloth"].toInt(-1);
+    emit unassignedClothChanged();
+
+    gameState = static_cast<GameState>(json["gameState"].toInt());
+
+    auto objectManager = ObjectManager::instance();
+    objectManager->reset(json["objectManager"].toArray());
+
+    std::vector<Tile*> abbeyTiles;
+    deserializePlayers(json["players"].toArray(), abbeyTiles);
+
+    std::vector<std::shared_ptr<Tile>> tiles;
+    tiles = deserializeTiles(json["deck"].toArray());
+    setDeck(tiles);
+
+    mapModel.deserialize(json["map"].toObject(), tiles, abbeyTiles);
+
+    Logger::instance()->deserialize(json["log"].toArray(), tiles);
+}
+
+void QmlPresenter::connectTiles(const std::vector<std::shared_ptr<Tile> > &tiles)
+{
+    for (const auto& tile: tiles)
+    {
+        connect(tile.get(), &Tile::objectCompleted, this, &QmlPresenter::onObjectCompleted);
+        connect(tile.get(), &Tile::isFixedChanged, this, [tile, this]() {
+            if (tile->fixed())
+                onTileFixed(tile.get());
+        });
+    }
+}
+
+void QmlPresenter::calculateUnassignedResources(const std::vector<std::shared_ptr<Tile> > &tiles)
+{
+    for (const auto& tile: tiles)
+    {
+        auto [wheat, barrels, cloth] = tile->resources();
+        unassignedWheat += wheat;
+        unassignedBarrels += barrels;
+        unassignedCloth += cloth;
+    }
+}
+
 void QmlPresenter::fixTile(Tile *tile)
 {
-    std::shared_ptr<const MapObjectData> builderObject(nullptr);
+    std::shared_ptr<const TileObject> builderObject(nullptr);
     if (bonusTurn != Logger::instance()->currentTurn() && (builderObject = mapModel.builderObjectProgression(tile, activePlayer())))
     {
         bonusTurn = Logger::instance()->currentTurn() + 1;
@@ -560,6 +685,40 @@ void QmlPresenter::fixTile(Tile *tile)
         Logger::instance()->logEffect(std::make_shared<FreeTurnLogRecord>(
             player->getColor(), player->getName(), builderObject->type, builderObject->initialId));
     }
+}
+
+void QmlPresenter::saveGame()
+{
+    QFile saveFile("save.json");
+
+    if (!saveFile.open(QIODevice::WriteOnly)) {
+        qWarning("Couldn't open save file for writing.");
+        return;
+    }
+
+    saveFile.write(QJsonDocument(serializeGameState()).toJson());
+}
+
+void QmlPresenter::loadGame()
+{
+    QFile loadFile("save.json");
+
+    if (!loadFile.open(QIODevice::ReadOnly)) {
+        qWarning("Couldn't open save file for reading.");
+        return;
+    }
+
+    QByteArray saveData = loadFile.readAll();
+    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
+
+    deserializeGameState(loadDoc.object());
+
+    emit gameObjectsLoaded();
+}
+
+QList<MeepleInfo> QmlPresenter::activeMeeples()
+{
+    return ObjectManager::instance()->getObjectMeeples();
 }
 
 void QmlPresenter::passTurn(int fixedTilesCount)
@@ -583,32 +742,34 @@ void QmlPresenter::passTurn(int fixedTilesCount)
     }
 }
 
-void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile* tile)
+void QmlPresenter::placeMeeple(int meepleType, int playerIndex, unsigned objectId, qreal tileXRatio, qreal tileYRatio)
 {
-    if (auto object = ObjectManager::instance()->GetObject(objectId); object)
+    if (auto object = ObjectManager::instance()->GetObject(objectId),
+        aggregateObject = ObjectManager::instance()->GetAggregateObject(objectId);
+        aggregateObject && object)
     {
-        addMeepleToObject(object, (QmlEnums::MeepleType)meepleType, playerIndex, tile);
+        addMeepleToObject(object, (QmlEnums::MeepleType)meepleType, playerIndex, tileXRatio, tileYRatio);
 
         Player* player = getPlayer(activePlayer());
-        Logger::instance()->logAction(std::make_shared<MeeplePlaceLogRecord>(player->getColor(), player->getName(), object->type,
-                                                                             (QmlEnums::MeepleType)meepleType, object->initialId));
+        Logger::instance()->logAction(std::make_shared<MeeplePlaceLogRecord>(player->getColor(), player->getName(), aggregateObject->type,
+                                                                             (QmlEnums::MeepleType)meepleType, aggregateObject->initialId));
 
-        if (object->isCompleted())
+        if (aggregateObject->isCompleted())
         {
-            scoreCompletedObject(object->initialId);
+            scoreCompletedObject(aggregateObject->initialId);
         }
 
         if ((QmlEnums::MeepleType)meepleType == QmlEnums::MeepleType::MeepleBarn)
         {
-            scoreFieldMeeples(object->initialId, 3);
-            barnFieldInitialIds[object->initialId].push_back(playerIndex);
+            scoreFieldMeeples(aggregateObject->initialId, 3);
+            barnFieldInitialIds[aggregateObject->initialId].push_back(playerIndex);
         }
     }
 }
 
 void QmlPresenter::scoreField(unsigned fieldCurrentId)
 {
-    if (auto object = ObjectManager::instance()->GetObject(fieldCurrentId); object && object->type == ObjectType::Field)
+    if (auto object = ObjectManager::instance()->GetAggregateObject(fieldCurrentId); object && object->type == ObjectType::Field)
     {
         scoreFieldMeeples(object->initialId, 3);
         scoreBarnes(object->initialId);
@@ -617,7 +778,7 @@ void QmlPresenter::scoreField(unsigned fieldCurrentId)
 
 bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile* tile) const
 {
-    if (auto object = ObjectManager::instance()->GetObject(objectId); object)
+    if (auto object = ObjectManager::instance()->GetAggregateObject(objectId); object)
     {
         switch ((QmlEnums::MeepleType)type)
         {
@@ -644,7 +805,7 @@ bool QmlPresenter::canPlaceMeeple(unsigned objectId, int playerIndex, int type, 
 
 bool QmlPresenter::isFieldObject(unsigned objectId) const
 {
-    return ObjectManager::instance()->GetObject(objectId)->type == ObjectType::Field;
+    return ObjectManager::instance()->GetAggregateObject(objectId)->type == ObjectType::Field;
 }
 
 void QmlPresenter::setWaitingCursor(bool value)

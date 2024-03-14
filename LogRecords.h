@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include "DataTypes.h"
-//#include "MapObjectData.h"
 #include "Tile.h"
 #include <QAbstractListModel>
+#include <QJsonObject>
 
 class MeepleInfoModel;
 
@@ -14,6 +14,9 @@ class LogRecord : public QObject
     Q_OBJECT
 
     QmlEnums::LogRecordType m_type = QmlEnums::LogRecordType::LogNone;
+
+protected:
+    void include(QJsonObject& main, const QJsonObject& part) const;
 
 public:
     explicit LogRecord(QmlEnums::LogRecordType type, QObject* parent = nullptr);
@@ -29,6 +32,8 @@ public:
     virtual QmlEnums::BonusType resourceType() const;
     virtual Tile* tile() const;
     virtual MeepleInfoModel* meeples();
+
+    virtual QJsonObject serialize() const;
 };
 
 class PlayerSpecificLogRecord : public LogRecord
@@ -43,6 +48,8 @@ public:
 
     virtual QColor color() const override;
     virtual QString name() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class NewTurnLogRecord : public PlayerSpecificLogRecord
@@ -55,6 +62,8 @@ public:
     explicit NewTurnLogRecord(QColor color, QString name, int turn, QObject* parent = nullptr);
 
     virtual int objectSize() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class GameEndLogRecord : public LogRecord
@@ -75,6 +84,8 @@ public:
     explicit ScoringLogRecord(QColor color, QString name, int points, QObject* parent = nullptr);
 
     virtual int points() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class CompletionLogRecord : public PlayerSpecificLogRecord
@@ -91,6 +102,8 @@ public:
     virtual QString objectType() const override;
     virtual int objectSize() const override;
     virtual int objectId() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class FreeTurnLogRecord : public PlayerSpecificLogRecord
@@ -105,6 +118,8 @@ public:
 
     virtual QString objectType() const override;
     virtual int objectId() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class MeeplePlaceLogRecord : public PlayerSpecificLogRecord
@@ -121,21 +136,23 @@ public:
     virtual QString objectType() const override;
     virtual QmlEnums::MeepleType meeple() const override;
     virtual int objectId() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class MeepleInfoModel: public QAbstractListModel
 {
     Q_OBJECT
-
-    std::vector<MapObjectData::MeepleInfo> m_meeples;
+    
+    std::vector<MeepleInfo> m_meeples;
 
 public:
     MeepleInfoModel(QObject* parent = nullptr);
     Q_INVOKABLE virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     Q_INVOKABLE virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
-
-    void add(const std::vector<MapObjectData::MeepleInfo>& meeples);
+    
+    void add(const std::vector<MeepleInfo>& meeples);
 };
 
 class FieldMeepleReleaseLogRecord : public PlayerSpecificLogRecord
@@ -145,9 +162,11 @@ class FieldMeepleReleaseLogRecord : public PlayerSpecificLogRecord
     MeepleInfoModel m_meeplesModel;
 
 public:
-    explicit FieldMeepleReleaseLogRecord(QColor color, QString name, const std::vector<MapObjectData::MeepleInfo>& meeples, QObject* parent = nullptr);
+    explicit FieldMeepleReleaseLogRecord(QColor color, QString name, const std::vector<MeepleInfo>& meeples, QObject* parent = nullptr);
 
     virtual MeepleInfoModel* meeples() override;
+
+    QJsonObject serialize() const override;
 };
 
 class RoadLeadLogRecord : public PlayerSpecificLogRecord
@@ -160,6 +179,8 @@ public:
     explicit RoadLeadLogRecord(QColor color, QString name, int objectSize, QObject* parent = nullptr);
 
     virtual int objectSize() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class TownLeadLogRecord : public PlayerSpecificLogRecord
@@ -172,6 +193,8 @@ public:
     explicit TownLeadLogRecord(QColor color, QString name, int objectSize, QObject* parent = nullptr);
 
     virtual int objectSize() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class ResourceLeadLogRecord : public PlayerSpecificLogRecord
@@ -187,6 +210,8 @@ public:
     virtual int objectSize() const override; // total
     virtual int points() const override; // extra
     virtual QmlEnums::BonusType resourceType() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class ResourceLogRecord : public PlayerSpecificLogRecord
@@ -201,6 +226,8 @@ public:
 
     virtual int points() const override;
     virtual QmlEnums::BonusType resourceType() const override;
+
+    QJsonObject serialize() const override;
 };
 
 class TilePlaceLogRecord : public PlayerSpecificLogRecord
@@ -208,11 +235,14 @@ class TilePlaceLogRecord : public PlayerSpecificLogRecord
     Q_OBJECT
 
     Tile* m_tile;
+    int tileIndex;
 
 public:
-    explicit TilePlaceLogRecord(QColor color, QString name, Tile* tile, QObject* parent = nullptr);
+    explicit TilePlaceLogRecord(QColor color, QString name, Tile* tile, int tileIndex, QObject* parent = nullptr);
 
     virtual Tile* tile() const override;
+
+    QJsonObject serialize() const override;
 };
 
 #endif // LOGRECORDS_H

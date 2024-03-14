@@ -42,6 +42,67 @@ Tile *MapModel::nextTileNorthWest(int x, int y) const
     return nextTileNorth(x, y) ? nextTileWest(x, y - 1) : nullptr;
 }
 
+QJsonObject MapModel::serialize() const
+{
+    QJsonObject result;
+
+    result["size"] = size;
+    result["minOccupiedX"] = minOccupiedX;
+    result["maxOccupiedX"] = maxOccupiedX;
+    result["minOccupiedY"] = minOccupiedY;
+    result["maxOccupiedY"] = maxOccupiedY;
+    result["minPlayableX"] = minPlayableX;
+    result["maxPlayableX"] = maxPlayableX;
+    result["minPlayableY"] = minPlayableY;
+    result["maxPlayableY"] = maxPlayableY;
+
+    // ?
+    if (latestTile)
+    {
+        result["latestTileX"] = latestTile->getX();
+        result["latestTileY"] = latestTile->getY();
+    }
+
+    return result;
+}
+
+void MapModel::deserialize(const QJsonObject &json, const std::vector<std::shared_ptr<Tile>>& shuffledDeck, const std::vector<Tile*>& abbeyTiles)
+{
+    size = json["size"].toInt();
+    tiles = { static_cast<unsigned>(size), std::vector<Tile*>{ static_cast<unsigned>(size), nullptr } };
+
+    for (const auto& tile: shuffledDeck)
+    {
+        if (tile->fixed())
+        {
+            tiles[tile->getY() + size/2][tile->getX() + size/2] = tile.get();
+        }
+    }
+
+    for (const auto& abbeyTile: abbeyTiles)
+    {
+        if (abbeyTile->fixed())
+        {
+            tiles[abbeyTile->getY() + size/2][abbeyTile->getX() + size/2] = abbeyTile;
+        }
+    }
+
+    // ?
+    if (json.contains("latestTileX") && json.contains("latestTileY"))
+    {
+        latestTile = tileAt(json["latestTileX"].toInt(), json["latestTileY"].toInt());
+    }
+
+    minOccupiedX = json["minOccupiedX"].toInt();
+    maxOccupiedX = json["maxOccupiedX"].toInt();
+    minOccupiedY = json["minOccupiedY"].toInt();
+    maxOccupiedY = json["maxOccupiedY"].toInt();
+    minPlayableX = json["minPlayableX"].toInt();
+    maxPlayableX = json["maxPlayableX"].toInt();
+    minPlayableY = json["minPlayableY"].toInt();
+    maxPlayableY = json["maxPlayableY"].toInt();
+}
+
 bool MapModel::canMergeRegularTile(int x, int y, const TileData &tile) const
 {
     return inPlayableRange(x, y) &&
@@ -74,7 +135,7 @@ bool MapModel::canMergeAbbeyTile() const
     return false;
 }
 
-std::shared_ptr<const MapObjectData> MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
+std::shared_ptr<const TileObject> MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
 {
     const int x = tile->getX();
     const int y = tile->getY();
@@ -179,11 +240,11 @@ MapModel::MapModel(QObject *parent)
 {
 }
 
-void MapModel::setSize(unsigned playableSize)
+void MapModel::setSize(int playableSize)
 {
     // 3x3 is the guaranteed center
     size = 3 + (playableSize - 3) * 2;
-    tiles = { size, std::vector<Tile*>{size, nullptr} };
+    tiles = { static_cast<unsigned>(size), std::vector<Tile*>{ static_cast<unsigned>(size), nullptr } };
 
     minOccupiedX = maxOccupiedX = minOccupiedY = maxOccupiedY = 0;
     maxPlayableX = maxPlayableY = playableSize - 2;
@@ -285,7 +346,8 @@ void MapModel::fixTile(Tile *tile)
 
     for (Tile* updatedTile: updatedTiles)
     {
-        emit updatedTile->objectIdsChanged();
+        // emit updatedTile->objectIdsChanged();
+        emit updatedTile->layoutChanged();
     }
 
     checkNearbyMonasteryAbbeyCompletion(x, y);
@@ -295,8 +357,11 @@ void MapModel::fixTile(Tile *tile)
         emit fieldIntegrityCheckRequested(fieldObjectId);
     }
 
-    latestTile = tile;
-    emit latestTileChanged();
+    if (x != 0 || y != 0) // starting tile was not placed by any player
+    {
+        latestTile = tile;
+        emit latestTileChanged();
+    }
 }
 
 bool MapModel::isFreeAdjacent(int x, int y) const

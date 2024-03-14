@@ -31,8 +31,26 @@ Window {
         visible: status == Loader.Ready
         onStatusChanged: {
             engine.setWaitingCursor(status == Loader.Loading)
-            if (status == Loader.Ready && "onLoaded" in item)
-                item.onLoaded()
+            if (status == Loader.Ready) {
+                if (newGame && "onNewGameLoaded" in item)
+                    item.onNewGameLoaded()
+                else if (!newGame && "onOldGameLoaded" in item)
+                    item.onOldGameLoaded()
+            }
+        }
+
+        property bool newGame: true
+
+        function loadNewGame() {
+            newGame = true
+            if (!active)
+                active = true
+        }
+
+        function loadOldGame() {
+            newGame = false
+            if (!active)
+                active = true
         }
     }
 

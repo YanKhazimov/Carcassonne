@@ -95,8 +95,121 @@ QHash<int, QByteArray> Logger::roleNames() const
     };
 }
 
+QJsonArray Logger::serialize() const
+{
+    QJsonArray result;
+
+    for (auto iter = m_turnLogs.begin(); iter != m_turnLogs.end(); ++iter)
+    {
+        result.push_back(QJsonObject ({
+                        { "newTurn", iter->first->serialize() },
+                        { "actions", iter->second->serialize() }
+        }));
+    }
+
+    return result;
+}
+
+void Logger::deserialize(const QJsonArray &json, const std::vector<std::shared_ptr<Tile> > &tiles)
+{
+    for (const auto& turnsEntry: json)
+    {
+        const QJsonObject& newTurn = turnsEntry["newTurn"].toObject();
+        auto newTurnRecord = std::make_shared<NewTurnLogRecord>(
+            QColor(newTurn["color"].toString()), newTurn["name"].toString(), newTurn["turn"].toInt());
+        m_turnLogs.push_back({ newTurnRecord, std::make_shared<TurnLog>(turnsEntry["actions"].toArray(), tiles)});
+    }
+}
+
+std::shared_ptr<LogRecord> TurnLog::fromJson(const QJsonObject &json, const std::vector<std::shared_ptr<Tile>>& tiles) const
+{
+    std::vector<MeepleInfo> meeples{};
+    switch (static_cast<QmlEnums::LogRecordType>(json["type"].toInt()))
+    {
+    case QmlEnums::LogScoring:
+        return std::make_shared<ScoringLogRecord>(QColor(json["color"].toString()),
+                                                  json["name"].toString(),
+                                                  json["points"].toInt());
+    case QmlEnums::LogObjectCompletion:
+        return std::make_shared<CompletionLogRecord>(QColor(json["color"].toString()),
+                                                     json["name"].toString(),
+                                                     static_cast<ObjectType>(json["objectType"].toInt()),
+                                                     json["objectSize"].toInt(),
+                                                     json["objectId"].toInt());
+    case QmlEnums::LogFreeTurn:
+        return std::make_shared<FreeTurnLogRecord>(QColor(json["color"].toString()),
+                                                   json["name"].toString(),
+                                                   static_cast<ObjectType>(json["objectType"].toInt()),
+                                                   json["objectId"].toInt());
+    case QmlEnums::LogRoadLeadChange:
+        return std::make_shared<RoadLeadLogRecord>(QColor(json["color"].toString()),
+                                                   json["name"].toString(),
+                                                   json["objectSize"].toInt());
+    case QmlEnums::LogTownLeadChange:
+        return std::make_shared<TownLeadLogRecord>(QColor(json["color"].toString()),
+                                                   json["name"].toString(),
+                                                   json["objectSize"].toInt());
+    case QmlEnums::LogMeeplePlaced:
+        return std::make_shared<MeeplePlaceLogRecord>(QColor(json["color"].toString()),
+                                                      json["name"].toString(),
+                                                      static_cast<ObjectType>(json["objectType"].toInt()),
+                                                      static_cast<QmlEnums::MeepleType>(json["meepleType"].toInt()),
+                                                      json["objectId"].toInt());
+    case QmlEnums::LogTilePlaced:
+        return std::make_shared<TilePlaceLogRecord>(QColor(json["color"].toString()),
+                                                    json["name"].toString(),
+                                                    tiles.at(json["tile"].toInt()).get(),
+                                                    json["tile"].toInt());
+    case QmlEnums::LogMeeplesReleased:
+        for (const QJsonValue& meeple : json["meeples"].toArray())
+        {
+            meeples.push_back(MeepleInfo(meeple["playerIndex"].toInt(), static_cast<QmlEnums::MeepleType>(meeple["meepleType"].toInt()), 0.0, 0.0));
+        }
+        return std::make_shared<FieldMeepleReleaseLogRecord>(QColor(json["color"].toString()),
+                                                             json["name"].toString(),
+                                                             meeples);
+    case QmlEnums::LogNewTurn:
+        return std::make_shared<NewTurnLogRecord>(QColor(json["color"].toString()),
+                                                  json["name"].toString(),
+                                                  json["turn"].toInt());
+    case QmlEnums::LogResourceLeadChange:
+        return std::make_shared<ResourceLeadLogRecord>(QColor(json["color"].toString()),
+                                                       json["name"].toString(),
+                                                       json["total"].toInt(),
+                                                       json["extra"].toInt(),
+                                                       static_cast<QmlEnums::BonusType>(json["resourceType"].toInt()));
+    case QmlEnums::LogResource:
+        return std::make_shared<ResourceLogRecord>(QColor(json["color"].toString()),
+                                                       json["name"].toString(),
+                                                       json["extra"].toInt(),
+                                                       static_cast<QmlEnums::BonusType>(json["resourceType"].toInt()));
+    case QmlEnums::LogGameEnd:
+        return std::make_shared<GameEndLogRecord>();
+    default:
+        qCritical() << "Unknown log record type" << static_cast<QmlEnums::LogRecordType>(json["action"]["type"].toInt());
+    }
+
+    return nullptr;
+}
+
 TurnLog::TurnLog(QObject *parent) : QAbstractListModel(parent)
 {
+}
+
+TurnLog::TurnLog(const QJsonArray &json, const std::vector<std::shared_ptr<Tile> > &tiles)
+{
+    for (const auto& actionsItem : json)
+    {
+        std::shared_ptr<LogRecord> action = fromJson(actionsItem["action"].toObject(), tiles);
+
+        std::shared_ptr<EffectsModel> effects = std::make_shared<EffectsModel>();
+        for (const auto& effect : actionsItem["effects"].toArray())
+        {
+            effects->logEffect(fromJson(effect.toObject(), tiles));
+        }
+
+        actionRecords.push_back({ action, effects });
+    }
 }
 
 void TurnLog::logAction(std::shared_ptr<LogRecord> actionRecord)
@@ -167,6 +280,21 @@ QHash<int, QByteArray> TurnLog::roleNames() const
     };
 }
 
+QJsonArray TurnLog::serialize() const
+{
+    QJsonArray result;
+
+    for (auto iter = actionRecords.begin(); iter != actionRecords.end(); ++iter)
+    {
+        result.push_back(QJsonObject ({
+            { "action", iter->first->serialize() },
+            { "effects", iter->second->serialize() }
+        }));
+    }
+
+    return result;
+}
+
 EffectsModel::EffectsModel(QObject *parent) : QAbstractListModel(parent)
 {
 }
@@ -220,4 +348,16 @@ QHash<int, QByteArray> EffectsModel::roleNames() const
         { DataRoles::EventResourceType, "RESOURCE_TYPE" },
         { DataRoles::EventMeeples, "MEEPLES" }
     };
+}
+
+QJsonArray EffectsModel::serialize() const
+{
+    QJsonArray result;
+
+    for (auto iter = effectRecords.begin(); iter != effectRecords.end(); ++iter)
+    {
+        result.push_back((*iter)->serialize());
+    }
+
+    return result;
 }

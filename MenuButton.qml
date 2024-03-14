@@ -43,7 +43,7 @@ Rectangle {
         anchors.right: parent.right; anchors.rightMargin: 5
         anchors.verticalCenter: parent.verticalCenter
         radius: 3
-        width: hotkey.contentWidth + 6
+        width: hotkey.contentWidth + 10
         height: root.height - 12
         color: "#333333"
         visible: hotkey.text !== ""
@@ -52,7 +52,8 @@ Rectangle {
             id: hotkey
             anchors.centerIn: parent
             color: "white"
-            font.pixelSize: 15
+            font.pixelSize: 10
+            font.bold: true
         }
     }
 

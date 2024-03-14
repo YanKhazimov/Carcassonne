@@ -5,6 +5,7 @@ import QtGraphicalEffects 1.15
 Item {
     id: root
 
+    readonly property alias scale: internal.scale
     property int capacity
     readonly property int maxCapacity: engine ? engine.mapModel.MaxCapacity : 0
     readonly property bool maxCapacityReached: capacity === maxCapacity
@@ -16,18 +17,34 @@ Item {
     property real centerTileCenterVOffset: centerTileVOffset + 0.5
 
     property bool activeDrag: false
-    property var activeTile: null
+    property Item activeTile: null
 
     signal boardRepositioned()
 
     Component.onCompleted: {
-        capacity = root.width / Constants.defaultTileSize
-        tilesSpace = capacity * Constants.defaultTileSize
+        capacity = root.width / Constants.tileSize
+        tilesSpace = capacity * Constants.tileSize
         centerTileHOffset = -0.5
         centerTileVOffset = -0.5
     }
 
+    function resetViewport() {
+        let lastCapacity
+        let lastCenterTileHOffset
+        let lastCenterTileVOffset
+        do {
+            lastCapacity = root.capacity
+            lastCenterTileHOffset = root.centerTileCenterHOffset
+            lastCenterTileVOffset = root.centerTileCenterVOffset
+            connections.onMinMaxChanged()
+        } while (lastCapacity !== root.capacity ||
+                 lastCenterTileHOffset !== root.centerTileCenterHOffset ||
+                 lastCenterTileVOffset !== root.centerTileCenterVOffset)
+    }
+
     Connections {
+        id: connections
+
         target: engine ? engine.mapModel : null
         function onMinMaxChanged() {
             // checking horizontal placement
@@ -126,11 +143,11 @@ Item {
     }
 
     function getX(xIndex) {
-        return 0.5 * root.width + Constants.tileSize * (centerTileHOffset + xIndex)
+        return 0.5 * root.width + (Constants.tileSize * internal.scale) * (centerTileHOffset + xIndex)
     }
 
     function getY(yIndex) {
-        return 0.5 * root.height + Constants.tileSize * (centerTileVOffset + yIndex)
+        return 0.5 * root.height + (Constants.tileSize * internal.scale) * (centerTileVOffset + yIndex)
     }
 
     function slideWest() {
@@ -155,7 +172,7 @@ Item {
 
     function expandNorthWest() {
         capacity++
-        Constants.mapScale = root.tilesSpace / Constants.defaultTileSize / capacity
+        internal.scale = root.tilesSpace / Constants.tileSize / capacity
         centerTileHOffset += 0.5
         centerTileVOffset += 0.5
 
@@ -164,7 +181,7 @@ Item {
 
     function expandNorthEast() {
         capacity++
-        Constants.mapScale = root.tilesSpace / Constants.defaultTileSize / capacity
+        internal.scale = root.tilesSpace / Constants.tileSize / capacity
         centerTileHOffset -= 0.5
         centerTileVOffset += 0.5
 
@@ -173,7 +190,7 @@ Item {
 
     function expandSouthEast() {
         capacity++
-        Constants.mapScale = root.tilesSpace / Constants.defaultTileSize / capacity
+        internal.scale = root.tilesSpace / Constants.tileSize / capacity
         centerTileHOffset -= 0.5
         centerTileVOffset -= 0.5
 
@@ -182,11 +199,17 @@ Item {
 
     function expandSouthWest() {
         capacity++
-        Constants.mapScale = root.tilesSpace / Constants.defaultTileSize / capacity
+        internal.scale = root.tilesSpace / Constants.tileSize / capacity
         centerTileHOffset += 0.5
         centerTileVOffset -= 0.5
 
         boardRepositioned()
+    }
+
+    QtObject {
+        id: internal
+        property int boardLength
+        property real scale: 1.0
     }
 
     Item {
@@ -196,13 +219,8 @@ Item {
 
         clip: true
 
-        QtObject {
-            id: internal
-            property int boardLength
-        }
-
         Component.onCompleted: {
-            internal.boardLength = capacity * Constants.defaultTileSize
+            internal.boardLength = capacity * Constants.tileSize
         }
 
         Image {
@@ -223,8 +241,8 @@ Item {
             }
 
             anchors.centerIn: parent
-            anchors.horizontalCenterOffset: centerTileCenterHOffset * Constants.tileSize
-            anchors.verticalCenterOffset: centerTileCenterVOffset * Constants.tileSize
+            anchors.horizontalCenterOffset: centerTileCenterHOffset * Constants.tileSize * internal.scale
+            anchors.verticalCenterOffset: centerTileCenterVOffset * Constants.tileSize * internal.scale
 
             Behavior on anchors.horizontalCenterOffset { NumberAnimation { duration: 200 } }
             Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 200 } }
@@ -245,8 +263,8 @@ Item {
                                                          !engine.mapModel.YRangeDefined)
                     readonly property bool isPlayable: inHorizontal && inVertictal
 
-                    width: Constants.tileSize
-                    height: Constants.tileSize
+                    width: Constants.tileSize * internal.scale
+                    height: Constants.tileSize * internal.scale
                     color: isPlayable ? "transparent" : "cyan"
                     border.color: root.activeDrag ? "silver" : "transparent"
 

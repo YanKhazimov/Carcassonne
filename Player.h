@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QColor>
 #include <QTimer>
+#include <QJsonObject>
 #include "Tile.h"
 
 class Player : public QObject
@@ -54,6 +55,7 @@ class Player : public QObject
 
 public:
     Player(QColor color, QString name, QObject *parent = nullptr);
+    Player(const QJsonObject& json, QObject *parent = nullptr);
     Player(Player&& other) noexcept;
 
     QColor getColor() const;
@@ -62,6 +64,7 @@ public:
     void setActive(bool value);
 
     std::shared_ptr<Tile> createAbbeyTile();
+    void deserializeAbbeyTile(const QJsonObject& json);
     Tile* getAbbeyTile();
 
     Q_INVOKABLE void scorePoints(int points);
@@ -92,6 +95,7 @@ public:
     int getPrevTurnsSeconds() const;
     int getCurrentTurnSeconds() const;
     Q_INVOKABLE void setTimerRunning(bool value);
+    QJsonObject serialilze() const;
 
 signals:
     void isActiveChanged();

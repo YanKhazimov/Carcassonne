@@ -18,6 +18,7 @@ public:
 private slots:
     void onDataChanged(QModelIndex first, QModelIndex last, QVector<int> roles);
     void onRowsInserted(const QModelIndex &source_parent, int first, int last);
+    void onSourceReset();
 
 protected:
     bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override;

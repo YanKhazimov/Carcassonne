@@ -1,7 +1,7 @@
 import QtQuick 2.15
+import EngineEnums 1.0
 
 Road_North {
     rotation: 180
-    currentId: tileData ? tileData.RoadSouthId : invalidId
-    visible: tileData && tileData.RoadSouth
+    objectData: tileData ? tileData.RoadSouthObject : null
 }

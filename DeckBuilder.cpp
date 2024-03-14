@@ -5,17 +5,17 @@
 
 #define X_(i,n) for(int i = 0; i < n; ++i)
 
-std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QString& imageFormat)
+std::vector<std::shared_ptr<Tile>> DeckBuilder::BuildDeck(const QString& imagesFolder, const QString& imageFormat)
 {
-    std::list<Tile> tiles;
+    std::vector<std::shared_ptr<Tile>> tiles;
 
     auto addTile = [&imagesFolder, &imageFormat, &tiles]
-        (const std::vector<std::pair<std::shared_ptr<MapObjectData>, TileData::ObjectLocation>>& objects, const QString& filename, int imageRotation)
+        (const std::vector<std::pair<std::shared_ptr<TileObject>, TileData::ObjectLocation>>& objects, const QString& filename, int imageRotation)
     {
         QString imagePath = QString("%1/%2/%3.%4").arg(QDir::currentPath(), imagesFolder, filename, imageFormat);
         if (QFileInfo::exists(imagePath))
         {
-            tiles.emplace_back(objects, QUrl::fromLocalFile(imagePath), imageRotation);
+            tiles.emplace_back(new Tile(objects, QUrl::fromLocalFile(imagePath), imageRotation));
         }
         else
         {
@@ -24,6 +24,7 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
     };
 
     auto objectManager = ObjectManager::instance();
+    objectManager->reset();
 
     addTile({
                 { objectManager->GenerateField(), { {0, 0}, {0, 2}, {0, 4} } },
@@ -32,9 +33,18 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
                 { objectManager->GenerateTown(1), { {4, 2} } }
             }, "18", 270);
     addTile({
+                { objectManager->GenerateTown(2, QmlEnums::Cloth), { {0, 0}, {2, 0}, {4, 0}, {0, 2}, {0, 4}, {4, 4} } },
+                { objectManager->GenerateRoad(1), { {2, 4} } },
+                { objectManager->GenerateRoad(1), { {4, 2} } },
+                { objectManager->GenerateField(), { {1, 4} } },
+                { objectManager->GenerateField(), { {3, 4} } },
+                { objectManager->GenerateField(), { {4, 1} } },
+                { objectManager->GenerateField(), { {4, 3} } }
+            }, "5", 0);
+    addTile({
                 { objectManager->GenerateMonastery(), { {2, 2} } },
                 { objectManager->GenerateField(), { {0, 0} } },
-                { objectManager->GenerateField(), { {4, 0} } },
+                   { objectManager->GenerateField(), { {4, 0} } },
                 { objectManager->GenerateField(), { {0, 4} } },
                 { objectManager->GenerateField(), { {4, 4} } },
                 { objectManager->GenerateRoad(1), { {0, 2} } },
@@ -52,7 +62,6 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
                         { objectManager->GenerateRoad(1), { {2, 4} } },
                         { objectManager->GenerateTown(1), { {4, 2} } }
                     }, "1", 0);
-    return tiles;
     addTile({
                 { objectManager->GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {0, 4}, {4, 4} } },
                 { objectManager->GenerateTown(1), { {0, 2} } },
@@ -94,6 +103,7 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
                         { objectManager->GenerateTown(1), { {0, 2} } },
                         { objectManager->GenerateField(), { {0, 0}, {2, 0}, {4, 0}, {4, 2}, {4, 4}, {2, 4}, {0, 4} } }
                     }, "7", 0);
+    return tiles;
     X_(i, 9)
             addTile({
                         { objectManager->GenerateRoad(2), { {2, 4}, {4, 2} } },
@@ -560,6 +570,28 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
     return tiles;
 }
 
+std::vector<std::shared_ptr<Tile>> DeckBuilder::BuildDeck(const QJsonArray &json)
+{
+    std::vector<std::shared_ptr<Tile>> tiles;
+
+    for (int objectIndex = 0; objectIndex < json.size(); ++objectIndex)
+    {
+        QJsonObject tileJson = json.at(objectIndex).toObject();
+        const QString pathPrefix = QDir::currentPath() + "/img/pnp/tiles";
+        const QString imagePath = QString("%1/%2").arg(pathPrefix, tileJson["imageUrl"].toString());
+        if (QFileInfo::exists(imagePath))
+        {
+            tiles.push_back(std::make_shared<Tile>(tileJson, pathPrefix));
+        }
+        else
+        {
+            qWarning() << QString("File %1 is missing, excluding from the deck.").arg(imagePath);
+        }
+    }
+
+    return tiles;
+}
+
 std::shared_ptr<Tile> DeckBuilder::createAbbeyTile(const QString &imagesFolder, const QString &imageFormat)
 {
     QString imagePath = QString("%1/%2/%3.%4").arg(QDir::currentPath(), imagesFolder, "abbey", imageFormat);
@@ -572,5 +604,17 @@ std::shared_ptr<Tile> DeckBuilder::createAbbeyTile(const QString &imagesFolder, 
                                            { ObjectManager::instance()->GenerateAbbey(),
                                             { {0, 0}, {0, 2}, {0, 4}, {2, 0}, {2, 2}, {2, 4}, {4, 0}, {4, 2}, {4, 4} } }
                                   },
-                                  QUrl::fromLocalFile(imagePath), 0));
+                                          QUrl::fromLocalFile(imagePath), 0));
+}
+
+std::shared_ptr<Tile> DeckBuilder::readAbbeyTile(const QJsonObject &json)
+{
+    const QString pathPrefix = QDir::currentPath() + "/img/pnp/tiles";
+    QString imagePath = QString("%1/%2").arg(pathPrefix, json["imageUrl"].toString());
+    if (!QFileInfo::exists(imagePath))
+    {
+        qWarning() << QString("File %1 is missing, excluding from the deck.").arg(imagePath);
+        return nullptr;
+    }
+    return std::make_shared<Tile>(json, pathPrefix);
 }

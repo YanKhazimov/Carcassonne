@@ -2,6 +2,7 @@
 #define QMLPRESENTER_H
 
 #include <QObject>
+#include <QJsonObject>
 #include "Tile.h"
 #include "TilesModel.h"
 #include "MapModel.h"
@@ -44,6 +45,8 @@ public:
     Q_ENUM(GameState)
 
 private:
+    std::vector<std::shared_ptr<Tile>> deserializeTiles(const QJsonArray &json);
+    void setDeck(const std::vector<std::shared_ptr<Tile>>& tiles);
     TilesModel deck;
 
     RemainingTilesModel remainingTilesModel;
@@ -67,6 +70,7 @@ private:
 
     GameState gameState;
 
+    void deserializePlayers(const QJsonArray &json, std::vector<Tile *> &abbeyTiles);
     PlayersModel players;
     PlayersModel* getPlayers();
     int getPlayerCount() const;
@@ -101,8 +105,8 @@ private:
 
     std::set<unsigned> scorableFields;
     QVariantList getScorableFields() const;
-    void addMeepleToObject(std::shared_ptr<MapObjectData>& object, QmlEnums::MeepleType meepleType, int playerIndex, Tile* tile);
-    void removeMeepleFromObject(std::shared_ptr<MapObjectData>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
+    void addMeepleToObject(std::shared_ptr<TileObject>& object, QmlEnums::MeepleType meepleType, int playerIndex, qreal tileXRatio, qreal tileYRatio);
+    void removeMeepleFromObject(std::shared_ptr<TileObject>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
 
     int bonusTurn = -1;
 
@@ -115,11 +119,16 @@ private:
     void onObjectCompleted(unsigned objectId);
     void logObjectCompletion(unsigned objectId);
     void onTileFixed(Tile *tile);
+    bool processGameEnd(int fixedTilesCount);
+    QJsonObject serializeGameState();
+    void deserializeGameState(const QJsonObject &json);
+    void connectTiles(const std::vector<std::shared_ptr<Tile>>& tiles);
+    void calculateUnassignedResources(const std::vector<std::shared_ptr<Tile>>& tiles);
 
 public:
     explicit QmlPresenter(QObject *parent = nullptr);
 
-    void AddTiles(std::list<Tile> &tiles);
+    Q_INVOKABLE void createRandomTiles();
     Q_INVOKABLE Tile* getTile(int i);
     Q_INVOKABLE Tile* getRemainingTile(int i);
     Q_INVOKABLE void highlight(int id);
@@ -128,13 +137,15 @@ public:
     Q_INVOKABLE Player* getPlayer(int i);
     Q_INVOKABLE Tile* getAbbeyTile(int i);
     Q_INVOKABLE void passTurn(int fixedTilesCount);
-    Q_INVOKABLE void placeMeeple(int meepleType, int playerIndex, unsigned objectId, Tile *tile);
+    Q_INVOKABLE void placeMeeple(int meepleType, int playerIndex, unsigned objectId, qreal tileXRatio, qreal tileYRatio);
     Q_INVOKABLE void scoreField(unsigned fieldCurrentId);
     Q_INVOKABLE bool canPlaceMeeple(unsigned objectId, int playerIndex, int type, Tile *tile) const;
     Q_INVOKABLE bool isFieldObject(unsigned objectId) const;
     Q_INVOKABLE void setWaitingCursor(bool value);
-    bool processGameEnd(int fixedTilesCount);
     Q_INVOKABLE void fixTile(Tile* tile);
+    Q_INVOKABLE void saveGame();
+    Q_INVOKABLE void loadGame();
+    Q_INVOKABLE QList<MeepleInfo> activeMeeples();
 
 signals:
     void tilesChanged();
@@ -152,6 +163,7 @@ signals:
     void scorableFieldsChanged();
     void gameLogChanged();
     void pointsScored(int points, QColor playerColor, Tile* tile);
+    void gameObjectsLoaded();
 };
 
 #endif // QMLPRESENTER_H
