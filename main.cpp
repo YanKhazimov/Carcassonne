@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
 
+    qRegisterMetaType<TileObject*>("TileObject*");
+    qmlRegisterUncreatableType<TileObject>("com.carcassonne.cppTypes", 1, 0, "TileObject", "");
     qmlRegisterUncreatableType<Tile>("com.carcassonne.cppTypes", 1, 0, "TileData", "");
     qmlRegisterUncreatableType<Player>("com.carcassonne.cppTypes", 1, 0, "Player", "");
     qmlRegisterUncreatableType<QmlPresenter>("QmlPresenter", 1, 0, "GameEngine",

@@ -50,7 +50,7 @@ public:
     Q_INVOKABLE bool canMergeRotated(int x, int y, Tile* tile) const;
     bool fitsCurrentBoard(Tile* tile) const;
     bool canMergeAbbeyTile() const;
-    std::shared_ptr<const MapObjectData> builderObjectProgression(Tile* tile, int activePlayer) const;
+    std::shared_ptr<const TileObject> builderObjectProgression(Tile* tile, int activePlayer) const;
 
     Tile* nextTileNorth(int x, int y) const;
     Tile* nextTileSouth(int x, int y) const;

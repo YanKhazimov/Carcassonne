@@ -3,8 +3,7 @@ import QtQuick.Shapes 1.15
 import "qrc:/"
 
 Road_NorthSouth {
-    currentId: tileData ? tileData.RoadLongNorthId : invalidId
-    visible: tileData && tileData.RoadLongNorth
+    objectData: tileData ? tileData.RoadLongNorth : null
 
     ShapePath {
         startX: side/2 + halfRoadWidth

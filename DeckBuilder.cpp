@@ -10,7 +10,7 @@ std::list<Tile> DeckBuilder::BuildDeck(const QString& imagesFolder, const QStrin
     std::list<Tile> tiles;
 
     auto addTile = [&imagesFolder, &imageFormat, &tiles]
-        (const std::vector<std::pair<std::shared_ptr<MapObjectData>, TileData::ObjectLocation>>& objects, const QString& filename, int imageRotation)
+        (const std::vector<std::pair<std::shared_ptr<TileObject>, TileData::ObjectLocation>>& objects, const QString& filename, int imageRotation)
     {
         QString imagePath = QString("%1/%2/%3.%4").arg(QDir::currentPath(), imagesFolder, filename, imageFormat);
         if (QFileInfo::exists(imagePath))

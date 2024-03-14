@@ -160,7 +160,7 @@ int MeeplePlaceLogRecord::objectId() const
 }
 
 FieldMeepleReleaseLogRecord::FieldMeepleReleaseLogRecord(QColor color, QString name,
-                                                         const std::vector<MapObjectData::MeepleInfo>& meeples, QObject *parent)
+                                                         const std::vector<TileObject::MeepleInfo>& meeples, QObject *parent)
     : PlayerSpecificLogRecord(QmlEnums::LogRecordType::LogMeeplesReleased, color, name, parent)
 {
     m_meeplesModel.add(meeples);
@@ -195,7 +195,7 @@ QHash<int, QByteArray> MeepleInfoModel::roleNames() const
     };
 }
 
-void MeepleInfoModel::add(const std::vector<MapObjectData::MeepleInfo>& meeples)
+void MeepleInfoModel::add(const std::vector<TileObject::MeepleInfo>& meeples)
 {
     beginResetModel();
 //    beginInsertRows(QModelIndex(), m_meeples.size(), m_meeples.size() + meeples.size() - 1);

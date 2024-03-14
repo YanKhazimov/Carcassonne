@@ -9,275 +9,157 @@ class Tile : public QObject, public TileData
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool Abbey READ hasAbbey NOTIFY layoutChanged)
-    Q_PROPERTY(int AbbeyId READ abbeyId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Abbey READ abbeyObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Monastery READ hasMonastery NOTIFY layoutChanged)
-    Q_PROPERTY(int MonasteryId READ monasteryId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Monastery READ monasteryObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool RoadBlock READ hasRoadBlock NOTIFY layoutChanged)
+    Q_PROPERTY(bool HasRoadBlock READ hasRoadBlock NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldWhole READ hasFieldWhole NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldWholeId READ fieldWholeId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldWhole READ fieldWholeObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldNorth READ hasFieldHalfNorth NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldNorthId READ fieldHalfNorthId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldEast READ hasFieldHalfEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldEastId READ fieldHalfEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldSouth READ hasFieldHalfSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldSouthId READ fieldHalfSouthId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldWest READ hasFieldHalfWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldWestId READ fieldHalfWestId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldNorth READ fieldHalfNorthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldEast READ fieldHalfEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldSouth READ fieldHalfSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldWest READ fieldHalfWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldNorthEast READ hasFieldNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldNorthEastId READ id_NE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldSouthEast READ hasFieldSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldSouthEastId READ id_SE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldSouthWest READ hasFieldSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldSouthWestId READ id_SW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldNorthWest READ hasFieldNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldNorthWestId READ id_NW NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldNorthEast READ fieldNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldSouthEast READ fieldSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldSouthWest READ fieldSouthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldNorthWest READ fieldNorthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldArc3cNorthEast READ hasFieldArc3cNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldArc3cNorthEastId READ fieldArc3cNorthEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldArc3cNorthWest READ hasFieldArc3cNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldArc3cNorthWestId READ fieldArc3cNorthWestId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldArc3cSouthEast READ hasFieldArc3cSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldArc3cSouthEastId READ fieldArc3cSouthEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldArc3cSouthWest READ hasFieldArc3cSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldArc3cSouthWestId READ fieldArc3cSouthWestId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldArc3cNorthEast READ fieldArc3cNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldArc3cNorthWest READ fieldArc3cNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldArc3cSouthEast READ fieldArc3cSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldArc3cSouthWest READ fieldArc3cSouthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldArcNorth READ hasFieldArc2cNorth NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldArcNorthId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldArcEast READ hasFieldArc2cEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldArcEastId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldArcSouth READ hasFieldArc2cSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldArcSouthId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldArcWest READ hasFieldArc2cWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldArcWestId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldArcNorth READ fieldArc2cNorthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldArcEast READ fieldArc2cEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldArcSouth READ fieldArc2cSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldArcWest READ fieldArc2cWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Field3qNoNorthEast READ hasField3qNoNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Field3qNoNorthEastId READ field3qNoNorthEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Field3qNoNorthWest READ hasField3qNoNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Field3qNoNorthWestId READ field3qNoNorthWestId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Field3qNoSouthEast READ hasField3qNoSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Field3qNoSouthEastId READ field3qNoSouthEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Field3qNoSouthWest READ hasField3qNoSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Field3qNoSouthWestId READ field3qNoSouthWestId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Field3qNoNorthEast READ field3qNoNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Field3qNoNorthWest READ field3qNoNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Field3qNoSouthEast READ field3qNoSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Field3qNoSouthWest READ field3qNoSouthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldDiagonalNWSE READ hasFieldDiagonalNWSE NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldDiagonalNWSEId READ fieldDiagonalNWSEId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldDiagonalNESW READ hasFieldDiagonalNESW NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldDiagonalNESWId READ fieldDiagonalNESWId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldDiagonalNWSE READ fieldDiagonalNWSEObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldDiagonalNESW READ fieldDiagonalNESWObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldLTriangleNorthEast READ hasFieldLTriangleNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldLTriangleNorthEastId READ id_NE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldLTriangleNorthWest READ hasFieldLTriangleNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldLTriangleNorthWestId READ id_NW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldLTriangleSouthEast READ hasFieldLTriangleSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldLTriangleSouthEastId READ id_SE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldLTriangleSouthWest READ hasFieldLTriangleSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldLTriangleSouthWestId READ id_SW NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldLTriangleNorthEast READ fieldLTriangleNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldLTriangleNorthWest READ fieldLTriangleNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldLTriangleSouthEast READ fieldLTriangleSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldLTriangleSouthWest READ fieldLTriangleSouthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldJTriangleNorthEast READ hasFieldJTriangleNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldJTriangleNorthEastId READ id_NE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldJTriangleNorthWest READ hasFieldJTriangleNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldJTriangleNorthWestId READ id_NW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldJTriangleSouthEast READ hasFieldJTriangleSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldJTriangleSouthEastId READ id_SE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldJTriangleSouthWest READ hasFieldJTriangleSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldJTriangleSouthWestId READ id_SW NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldJTriangleNorthEast READ fieldJTriangleNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldJTriangleNorthWest READ fieldJTriangleNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldJTriangleSouthEast READ fieldJTriangleSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldJTriangleSouthWest READ fieldJTriangleSouthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldLTrapezoidNorthEast READ hasFieldLTrapezoidNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldLTrapezoidNorthEastId READ id_NE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldLTrapezoidNorthWest READ hasFieldLTrapezoidNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldLTrapezoidNorthWestId READ id_NW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldLTrapezoidSouthEast READ hasFieldLTrapezoidSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldLTrapezoidSouthEastId READ id_SE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldLTrapezoidSouthWest READ hasFieldLTrapezoidSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldLTrapezoidSouthWestId READ id_SW NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldLTrapezoidNorthEast READ fieldLTrapezoidNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldLTrapezoidNorthWest READ fieldLTrapezoidNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldLTrapezoidSouthEast READ fieldLTrapezoidSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldLTrapezoidSouthWest READ fieldLTrapezoidSouthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldJTrapezoidNorthEast READ hasFieldJTrapezoidNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldJTrapezoidNorthEastId READ id_NE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldJTrapezoidNorthWest READ hasFieldJTrapezoidNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldJTrapezoidNorthWestId READ id_NW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldJTrapezoidSouthEast READ hasFieldJTrapezoidSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldJTrapezoidSouthEastId READ id_SE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldJTrapezoidSouthWest READ hasFieldJTrapezoidSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldJTrapezoidSouthWestId READ id_SW NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldJTrapezoidNorthEast READ fieldJTrapezoidNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldJTrapezoidNorthWest READ fieldJTrapezoidNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldJTrapezoidSouthEast READ fieldJTrapezoidSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldJTrapezoidSouthWest READ fieldJTrapezoidSouthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool FieldHalfQuarterNEE READ hasFieldHalfQuarterNEE NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldHalfQuarterNEEId READ id_NEE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldHalfQuarterSEE READ hasFieldHalfQuarterSEE NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldHalfQuarterSEEId READ id_SEE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldHalfQuarterSSE READ hasFieldHalfQuarterSSE NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldHalfQuarterSSEId READ id_SSE NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldHalfQuarterSSW READ hasFieldHalfQuarterSSW NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldHalfQuarterSSWId READ id_SSW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldHalfQuarterSWW READ hasFieldHalfQuarterSWW NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldHalfQuarterSWWId READ id_SWW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldHalfQuarterNWW READ hasFieldHalfQuarterNWW NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldHalfQuarterNWWId READ id_NWW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldHalfQuarterNNW READ hasFieldHalfQuarterNNW NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldHalfQuarterNNWId READ id_NNW NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool FieldHalfQuarterNNE READ hasFieldHalfQuarterNNE NOTIFY layoutChanged)
-    Q_PROPERTY(int FieldHalfQuarterNNEId READ id_NNE NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* FieldHalfQuarterNEE READ fieldNEEObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldHalfQuarterSEE READ fieldSEEObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldHalfQuarterSSE READ fieldSSEObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldHalfQuarterSSW READ fieldSSWObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldHalfQuarterSWW READ fieldSWWObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldHalfQuarterNWW READ fieldNWWObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldHalfQuarterNNW READ fieldNNWObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* FieldHalfQuarterNNE READ fieldNNEObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool RoadLongNorth READ hasRoadLongNorth NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadLongNorthId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadLongEast READ hasRoadLongEast NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadLongEastId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadLongSouth READ hasRoadLongSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadLongSouthId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadLongWest READ hasRoadLongWest NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadLongWestId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* RoadLongNorth READ roadLongNorthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadLongEast READ roadLongEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadLongSouth READ roadLongSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadLongWest READ roadLongWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool RoadNorth READ hasRoadNorth NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadNorthId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadEast READ hasRoadEast NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadEastId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadSouth READ hasRoadSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadSouthId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadWest READ hasRoadWest NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadWestId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* RoadNorth READ roadNorthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadEastObject READ roadEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadSouthObject READ roadSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadWestObject READ roadWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool RoadNorthSouth READ hasRoadNorthSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadNorthSouthId READ roadNorthSouthId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadEastWest READ hasRoadEastWest NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadEastWestId READ roadEastWestId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* RoadNorthSouth READ roadNorthSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadEastWest READ roadEastWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool RoadDownThroughTownNorthSouth READ hasRoadDownThroughTownNorthSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadDownThroughTownNorthSouthId READ roadDownThroughTownNorthSouthId() NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadDownThroughTownEastWest READ hasRoadDownThroughTownEastWest() NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadDownThroughTownEastWestId READ roadDownThroughTownEastWestId() NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadDownThroughTownSouthNorth READ hasRoadDownThroughTownSouthNorth() NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadDownThroughTownSouthNorthId READ roadDownThroughTownSouthNorthId() NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool RoadDownThroughTownWestEast READ hasRoadDownThroughTownWestEast() NOTIFY layoutChanged)
-    Q_PROPERTY(int RoadDownThroughTownWestEastId READ roadDownThroughTownWestEastId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* RoadDownThroughTownNorthSouth READ roadDownThroughTownNorthSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadDownThroughTownEastWest READ roadDownThroughTownEastWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadDownThroughTownSouthNorth READ roadDownThroughTownSouthNorthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* RoadDownThroughTownWestEast READ roadDownThroughTownWestEastObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool T_NorthWestSouthRoad READ hasT_NorthWestSouthRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int T_NorthWestSouthRoadId READ T_NorthWestSouthRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool T_WestSouthEastRoad READ hasT_WestSouthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int T_WestSouthEastRoadId READ T_WestSouthEastRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool T_SouthEastNorthRoad READ hasT_SouthEastNorthRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int T_SouthEastNorthRoadId READ T_SouthEastNorthRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool T_EastNorthWestRoad READ hasT_EastNorthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int T_EastNorthWestRoadId READ T_EastNorthWestRoadId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* T_NorthWestSouthRoad READ T_NorthWestSouthRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* T_WestSouthEastRoad READ T_WestSouthEastRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* T_SouthEastNorthRoad READ T_SouthEastNorthRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* T_EastNorthWestRoad READ T_EastNorthWestRoadObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool C_ToTown_NorthEastRoad READ hasC_ToTown_NorthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_ToTown_NorthEastRoadId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_ToTown_NorthWestRoad READ hasC_ToTown_NorthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_ToTown_NorthWestRoadId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_ToTown_SouthEastRoad READ hasC_ToTown_SouthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_ToTown_SouthEastRoadId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_ToTown_SouthWestRoad READ hasC_ToTown_SouthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_ToTown_SouthWestRoadId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_ToTown_EastNorthRoad READ hasC_ToTown_EastNorthRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_ToTown_EastNorthRoadId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_ToTown_WestNorthRoad READ hasC_ToTown_WestNorthRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_ToTown_WestNorthRoadId READ id_W NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_ToTown_EastSouthRoad READ hasC_ToTown_EastSouthRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_ToTown_EastSouthRoadId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_ToTown_WestSouthRoad READ hasC_ToTown_WestSouthRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_ToTown_WestSouthRoadId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* C_ToTown_NorthEastRoad READ C_ToTownNorthEastRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_ToTown_NorthWestRoad READ C_ToTownNorthWestRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_ToTown_SouthEastRoad READ C_ToTownSouthEastRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_ToTown_SouthWestRoad READ C_ToTownSouthWestRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_ToTown_EastNorthRoad READ C_ToTownEastNorthRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_ToTown_WestNorthRoad READ C_ToTownWestNorthRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_ToTown_EastSouthRoad READ C_ToTownEastSouthRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_ToTown_WestSouthRoad READ C_ToTownWestSouthRoadObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool C_NorthEastRoad READ hasC_NorthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_NorthEastRoadId READ C_NorthEastRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_NorthWestRoad READ hasC_NorthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_NorthWestRoadId READ C_NorthWestRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_SouthEastRoad READ hasC_SouthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_SouthEastRoadId READ C_SouthEastRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool C_SouthWestRoad READ hasC_SouthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int C_SouthWestRoadId READ C_SouthWestRoadId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* C_NorthEastRoad READ C_NorthEastRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_NorthWestRoad READ C_NorthWestRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_SouthEastRoad READ C_SouthEastRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* C_SouthWestRoad READ C_SouthWestRoadObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool L_NorthEastRoad READ hasL_NorthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int L_NorthEastRoadId READ L_NorthEastRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool L_NorthWestRoad READ hasL_NorthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int L_NorthWestRoadId READ L_NorthWestRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool L_SouthEastRoad READ hasL_SouthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int L_SouthEastRoadId READ L_SouthEastRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool L_SouthWestRoad READ hasL_SouthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int L_SouthWestRoadId READ L_SouthWestRoadId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* L_NorthEastRoad READ L_NorthEastRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* L_NorthWestRoad READ L_NorthWestRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* L_SouthEastRoad READ L_SouthEastRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* L_SouthWestRoad READ L_SouthWestRoadObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool J_NorthWestRoad READ hasJ_NorthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int J_NorthWestRoadId READ J_NorthWestRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool J_NorthEastRoad READ hasJ_NorthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int J_NorthEastRoadId READ J_NorthEastRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool J_SouthWestRoad READ hasJ_SouthWestRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int J_SouthWestRoadId READ J_SouthWestRoadId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool J_SouthEastRoad READ hasJ_SouthEastRoad NOTIFY layoutChanged)
-    Q_PROPERTY(int J_SouthEastRoadId READ J_SouthEastRoadId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* J_NorthWestRoad READ J_NorthWestRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* J_NorthEastRoad READ J_NorthEastRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* J_SouthWestRoad READ J_SouthWestRoadObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* J_SouthEastRoad READ J_SouthEastRoadObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Town1eArcNorth READ hasTown1eArcNorth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1eArcNorthId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1eArcEast READ hasTown1eArcEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1eArcEastId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1eArcSouth READ hasTown1eArcSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1eArcSouthId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1eArcWest READ hasTown1eArcWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1eArcWestId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Town1eArcNorth READ town1eArcNorthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1eArcEast READ town1eArcEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1eArcSouth READ town1eArcSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1eArcWest READ town1eArcWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Town1eBridgeNorth READ hasTown1eBridgeNorth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1eBridgeNorthId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1eBridgeEast READ hasTown1eBridgeEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1eBridgeEastId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1eBridgeSouth READ hasTown1eBridgeSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1eBridgeSouthId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1eBridgeWest READ hasTown1eBridgeWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1eBridgeWestId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Town1eBridgeNorth READ town1eBridgeNorthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1eBridgeEast READ town1eBridgeEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1eBridgeSouth READ town1eBridgeSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1eBridgeWest READ town1eBridgeWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Town1e4cNorth READ hasTown1e4cNorth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1e4cNorthId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1e4cEast READ hasTown1e4cEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1e4cEastId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1e4cSouth READ hasTown1e4cSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1e4cSouthId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1e4cWest READ hasTown1e4cWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1e4cWestId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Town1e4cNorth READ town1e4cNorthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1e4cEast READ town1e4cEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1e4cSouth READ town1e4cSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1e4cWest READ town1e4cWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Town1e3cNorthToSouthEast READ hasTown1e3cNorthToSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1e3cNorthToSouthEastId READ id_N NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1e3cEastToSouthWest READ hasTown1e3cEastToSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1e3cEastToSouthWestId READ id_E NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1e3cSouthToNorthWest READ hasTown1e3cSouthToNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1e3cSouthToNorthWestId READ id_S NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town1e3cWestToNorthEast READ hasTown1e3cWestToNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town1e3cWestToNorthEastId READ id_W NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Town1e3cNorthToSouthEast READ town1e3cNorthToSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1e3cEastToSouthWest READ town1e3cEastToSouthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1e3cSouthToNorthWest READ town1e3cSouthToNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town1e3cWestToNorthEast READ town1e3cWestToNorthEastObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Town2eNorthSouth READ hasTown2eNorthSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2eNorthSouthId READ town2eNorthSouthId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town2eEastWest READ hasTown2eEastWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2eEastWestId READ town2eEastWestId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Town2eNorthSouth READ town2eNorthSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town2eEastWest READ town2eEastWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Town2e2cNorthEast READ hasTown2e2cNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2e2cNorthEastId READ town2e2cNorthEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town2e2cNorthWest READ hasTown2e2cNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2e2cNorthWestId READ town2e2cNorthWestId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town2e2cSouthEast READ hasTown2e2cSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2e2cSouthEastId READ town2e2cSouthEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town2e2cSouthWest READ hasTown2e2cSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2e2cSouthWestId READ town2e2cSouthWestId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Town2e2cNorthEast READ town2e2cNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town2e2cNorthWest READ town2e2cNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town2e2cSouthEast READ town2e2cSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town2e2cSouthWest READ town2e2cSouthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Town2e3cNorthEast READ hasTown2e3cNorthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2e3cNorthEastId READ town2e3cNorthEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town2e3cNorthWest READ hasTown2e3cNorthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2e3cNorthWestId READ town2e3cNorthWestId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town2e3cSouthEast READ hasTown2e3cSouthEast NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2e3cSouthEastId READ town2e3cSouthEastId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town2e3cSouthWest READ hasTown2e3cSouthWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town2e3cSouthWestId READ town2e3cSouthWestId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Town2e3cNorthEast READ town2e3cNorthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town2e3cNorthWest READ town2e3cNorthWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town2e3cSouthEast READ town2e3cSouthEastObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town2e3cSouthWest READ town2e3cSouthWestObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool Town3e4cNorthEastWest READ hasTown3e4cNorthEastWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town3e4cNorthEastWestId READ town3e4cNorthEastWestId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town3e4cEastNorthSouth READ hasTown3e4cEastNorthSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town3e4cEastNorthSouthId READ town3e4cEastNorthSouthId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town3e4cSouthEastWest READ hasTown3e4cSouthEastWest NOTIFY layoutChanged)
-    Q_PROPERTY(int Town3e4cSouthEastWestId READ town3e4cSouthEastWestId NOTIFY objectIdsChanged)
-    Q_PROPERTY(bool Town3e4cWestNorthSouth READ hasTown3e4cWestNorthSouth NOTIFY layoutChanged)
-    Q_PROPERTY(int Town3e4cWestNorthSouthId READ town3e4cWestNorthSouthId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* Town3e4cNorthEastWest READ town3e4cNorthEastWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town3e4cEastNorthSouth READ town3e4cEastNorthSouthObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town3e4cSouthEastWest READ town3e4cSouthEastWestObject NOTIFY layoutChanged)
+    Q_PROPERTY(TileObject* Town3e4cWestNorthSouth READ town3e4cWestNorthSouthObject NOTIFY layoutChanged)
 
-    Q_PROPERTY(bool TownWhole READ hasTownWhole NOTIFY layoutChanged)
-    Q_PROPERTY(int TownWholeId READ townWholeId NOTIFY objectIdsChanged)
+    Q_PROPERTY(TileObject* TownWhole READ townWholeObject NOTIFY layoutChanged)
 
 
     Q_PROPERTY(QUrl Picture MEMBER imageUrl CONSTANT)
@@ -301,10 +183,162 @@ class Tile : public QObject, public TileData
     void setPlaced(bool placed);
     void setPosition(int x, int y);
 
-    void checkObjectCompletion(std::shared_ptr<MapObjectData> object) override;
+    void checkObjectCompletion(std::shared_ptr<TileObject> object) override;
+
+    TileObject* abbeyObject() const;
+
+    TileObject* monasteryObject() const;
+
+    // bool hasRoadBlock() const;
+
+    TileObject* fieldWholeObject() const;
+
+    TileObject* fieldHalfNorthObject() const;
+    TileObject* fieldHalfEastObject() const;
+    TileObject* fieldHalfSouthObject() const;
+    TileObject* fieldHalfWestObject() const;
+
+    TileObject* fieldNorthEastObject() const;
+    TileObject* fieldSouthEastObject() const;
+    TileObject* fieldSouthWestObject() const;
+    TileObject* fieldNorthWestObject() const;
+
+    TileObject* fieldArc2cNorthObject() const;
+    TileObject* fieldArc2cEastObject() const;
+    TileObject* fieldArc2cSouthObject() const;
+    TileObject* fieldArc2cWestObject() const;
+
+    TileObject* fieldArc3cNorthEastObject() const;
+    TileObject* fieldArc3cSouthEastObject() const;
+    TileObject* fieldArc3cSouthWestObject() const;
+    TileObject* fieldArc3cNorthWestObject() const;
+
+    TileObject* field3qNoNorthEastObject() const;
+    TileObject* field3qNoNorthWestObject() const;
+    TileObject* field3qNoSouthEastObject() const;
+    TileObject* field3qNoSouthWestObject() const;
+
+    TileObject* fieldDiagonalNWSEObject() const;
+    TileObject* fieldDiagonalNESWObject() const;
+
+    TileObject* fieldLTriangleNorthEastObject() const;
+    TileObject* fieldLTriangleNorthWestObject() const;
+    TileObject* fieldLTriangleSouthEastObject() const;
+    TileObject* fieldLTriangleSouthWestObject() const;
+
+    TileObject* fieldJTriangleNorthEastObject() const;
+    TileObject* fieldJTriangleNorthWestObject() const;
+    TileObject* fieldJTriangleSouthEastObject() const;
+    TileObject* fieldJTriangleSouthWestObject() const;
+
+    TileObject* fieldLTrapezoidNorthEastObject() const;
+    TileObject* fieldLTrapezoidNorthWestObject() const;
+    TileObject* fieldLTrapezoidSouthEastObject() const;
+    TileObject* fieldLTrapezoidSouthWestObject() const;
+
+    TileObject* fieldJTrapezoidNorthEastObject() const;
+    TileObject* fieldJTrapezoidNorthWestObject() const;
+    TileObject* fieldJTrapezoidSouthEastObject() const;
+    TileObject* fieldJTrapezoidSouthWestObject() const;
+
+    TileObject* fieldNEEObject() const;
+    TileObject* fieldSEEObject() const;
+    TileObject* fieldSSEObject() const;
+    TileObject* fieldSSWObject() const;
+    TileObject* fieldSWWObject() const;
+    TileObject* fieldNWWObject() const;
+    TileObject* fieldNNWObject() const;
+    TileObject* fieldNNEObject() const;
+
+    TileObject* roadNorthObject() const;
+    TileObject* roadEastObject() const;
+    TileObject* roadSouthObject() const;
+    TileObject* roadWestObject() const;
+
+    TileObject* roadLongNorthObject() const;
+    TileObject* roadLongEastObject() const;
+    TileObject* roadLongSouthObject() const;
+    TileObject* roadLongWestObject() const;
+
+    TileObject* C_ToTownNorthEastRoadObject() const;
+    TileObject* C_ToTownNorthWestRoadObject() const;
+    TileObject* C_ToTownSouthEastRoadObject() const;
+    TileObject* C_ToTownSouthWestRoadObject() const;
+    TileObject* C_ToTownEastNorthRoadObject() const;
+    TileObject* C_ToTownEastSouthRoadObject() const;
+    TileObject* C_ToTownWestNorthRoadObject() const;
+    TileObject* C_ToTownWestSouthRoadObject() const;
+
+    TileObject* roadNorthSouthObject() const;
+    TileObject* roadEastWestObject() const;
+
+    TileObject* roadDownThroughTownNorthSouthObject() const;
+    TileObject* roadDownThroughTownEastWestObject() const;
+    TileObject* roadDownThroughTownSouthNorthObject() const;
+    TileObject* roadDownThroughTownWestEastObject() const;
+
+    TileObject* T_NorthWestSouthRoadObject() const;
+    TileObject* T_WestSouthEastRoadObject() const;
+    TileObject* T_SouthEastNorthRoadObject() const;
+    TileObject* T_EastNorthWestRoadObject() const;
+
+    TileObject* C_NorthEastRoadObject() const;
+    TileObject* C_NorthWestRoadObject() const;
+    TileObject* C_SouthEastRoadObject() const;
+    TileObject* C_SouthWestRoadObject() const;
+
+    TileObject* L_NorthEastRoadObject() const;
+    TileObject* L_NorthWestRoadObject() const;
+    TileObject* L_SouthEastRoadObject() const;
+    TileObject* L_SouthWestRoadObject() const;
+
+    TileObject* J_NorthWestRoadObject() const;
+    TileObject* J_NorthEastRoadObject() const;
+    TileObject* J_SouthWestRoadObject() const;
+    TileObject* J_SouthEastRoadObject() const;
+
+    TileObject* town1eArcNorthObject() const;
+    TileObject* town1eArcEastObject() const;
+    TileObject* town1eArcSouthObject() const;
+    TileObject* town1eArcWestObject() const;
+
+    TileObject* town1eBridgeNorthObject() const;
+    TileObject* town1eBridgeEastObject() const;
+    TileObject* town1eBridgeSouthObject() const;
+    TileObject* town1eBridgeWestObject() const;
+
+    TileObject* town1e4cNorthObject() const;
+    TileObject* town1e4cEastObject() const;
+    TileObject* town1e4cSouthObject() const;
+    TileObject* town1e4cWestObject() const;
+
+    TileObject* town1e3cNorthToSouthEastObject() const;
+    TileObject* town1e3cEastToSouthWestObject() const;
+    TileObject* town1e3cSouthToNorthWestObject() const;
+    TileObject* town1e3cWestToNorthEastObject() const;
+
+    TileObject* town2eNorthSouthObject() const;
+    TileObject* town2eEastWestObject() const;
+
+    TileObject* town2e2cNorthEastObject() const;
+    TileObject* town2e2cNorthWestObject() const;
+    TileObject* town2e2cSouthEastObject() const;
+    TileObject* town2e2cSouthWestObject() const;
+
+    TileObject* town2e3cNorthEastObject() const;
+    TileObject* town2e3cNorthWestObject() const;
+    TileObject* town2e3cSouthEastObject() const;
+    TileObject* town2e3cSouthWestObject() const;
+
+    TileObject* town3e4cNorthEastWestObject() const;
+    TileObject* town3e4cEastNorthSouthObject() const;
+    TileObject* town3e4cSouthEastWestObject() const;
+    TileObject* town3e4cWestNorthSouthObject() const;
+
+    TileObject* townWholeObject() const;
 
 public:
-    explicit Tile(const std::vector<std::pair<std::shared_ptr<MapObjectData>, TileData::ObjectLocation>>& objects, const QUrl& imageUrl, int imageRotation, QObject *parent = nullptr);
+    explicit Tile(const std::vector<std::pair<std::shared_ptr<TileObject>, TileData::ObjectLocation>>& objects, const QUrl& imageUrl, int imageRotation, QObject *parent = nullptr);
     Tile(Tile&& other) noexcept;
     Q_INVOKABLE void rotateClockwise();
     Q_INVOKABLE void rotateCounterclockwise();

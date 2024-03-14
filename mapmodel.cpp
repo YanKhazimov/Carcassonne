@@ -74,7 +74,7 @@ bool MapModel::canMergeAbbeyTile() const
     return false;
 }
 
-std::shared_ptr<const MapObjectData> MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
+std::shared_ptr<const TileObject> MapModel::builderObjectProgression(Tile *tile, int activePlayer) const
 {
     const int x = tile->getX();
     const int y = tile->getY();

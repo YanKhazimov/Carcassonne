@@ -101,8 +101,8 @@ private:
 
     std::set<unsigned> scorableFields;
     QVariantList getScorableFields() const;
-    void addMeepleToObject(std::shared_ptr<MapObjectData>& object, QmlEnums::MeepleType meepleType, int playerIndex, Tile* tile);
-    void removeMeepleFromObject(std::shared_ptr<MapObjectData>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
+    void addMeepleToObject(std::shared_ptr<TileObject>& object, QmlEnums::MeepleType meepleType, int playerIndex, Tile* tile);
+    void removeMeepleFromObject(std::shared_ptr<TileObject>& object, const std::set<QmlEnums::MeepleType>& typesToRemove);
 
     int bonusTurn = -1;
 

@@ -1,41 +1,46 @@
-#include "MapObjectData.h"
+#include "TileObject.h"
 #include "ObjectManager.h"
 #include "Tile.h"
 
 using namespace QmlEnums;
 
-MapObjectData::MapObjectData(ObjectType t, unsigned i, int v)
+TileObject::TileObject(ObjectType t, unsigned i, int v)
     : type(t), initialId(i), initialValency(v)
 {
 }
 
-std::shared_ptr<MapObjectData> MapObjectData::currentObject() const
+std::shared_ptr<TileObject> TileObject::currentObject() const
 {
     return ObjectManager::instance()->GetObject(initialId);
 }
 
-void MapObjectData::mergeObject(std::shared_ptr<MapObjectData> other, std::set<Tile*>& updatedTiles)
+int TileObject::currentId() const
 {
-    ObjectManager::instance()->MergeObjectIds(std::make_shared<MapObjectData>(*this), other, updatedTiles);
+    return currentObject()->initialId;
 }
 
-void MapObjectData::setTile(Tile *tilePtr)
+void TileObject::mergeObject(std::shared_ptr<TileObject> other, std::set<Tile*>& updatedTiles)
+{
+    ObjectManager::instance()->MergeObjectIds(ObjectManager::instance()->GetObject(initialId), other, updatedTiles);
+}
+
+void TileObject::setTile(Tile *tilePtr)
 {
     tile = tilePtr;
 }
 
-QmlEnums::BonusType MapObjectData::getBonusType() const
+QmlEnums::BonusType TileObject::getBonusType() const
 {
     return bonusType;
 }
 
-bool MapObjectData::isCompleted() const
+bool TileObject::isCompleted() const
 {
     return completedCentralObject;
 }
 
 Town::Town(int _valency, unsigned id, QmlEnums::BonusType _bonusType)
-    : MapObjectData(ObjectType::Town, id, _valency)
+    : TileObject(ObjectType::Town, id, _valency)
 {
     valency = _valency;
     bonusType = _bonusType;
@@ -47,13 +52,13 @@ bool Town::isCompleted() const
     return valency == 0;
 }
 
-void MapObjectData::markCompleted()
+void TileObject::markCompleted()
 {
     completedCentralObject = true;
 }
 
 Road::Road(int _valency, unsigned id, QmlEnums::BonusType _bonusType)
-    : MapObjectData(ObjectType::Road, id, _valency)
+    : TileObject(ObjectType::Road, id, _valency)
 {
     valency = _valency;
     bonusType = _bonusType;
@@ -66,12 +71,12 @@ bool Road::isCompleted() const
 }
 
 Field::Field(unsigned id)
-    : MapObjectData(ObjectType::Field, id, -1)
+    : TileObject(ObjectType::Field, id, -1)
 {
 }
 
 Abbey::Abbey(unsigned id)
-    : MapObjectData(ObjectType::Abbey, id, -1)
+    : TileObject(ObjectType::Abbey, id, -1)
 {
     // setting valency to 1 so that it closes every connection
     valency = 1;
@@ -79,12 +84,12 @@ Abbey::Abbey(unsigned id)
 }
 
 Monastery::Monastery(unsigned id)
-    : MapObjectData(ObjectType::Monastery, id, -1)
+    : TileObject(ObjectType::Monastery, id, -1)
 {
     pointValue = 9;
 }
 
-std::list<MapObjectData::MeepleInfo> MapObjectData::freeMeeples(const std::set<QmlEnums::MeepleType>& typesToRemove)
+std::list<TileObject::MeepleInfo> TileObject::freeMeeples(const std::set<QmlEnums::MeepleType>& typesToRemove)
 {
     std::list<MeepleInfo> removedMeeples;
     for (const auto& object: group())
@@ -107,7 +112,7 @@ std::list<MapObjectData::MeepleInfo> MapObjectData::freeMeeples(const std::set<Q
     return removedMeeples;
 }
 
-std::vector<int> MapObjectData::mostPresentPlayers() const
+std::vector<int> TileObject::mostPresentPlayers() const
 {
     std::vector<int> result;
 
@@ -142,7 +147,7 @@ std::vector<int> MapObjectData::mostPresentPlayers() const
     return result;
 }
 
-std::set<int> MapObjectData::pigs() const
+std::set<int> TileObject::pigs() const
 {
     std::set<int> result;
 
@@ -158,7 +163,7 @@ std::set<int> MapObjectData::pigs() const
     return result;
 }
 
-bool MapObjectData::meeplePresent(const std::set<QmlEnums::MeepleType> &types, int playerIndex) const
+bool TileObject::meeplePresent(const std::set<QmlEnums::MeepleType> &types, int playerIndex) const
 {
     for (const auto& object: group())
     {
@@ -174,19 +179,19 @@ bool MapObjectData::meeplePresent(const std::set<QmlEnums::MeepleType> &types, i
     return false;
 }
 
-bool MapObjectData::taken() const
+bool TileObject::taken() const
 {
     return playerPresence.hasBeenTaken;
 }
 
-std::vector<std::shared_ptr<MapObjectData> > MapObjectData::group() const
+std::vector<std::shared_ptr<TileObject> > TileObject::group() const
 {
     auto dependencies = ObjectManager::instance()->GetObjectDependencies(currentObject()->initialId);
     dependencies.push_back(ObjectManager::instance()->GetObject(initialId));
     return dependencies;
 }
 
-void MapObjectData::addMeeple(int playerIndex, MeepleType meepleType, Tile *tile)
+void TileObject::addMeeple(int playerIndex, MeepleType meepleType, Tile *tile)
 {
     playerPresence.meeples.push_back({ playerIndex, meepleType, tile });
     playerPresence.hasBeenTaken = true;

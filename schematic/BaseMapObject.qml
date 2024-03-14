@@ -7,8 +7,10 @@ import "qrc:/"
 Shape {
     id: root
 
-    required property int currentId
+    required property TileObject objectData
+    required property TileData tileData
     readonly property int invalidId: 0
+    readonly property int currentId: objectData ? objectData.CurrentId : invalidId
     readonly property bool highlighted: engine && engine.HighlightedObjectId === currentId
     readonly property int side: parent.width
     readonly property real town1eOffset: side / 5
@@ -17,12 +19,12 @@ Shape {
     readonly property real town2eOffset: side * 35 / 100
     readonly property real town2eRadius: (side * side) / (8 * town2eOffset) + town2eOffset / 2
     property alias idLabel: idLabel
-    required property TileData tileData
     readonly property int bonusSideIndex: (rotation + 360) % 360 / 90
 
     readonly property color fieldColor: (engine && engine.GameState === GameEngine.GameEnd && engine.ScorableFields.includes(currentId))
                                         ? Constants.color.schematic.scorableField : Constants.color.schematic.field
 
+    visible: objectData
     width: side
     height: side
     containsMode: Shape.FillContains

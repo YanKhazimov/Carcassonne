@@ -4,9 +4,9 @@
 
 ObjectManager* ObjectManager::m_instance = nullptr;
 
-std::shared_ptr<MapObjectData> ObjectManager::generateVoid()
+std::shared_ptr<TileObject> ObjectManager::generateVoid()
 {
-    mapObjects[-1] = { std::make_shared<MapObjectData>(ObjectType::None, -1, -1), 0, {} };
+    mapObjects[-1] = { std::make_shared<TileObject>(ObjectType::None, -1, -1), 0, {} };
     return std::get<0>(mapObjects[-1]);
 }
 
@@ -24,31 +24,31 @@ ObjectManager *ObjectManager::instance()
     return m_instance;
 }
 
-std::shared_ptr<MapObjectData> ObjectManager::GenerateRoad(unsigned valency, QmlEnums::BonusType bonusType)
+std::shared_ptr<TileObject> ObjectManager::GenerateRoad(unsigned valency, QmlEnums::BonusType bonusType)
 {
     mapObjects[objectCounter] = { std::make_shared<Road>(valency, objectCounter, bonusType), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
-std::shared_ptr<MapObjectData> ObjectManager::GenerateTown(unsigned valency, QmlEnums::BonusType bonusType)
+std::shared_ptr<TileObject> ObjectManager::GenerateTown(unsigned valency, QmlEnums::BonusType bonusType)
 {
     mapObjects[objectCounter] = { std::make_shared<Town>(valency, objectCounter, bonusType), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
-std::shared_ptr<MapObjectData> ObjectManager::GenerateField()
+std::shared_ptr<TileObject> ObjectManager::GenerateField()
 {
     mapObjects[objectCounter] = { std::make_shared<Field>(objectCounter), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
-std::shared_ptr<MapObjectData> ObjectManager::GenerateAbbey()
+std::shared_ptr<TileObject> ObjectManager::GenerateAbbey()
 {
     mapObjects[objectCounter] = { std::make_shared<Abbey>(objectCounter), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
 }
 
-std::shared_ptr<MapObjectData> ObjectManager::GenerateMonastery()
+std::shared_ptr<TileObject> ObjectManager::GenerateMonastery()
 {
     mapObjects[objectCounter] = { std::make_shared<Monastery>(objectCounter), 0, {} };
     return std::get<0>(mapObjects[objectCounter++]);
@@ -59,19 +59,19 @@ unsigned ObjectManager::VoidId() const
     return voidId;
 }
 
-std::shared_ptr<MapObjectData> ObjectManager::GetObject(unsigned id) const
+std::shared_ptr<TileObject> ObjectManager::GetObject(unsigned id) const
 {
     auto [objectPtr, substituteId, slaves] = mapObjects.at(id);
     return substituteId == 0 ? objectPtr : GetObject(substituteId);
 }
 
-std::vector<std::shared_ptr<MapObjectData> > ObjectManager::GetObjectDependencies(unsigned id) const
+std::vector<std::shared_ptr<TileObject> > ObjectManager::GetObjectDependencies(unsigned id) const
 {
     return std::get<2>(mapObjects.at(id));
 }
 
-void ObjectManager::MergeObjectIds(std::shared_ptr<MapObjectData> absorbingObject,
-            std::shared_ptr<MapObjectData> absorbedObject, std::set<Tile*>& updatedTiles)
+void ObjectManager::MergeObjectIds(std::shared_ptr<TileObject> absorbingObject,
+            std::shared_ptr<TileObject> absorbedObject, std::set<Tile*>& updatedTiles)
 {
     unsigned masterId = absorbingObject->currentObject()->initialId;
     unsigned slaveId = absorbedObject->currentObject()->initialId;
@@ -84,12 +84,14 @@ void ObjectManager::MergeObjectIds(std::shared_ptr<MapObjectData> absorbingObjec
         slaveMaster = masterId;
         masterDependencies.push_back(slaveObject);
         updatedTiles.insert(slaveObject->tile);
+        emit slaveObject->currentIdChanged(masterId);
 
         masterDependencies.insert(masterDependencies.end(), slaveDependencies.begin(), slaveDependencies.end());
 
         for (auto& dep: slaveDependencies)
         {
             updatedTiles.insert(dep->tile);
+            emit dep->currentIdChanged(masterId);
         }
         slaveDependencies.clear();
     }
@@ -139,9 +141,9 @@ int ObjectManager::getPoints(unsigned objectId)
     std::set<Tile*> tiles({object->tile});
     int pointSourceValue = object->pointValue;
     int pointSourceCount = 1;
-    if (object->bonusType == QmlEnums::BonusType::Shield)
+    if (object->getBonusType() == QmlEnums::BonusType::Shield)
         ++pointSourceCount;
-    else if (object->bonusType == QmlEnums::BonusType::DoubleShield)
+    else if (object->getBonusType() == QmlEnums::BonusType::DoubleShield)
         pointSourceCount += 2;
 
     for (auto& slave: slaveObjects)
@@ -151,9 +153,9 @@ int ObjectManager::getPoints(unsigned objectId)
         if (tiles.insert(slave->tile).second)
         {
             ++pointSourceCount;
-            if (slave->bonusType == QmlEnums::BonusType::Shield)
+            if (slave->getBonusType() == QmlEnums::BonusType::Shield)
                 ++pointSourceCount;
-            else if (slave->bonusType == QmlEnums::BonusType::DoubleShield)
+            else if (slave->getBonusType() == QmlEnums::BonusType::DoubleShield)
                 pointSourceCount += 2;
         }
     }
@@ -165,8 +167,8 @@ int ObjectManager::countTownsAround(unsigned objectId)
 {
     if (auto object = GetObject(objectId); object->type == ObjectType::Field)
     {
-        std::set<std::shared_ptr<MapObjectData>> adjacentTowns;
-        std::vector<std::shared_ptr<MapObjectData>> group = GetObjectDependencies(objectId);
+        std::set<std::shared_ptr<TileObject>> adjacentTowns;
+        std::vector<std::shared_ptr<TileObject>> group = GetObjectDependencies(objectId);
         group.push_back(object);
 
         for (auto& tileObject: group)

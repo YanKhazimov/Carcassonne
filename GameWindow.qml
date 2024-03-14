@@ -27,13 +27,17 @@ Item {
 
     function tryPauseGame() {
         if (engine.GameState !== GameEngine.Initialization && internal.gameViewLoadProgress === 1.0) {
-            engine.getPlayer(engine.ActivePlayer).setTimerRunning(false)
+            if (engine.GameState !== GameEngine.GameEnd) {
+                engine.getPlayer(engine.ActivePlayer).setTimerRunning(false)
+            }
             pauseAnimation.start()
         }
     }
 
     function unpauseGame() {
-        engine.getPlayer(engine.ActivePlayer).setTimerRunning(true)
+        if (engine.GameState !== GameEngine.GameEnd) {
+            engine.getPlayer(engine.ActivePlayer).setTimerRunning(true)
+        }
         unpauseAnimation.start()
     }
 

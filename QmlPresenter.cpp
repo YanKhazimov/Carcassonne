@@ -418,7 +418,7 @@ QVariantList QmlPresenter::getScorableFields() const
     return QVariantList(scorableFields.begin(), scorableFields.end());
 }
 
-void QmlPresenter::addMeepleToObject(std::shared_ptr<MapObjectData> &object, QmlEnums::MeepleType meepleType, int playerIndex, Tile *tile)
+void QmlPresenter::addMeepleToObject(std::shared_ptr<TileObject> &object, QmlEnums::MeepleType meepleType, int playerIndex, Tile *tile)
 {
     object->addMeeple(playerIndex, meepleType, tile);
     if (object->type == ObjectType::Field)
@@ -428,7 +428,7 @@ void QmlPresenter::addMeepleToObject(std::shared_ptr<MapObjectData> &object, Qml
     }
 }
 
-void QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
+void QmlPresenter::removeMeepleFromObject(std::shared_ptr<TileObject> &object, const std::set<QmlEnums::MeepleType> &typesToRemove)
 {
     auto removedMeeples = object->freeMeeples(typesToRemove);
     if (object->type == ObjectType::Field && object->mostPresentPlayers().empty())
@@ -441,7 +441,7 @@ void QmlPresenter::removeMeepleFromObject(std::shared_ptr<MapObjectData> &object
     {
         Player* player = getPlayer(activePlayer());
         Logger::instance()->logEffect(std::make_shared<FieldMeepleReleaseLogRecord>(player->getColor(), player->getName(),
-                                                                                    std::vector<MapObjectData::MeepleInfo>(removedMeeples.begin(), removedMeeples.end())));
+                                                                                    std::vector<TileObject::MeepleInfo>(removedMeeples.begin(), removedMeeples.end())));
     }
 }
 
@@ -544,7 +544,7 @@ bool QmlPresenter::processGameEnd(int fixedTilesCount)
 
 void QmlPresenter::fixTile(Tile *tile)
 {
-    std::shared_ptr<const MapObjectData> builderObject(nullptr);
+    std::shared_ptr<const TileObject> builderObject(nullptr);
     if (bonusTurn != Logger::instance()->currentTurn() && (builderObject = mapModel.builderObjectProgression(tile, activePlayer())))
     {
         bonusTurn = Logger::instance()->currentTurn() + 1;

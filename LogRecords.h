@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include "DataTypes.h"
-//#include "MapObjectData.h"
 #include "Tile.h"
 #include <QAbstractListModel>
 
@@ -127,7 +126,7 @@ class MeepleInfoModel: public QAbstractListModel
 {
     Q_OBJECT
 
-    std::vector<MapObjectData::MeepleInfo> m_meeples;
+    std::vector<TileObject::MeepleInfo> m_meeples;
 
 public:
     MeepleInfoModel(QObject* parent = nullptr);
@@ -135,7 +134,7 @@ public:
     Q_INVOKABLE virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
-    void add(const std::vector<MapObjectData::MeepleInfo>& meeples);
+    void add(const std::vector<TileObject::MeepleInfo>& meeples);
 };
 
 class FieldMeepleReleaseLogRecord : public PlayerSpecificLogRecord
@@ -145,7 +144,7 @@ class FieldMeepleReleaseLogRecord : public PlayerSpecificLogRecord
     MeepleInfoModel m_meeplesModel;
 
 public:
-    explicit FieldMeepleReleaseLogRecord(QColor color, QString name, const std::vector<MapObjectData::MeepleInfo>& meeples, QObject* parent = nullptr);
+    explicit FieldMeepleReleaseLogRecord(QColor color, QString name, const std::vector<TileObject::MeepleInfo>& meeples, QObject* parent = nullptr);
 
     virtual MeepleInfoModel* meeples() override;
 };

@@ -19,20 +19,20 @@ bool sameType(T type0, const Ts&... args)
 }
 
 template<typename ... T>
-bool sameInitialId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
+bool sameInitialId(const std::shared_ptr<TileObject>& obj0, const T&... args)
 {
     return ((obj0->initialId == args->initialId) && ...);
 }
 
 template<typename ... T>
-bool sameId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
+bool sameId(const std::shared_ptr<TileObject>& obj0, const T&... args)
 {
     return ((obj0->currentObject()->initialId == args->currentObject()->initialId) && ...);
 }
 
 // ! returns InvalidId in case the ids are not all equal, the id otherwise
 template <typename ... T>
-unsigned commonId(const std::shared_ptr<MapObjectData>& obj0, const T&... args)
+unsigned commonId(const std::shared_ptr<TileObject>& obj0, const T&... args)
 {
     return (((obj0->currentObject()->initialId == args->currentObject()->initialId) ? obj0->currentObject()->initialId : InvalidId) & ...);
 }
@@ -1132,7 +1132,7 @@ bool TileData::hasAnyJ_Road() const
             hasJ_SouthWestRoad();
 }
 
-std::shared_ptr<MapObjectData> TileData::getConnector(TileSide direction)
+std::shared_ptr<TileObject> TileData::getConnector(TileSide direction)
 {
     switch (direction) {
     case TileSide::North: return grid5x5[0][2]; break;
@@ -1143,7 +1143,7 @@ std::shared_ptr<MapObjectData> TileData::getConnector(TileSide direction)
     }
 }
 
-std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > TileData::getSideConnectors(TileSide direction) const
+std::pair<std::shared_ptr<TileObject>, std::shared_ptr<TileObject> > TileData::getSideConnectors(TileSide direction) const
 {
     switch (direction) {
     case TileSide::North: return { NNW() ? NNW() : NW(), NNE() ? NNE() : NE() }; break;
@@ -1154,7 +1154,7 @@ std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData> > TileD
     }
 }
 
-std::shared_ptr<const MapObjectData> TileData::checkConnector(TileSide direction) const
+std::shared_ptr<const TileObject> TileData::checkConnector(TileSide direction) const
 {
     switch (direction) {
     case TileSide::North: return N(); break;
@@ -1165,12 +1165,12 @@ std::shared_ptr<const MapObjectData> TileData::checkConnector(TileSide direction
     }
 }
 
-void TileData::checkObjectCompletion(std::shared_ptr<MapObjectData> object)
+void TileData::checkObjectCompletion(std::shared_ptr<TileObject> object)
 {
     qDebug() << "Reimplement me";
 }
 
-void TileData::mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject, std::shared_ptr<MapObjectData> absorbedObject) const
+void TileData::mergeObjectShapes(std::shared_ptr<TileObject> absorbingObject, std::shared_ptr<TileObject> absorbedObject) const
 {
     if (absorbedObject->initialId == absorbingObject->initialId)
     {
@@ -1189,23 +1189,23 @@ void TileData::mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject,
     }
 }
 
-const std::shared_ptr<MapObjectData> TileData::NW() const { return grid5x5[0][0]; }
-const std::shared_ptr<MapObjectData> TileData::NNW() const { return grid5x5[0][1]; }
-const std::shared_ptr<MapObjectData> TileData::N() const { return grid5x5[0][2]; }
-const std::shared_ptr<MapObjectData> TileData::NNE() const { return grid5x5[0][3]; }
-const std::shared_ptr<MapObjectData> TileData::NE() const { return grid5x5[0][4]; }
-const std::shared_ptr<MapObjectData> TileData::NWW() const { return grid5x5[1][0]; }
-const std::shared_ptr<MapObjectData> TileData::NEE() const { return grid5x5[1][4]; }
-const std::shared_ptr<MapObjectData> TileData::W() const { return grid5x5[2][0]; }
-const std::shared_ptr<MapObjectData> TileData::C() const { return grid5x5[2][2]; }
-const std::shared_ptr<MapObjectData> TileData::E() const { return grid5x5[2][4]; }
-const std::shared_ptr<MapObjectData> TileData::SWW() const { return grid5x5[3][0]; }
-const std::shared_ptr<MapObjectData> TileData::SEE() const { return grid5x5[3][4]; }
-const std::shared_ptr<MapObjectData> TileData::SW() const { return grid5x5[4][0]; }
-const std::shared_ptr<MapObjectData> TileData::SSW() const { return grid5x5[4][1]; }
-const std::shared_ptr<MapObjectData> TileData::S() const { return grid5x5[4][2]; }
-const std::shared_ptr<MapObjectData> TileData::SSE() const { return grid5x5[4][3]; }
-const std::shared_ptr<MapObjectData> TileData::SE() const { return grid5x5[4][4]; }
+const std::shared_ptr<TileObject> TileData::NW() const { return grid5x5[0][0]; }
+const std::shared_ptr<TileObject> TileData::NNW() const { return grid5x5[0][1]; }
+const std::shared_ptr<TileObject> TileData::N() const { return grid5x5[0][2]; }
+const std::shared_ptr<TileObject> TileData::NNE() const { return grid5x5[0][3]; }
+const std::shared_ptr<TileObject> TileData::NE() const { return grid5x5[0][4]; }
+const std::shared_ptr<TileObject> TileData::NWW() const { return grid5x5[1][0]; }
+const std::shared_ptr<TileObject> TileData::NEE() const { return grid5x5[1][4]; }
+const std::shared_ptr<TileObject> TileData::W() const { return grid5x5[2][0]; }
+const std::shared_ptr<TileObject> TileData::C() const { return grid5x5[2][2]; }
+const std::shared_ptr<TileObject> TileData::E() const { return grid5x5[2][4]; }
+const std::shared_ptr<TileObject> TileData::SWW() const { return grid5x5[3][0]; }
+const std::shared_ptr<TileObject> TileData::SEE() const { return grid5x5[3][4]; }
+const std::shared_ptr<TileObject> TileData::SW() const { return grid5x5[4][0]; }
+const std::shared_ptr<TileObject> TileData::SSW() const { return grid5x5[4][1]; }
+const std::shared_ptr<TileObject> TileData::S() const { return grid5x5[4][2]; }
+const std::shared_ptr<TileObject> TileData::SSE() const { return grid5x5[4][3]; }
+const std::shared_ptr<TileObject> TileData::SE() const { return grid5x5[4][4]; }
 
 void TileData::markCentralObjectCompleted()
 {
@@ -1218,13 +1218,13 @@ bool TileData::hasCentralScorableObject() const
     return hasAbbey() || hasMonastery();
 }
 
-void TileData::getAdjacentTowns(const std::shared_ptr<MapObjectData> &object, std::set<std::shared_ptr<MapObjectData>>& towns) const
+void TileData::getAdjacentTowns(const std::shared_ptr<TileObject> &object, std::set<std::shared_ptr<TileObject>>& towns) const
 {
     for (const auto& tileObject: tileObjects)
     {
         if (object == tileObject)
         {
-            auto checkInsert = [&towns](const std::shared_ptr<MapObjectData>& object) {
+            auto checkInsert = [&towns](const std::shared_ptr<TileObject>& object) {
                 if (object && object->type == ObjectType::Town && object->currentObject()->isCompleted())
                     towns.insert(object->currentObject());
             };
@@ -1364,7 +1364,7 @@ TileData& TileData::rotateClockwise(int times)
     return *this;
 }
 
-TileData::TileData(const std::vector<std::pair<std::shared_ptr<MapObjectData>, ObjectLocation>>& objects)
+TileData::TileData(const std::vector<std::pair<std::shared_ptr<TileObject>, ObjectLocation>>& objects)
     : grid5x5 {
               {nullptr,nullptr,nullptr,nullptr,nullptr},
               {nullptr,nullptr,nullptr,nullptr,nullptr},
@@ -1460,8 +1460,8 @@ void TileData::Connect(TileData &newTile, TileSide side, std::set<Tile*>& update
     // not checking the connection validity
 
     // merge objects
-    std::shared_ptr<MapObjectData> connectorObject = getConnector(side);
-    std::shared_ptr<MapObjectData> otherConnectorObject = newTile.getConnector(opposite(side));
+    std::shared_ptr<TileObject> connectorObject = getConnector(side);
+    std::shared_ptr<TileObject> otherConnectorObject = newTile.getConnector(opposite(side));
 
     switch (otherConnectorObject->type) {
     case ObjectType::Town: {

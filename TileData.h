@@ -2,30 +2,30 @@
 #define TILEDATA_H
 
 #include "DataTypes.h"
-#include "MapObjectData.h"
+#include "TileObject.h"
 #include <memory>
 #include <vector>
 #include <set>
 
 class TileData {
-    std::shared_ptr<MapObjectData> grid5x5[5][5];
+    std::shared_ptr<TileObject> grid5x5[5][5];
 
-    std::pair<std::shared_ptr<MapObjectData>, std::shared_ptr<MapObjectData>> getSideConnectors(TileSide direction) const;
-    std::shared_ptr<MapObjectData> getConnector(TileSide direction);
-    void mergeObjectShapes(std::shared_ptr<MapObjectData> absorbingObject, std::shared_ptr<MapObjectData> absorbedObject) const;
+    std::pair<std::shared_ptr<TileObject>, std::shared_ptr<TileObject>> getSideConnectors(TileSide direction) const;
+    std::shared_ptr<TileObject> getConnector(TileSide direction);
+    void mergeObjectShapes(std::shared_ptr<TileObject> absorbingObject, std::shared_ptr<TileObject> absorbedObject) const;
 
 public:
     void RotateClockwise();
     void RotateCounterclockwise();
     bool CanConnect(const TileData& other, TileSide from) const;
     void Connect(TileData& newTile, TileSide side, std::set<Tile*>& updatedTiles);
-    std::shared_ptr<const MapObjectData> checkConnector(TileSide direction) const;
+    std::shared_ptr<const TileObject> checkConnector(TileSide direction) const;
     TileData copy() const;
     TileData& rotateClockwise(int times = 1);
     void print() const;
     void markCentralObjectCompleted();
     bool hasCentralScorableObject() const;
-    void getAdjacentTowns(const std::shared_ptr<MapObjectData>& object, std::set<std::shared_ptr<MapObjectData>> &towns) const;
+    void getAdjacentTowns(const std::shared_ptr<TileObject>& object, std::set<std::shared_ptr<TileObject>> &towns) const;
     std::set<unsigned> getFieldObjectIds() const;
     unsigned NEBarnCornerId() const;
     unsigned NWBarnCornerId() const;
@@ -36,27 +36,27 @@ public:
     using ObjectLocation = std::vector<std::pair<int, int>>;
 
 protected:
-    std::vector<std::shared_ptr<MapObjectData>> tileObjects;
-    TileData(const std::vector<std::pair<std::shared_ptr<MapObjectData>, ObjectLocation>>& objects);
-    virtual void checkObjectCompletion(std::shared_ptr<MapObjectData> object);
+    std::vector<std::shared_ptr<TileObject>> tileObjects;
+    TileData(const std::vector<std::pair<std::shared_ptr<TileObject>, ObjectLocation>>& objects);
+    virtual void checkObjectCompletion(std::shared_ptr<TileObject> object);
 
-    const std::shared_ptr<MapObjectData> NW() const;
-    const std::shared_ptr<MapObjectData> NNW() const;
-    const std::shared_ptr<MapObjectData> N() const;
-    const std::shared_ptr<MapObjectData> NNE() const;
-    const std::shared_ptr<MapObjectData> NE() const;
-    const std::shared_ptr<MapObjectData> NWW() const;
-    const std::shared_ptr<MapObjectData> NEE() const;
-    const std::shared_ptr<MapObjectData> W() const;
-    const std::shared_ptr<MapObjectData> C() const;
-    const std::shared_ptr<MapObjectData> E() const;
-    const std::shared_ptr<MapObjectData> SWW() const;
-    const std::shared_ptr<MapObjectData> SEE() const;
-    const std::shared_ptr<MapObjectData> SW() const;
-    const std::shared_ptr<MapObjectData> SSW() const;
-    const std::shared_ptr<MapObjectData> S() const;
-    const std::shared_ptr<MapObjectData> SSE() const;
-    const std::shared_ptr<MapObjectData> SE() const;
+    const std::shared_ptr<TileObject> NW() const;
+    const std::shared_ptr<TileObject> NNW() const;
+    const std::shared_ptr<TileObject> N() const;
+    const std::shared_ptr<TileObject> NNE() const;
+    const std::shared_ptr<TileObject> NE() const;
+    const std::shared_ptr<TileObject> NWW() const;
+    const std::shared_ptr<TileObject> NEE() const;
+    const std::shared_ptr<TileObject> W() const;
+    const std::shared_ptr<TileObject> C() const;
+    const std::shared_ptr<TileObject> E() const;
+    const std::shared_ptr<TileObject> SWW() const;
+    const std::shared_ptr<TileObject> SEE() const;
+    const std::shared_ptr<TileObject> SW() const;
+    const std::shared_ptr<TileObject> SSW() const;
+    const std::shared_ptr<TileObject> S() const;
+    const std::shared_ptr<TileObject> SSE() const;
+    const std::shared_ptr<TileObject> SE() const;
 
     int id_NE() const;
     int id_SE() const;

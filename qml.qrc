@@ -5,7 +5,6 @@
         <file>Constants.qml</file>
         <file>qmldir</file>
         <file>InvertedOpacityMaskShader.qml</file>
-        <file>schematic/NorthWestTown2e2c.qml</file>
         <file>schematic/Town_2e2c_NorthEast.qml</file>
         <file>schematic/Road_L_NorthEast.qml</file>
         <file>schematic/Road_L_NorthWest.qml</file>
